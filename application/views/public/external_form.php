@@ -23,21 +23,13 @@ $inv = function ($k) use ($custom_errors) {
 		</div>
 
 		<!-- Header Banner -->
-		<div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden text-white" style="background: linear-gradient(135deg, #091e42 0%, #0c2e68 55%, #174291 100%);">
-			<div class="card-body p-4 p-md-4 position-relative">
-				<div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-					<span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold" style="font-size: 0.75rem;">
-						<i class="fa-solid fa-shield-halved me-1"></i> KHUSUS INSTANSI / LEMBAGA LAIN
-					</span>
-					<span class="badge bg-white bg-opacity-25 text-white rounded-pill px-2 py-1 small">Bukan Siswa</span>
-				</div>
-				<div class="badge bg-white text-primary px-3 py-1 rounded-pill mb-2 fw-semibold">
-					<i class="fa-solid fa-building-columns me-1"></i> Portal Instansi Luar &amp; Mitra
-				</div>
-				<h1 class="h4 fw-bold mb-1">Pengiriman Surat Kedinasan Masuk</h1>
-				<p class="small text-white-50 mb-0" style="max-width: 580px;">
-					Layanan penyerahan surat dinas, permohonan kerjasama, undangan resmi, atau surat edaran dari instansi pemerintah, DUDI, kepolisian, puskesmas, dan sekolah mitra secara online langsung ke Bagian Tata Usaha.
-				</p>
+		<div class="d-flex align-items-center gap-3 mb-4">
+			<div class="bg-primary bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:48px;height:48px;">
+				<i class="fa-solid fa-building-columns text-primary fs-5"></i>
+			</div>
+			<div>
+				<h1 class="h5 fw-bold text-navy mb-0">Kirim Surat Kedinasan</h1>
+				<p class="text-muted small mb-0">Upload surat dinas resmi langsung ke Tata Usaha sekolah</p>
 			</div>
 		</div>
 

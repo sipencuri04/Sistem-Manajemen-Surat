@@ -5,74 +5,30 @@ $icons = array(
 );
 ?>
 <!-- Hero Banner / Greeting -->
-<div class="app-hero-banner">
-	<div class="app-hero-pill">
-		<i class="fa-solid fa-bolt"></i> Layanan Mandiri Siswa
+<div class="d-flex align-items-center justify-content-between mb-3">
+	<div>
+		<h1 class="h5 fw-bold text-navy mb-0"><i class="fa-solid fa-file-circle-plus text-primary me-2"></i>Ajukan Surat Sekolah</h1>
+		<small class="text-muted">Pilih jenis surat yang Anda butuhkan</small>
 	</div>
-	<h1 class="app-hero-title">Ajukan Surat Sekolah Cepat &amp; Praktis</h1>
-	<p class="app-hero-desc">Pilih permohonan surat keterangan yang Anda butuhkan tanpa perlu antre di ruang TU. Pantau status dan cetak langsung dari smartphone Anda.</p>
-	
+	<a href="<?= site_url('permohonan/cek') ?>" class="btn-app-track" aria-label="Cek status permohonan">
+		<i class="fa-solid fa-magnifying-glass"></i>
+		<span>Cek Status</span>
+	</a>
 </div>
 
 
 
-<!-- Card Khusus: Pengiriman Surat dari Instansi Lain / Kedinasan (Sangat Jelas & Terpisah) -->
-<div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden position-relative" style="background: linear-gradient(135deg, #091e42 0%, #0c2e68 55%, #174291 100%);">
-	<div class="card-body p-3 p-md-4 text-white">
-		<div class="row align-items-center g-3">
-			<div class="col-lg-8">
-				<div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-					<span class="badge bg-warning text-dark fw-bold px-3 py-1 rounded-pill" style="font-size: 0.75rem; letter-spacing: 0.05em;">
-						<i class="fa-solid fa-shield-halved me-1"></i> KHUSUS INSTANSI / LEMBAGA LAIN
-					</span>
-					<span class="badge bg-white bg-opacity-25 text-white rounded-pill px-2 py-1 small">Bukan Siswa</span>
-				</div>
-				<h2 class="h5 fw-bold mb-1 text-white">Kirim Surat Masuk Kedinasan (Format PDF)</h2>
-				<p class="small text-white-50 mb-0">
-					Bagi <strong>Dinas Pendidikan, Instansi Pemerintah, Dunia Usaha (DUDI), Puskesmas, Kepolisian, atau Sekolah Mitra</strong> yang ingin mengirimkan surat resmi, undangan kedinasan, atau permohonan kerjasama secara online langsung ke Bagian Tata Usaha.
-				</p>
-			</div>
-			<div class="col-lg-4 text-lg-end">
-				<div class="d-flex flex-wrap gap-2 justify-content-lg-end">
-					<a href="<?= site_url('kirim-surat') ?>" class="btn btn-warning rounded-pill px-3 py-2 fw-bold shadow-sm text-dark">
-						<i class="fa-solid fa-file-arrow-up me-1"></i> Kirim Surat Sekarang &raquo;
-					</a>
-					<a href="<?= site_url('kirim-surat/status') ?>" class="btn btn-outline-light rounded-pill px-3 py-2 btn-sm">
-						<i class="fa-solid fa-receipt me-1"></i> Cek Resi Surat
-					</a>
-				</div>
-			</div>
-		</div>
+<!-- Card Instansi -->
+<div class="d-flex align-items-center gap-3 p-3 rounded-3 border mb-3" style="background:#f8faff;">
+	<i class="fa-solid fa-building-columns fa-lg text-primary flex-shrink-0"></i>
+	<div class="flex-grow-1 min-w-0">
+		<div class="fw-semibold small text-dark">Kirim Surat dari Instansi / Dinas?</div>
+		<div class="text-muted" style="font-size:0.8rem;">Upload surat dinas langsung ke Tata Usaha</div>
 	</div>
+	<a href="<?= site_url('kirim-surat') ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3 flex-shrink-0">Kirim &raquo;</a>
 </div>
 
-<!-- Process Step Cards (Mobile Carousel / Grid) -->
-<div class="d-flex align-items-center justify-content-between mb-2">
-	<h2 class="h6 fw-bold text-navy mb-0"><i class="fa-solid fa-route text-primary me-1"></i> Alur Permohonan</h2>
-	<a href="#modalAlur" data-bs-toggle="modal" class="small text-primary text-decoration-none fw-semibold">Detail &raquo;</a>
-</div>
-<div class="app-steps-grid">
-	<div class="app-step-card">
-		<div class="step-number-circle step-1">1</div>
-		<div class="step-label">Isi Form</div>
-		<div class="step-desc">Pilih surat &amp; data diri</div>
-	</div>
-	<div class="app-step-card">
-		<div class="step-number-circle step-2">2</div>
-		<div class="step-label">Kode Unik</div>
-		<div class="step-desc">Simpan kode lacak</div>
-	</div>
-	<div class="app-step-card">
-		<div class="step-number-circle step-3">3</div>
-		<div class="step-label">Verifikasi</div>
-		<div class="step-desc">TU proses di jam kerja</div>
-	</div>
-	<div class="app-step-card">
-		<div class="step-number-circle step-4">4</div>
-		<div class="step-label">Selesai</div>
-		<div class="step-desc">Cetak / ambil fisik</div>
-	</div>
-</div>
+
 
 <!-- Section: Letter Types -->
 <div id="daftarSurat" class="d-flex align-items-center justify-content-between mb-3 pt-2">
