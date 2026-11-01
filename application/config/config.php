@@ -50,7 +50,7 @@ if ($config['base_url'] === '' && isset($_SERVER['HTTP_HOST']) && preg_match('/^
 | variable so that it is blank.
 |
 */
-$config['index_page'] = ''; // kosong karena memakai .htaccess (URL rewriting)
+$config['index_page'] = 'index.php';
 
 /*
 |--------------------------------------------------------------------------
