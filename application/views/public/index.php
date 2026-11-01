@@ -5,13 +5,19 @@ $icons = array(
 );
 ?>
 <!-- Card Instansi -->
-<div class="d-flex align-items-center gap-3 p-3 rounded-3 border mb-3" style="background:#f8faff;">
-	<i class="fa-solid fa-building-columns fa-lg text-primary flex-shrink-0"></i>
-	<div class="flex-grow-1 min-w-0">
-		<div class="fw-semibold small text-dark">Kirim Surat dari Instansi / Dinas?</div>
-		<div class="text-muted" style="font-size:0.8rem;">Upload surat dinas langsung ke Tata Usaha</div>
+<div class="instansi-card mb-4">
+	<div class="instansi-card-badge">
+		<i class="fa-solid fa-shield-halved me-1"></i> KHUSUS INSTANSI / LEMBAGA LAIN
 	</div>
-	<a href="<?= site_url('kirim-surat') ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3 flex-shrink-0">Kirim &raquo;</a>
+	<span class="instansi-card-chip">Bukan Siswa</span>
+	<h2 class="instansi-card-title">Kirim Surat Masuk Kedinasan<br><span style="font-weight:700;">(Format PDF)</span></h2>
+	<p class="instansi-card-desc">Bagi <strong>Dinas Pendidikan, Instansi Pemerintah, Dunia Usaha (DUDI), Puskesmas, Kepolisian,</strong> atau <strong>Sekolah Mitra</strong> yang ingin mengirimkan surat resmi, undangan kedinasan, atau permohonan kerjasama secara online langsung ke Bagian Tata Usaha.</p>
+	<a href="<?= site_url('kirim-surat') ?>" class="instansi-card-btn-primary">
+		<i class="fa-solid fa-file-arrow-up me-1"></i> Kirim Surat Sekarang &raquo;
+	</a>
+	<a href="<?= site_url('permohonan/cek') ?>" class="instansi-card-btn-outline">
+		<i class="fa-solid fa-receipt me-1"></i> Cek Resi Surat
+	</a>
 </div>
 
 

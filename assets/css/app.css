@@ -1004,3 +1004,102 @@ a.list-mobile-item:hover, a.list-mobile-item:active { background: #f7f9fc; color
 	.sticky-actions > .btn:only-of-type { grid-column: 1 / -1; }
 	.content:has(.sticky-actions) { padding-bottom: 9rem; }
 }
+
+
+/* ============================================================
+   Card Instansi / Lembaga Lain - Public Portal
+   ============================================================ */
+.instansi-card {
+  background: #0d2c64;
+  background: linear-gradient(165deg, #0b2554 0%, #0d3273 100%);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  box-shadow: 0 10px 25px -5px rgba(11, 37, 84, 0.4);
+}
+.instansi-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f7a900;
+  color: #111827;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.35rem 0.85rem;
+  border-radius: 2rem;
+  width: fit-content;
+}
+.instansi-card-chip {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.16);
+  color: #f1f5f9;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.22rem 0.75rem;
+  border-radius: 2rem;
+  width: fit-content;
+  margin-top: -0.2rem;
+}
+.instansi-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 0;
+}
+.instansi-card-desc {
+  font-size: 0.84rem;
+  color: #9bb2d6;
+  line-height: 1.6;
+  margin: 0;
+}
+.instansi-card-desc strong {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+.instansi-card-btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #f7a900;
+  color: #0f172a !important;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 2rem;
+  text-decoration: none;
+  transition: all .2s ease;
+  box-shadow: 0 4px 12px rgba(247, 169, 0, 0.3);
+  margin-top: 0.25rem;
+}
+.instansi-card-btn-primary:hover {
+  background: #e09900;
+  color: #000 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(247, 169, 0, 0.4);
+}
+.instansi-card-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 2rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  width: fit-content;
+  transition: all .2s ease;
+}
+.instansi-card-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.8);
+  color: #ffffff !important;
+}
