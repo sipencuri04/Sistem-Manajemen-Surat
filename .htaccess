@@ -1,15 +1,10 @@
 # =============================================================
 # Sistem Manajemen Persuratan SMK - Apache (cPanel / Shared Hosting / Local)
 # =============================================================
-# Baris Options di-nonaktifkan karena sering memicu Error 500 pada shared hosting:
-# Options -Indexes
 DirectoryIndex index.php
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-
-    # Mencegah redirect loop pada Apache/LiteSpeed (penyebab Error 500 pada subfolder)
-    RewriteRule ^index\.php - [L]
 
     # Tolak akses langsung ke folder internal
     RewriteRule ^(application|system|vendor|database|storage)(/|$) - [F,L,NC]
@@ -19,5 +14,5 @@ DirectoryIndex index.php
     # Teruskan semua request non-file ke index.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php/$1 [L,QSA]
+    RewriteRule ^(.*)$ index.php [L,QSA]
 </IfModule>
