@@ -79,7 +79,13 @@
 		}
 	}
 
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+	// Otomatis deteksi: jika di localhost/Laragon -> development, jika di live hosting/cPanel -> production
+	$__host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+	$__is_local = in_array($__host, array('localhost', '127.0.0.1', 'sistem-manajemen-surat.test', 'sistem-manajemen-surat.local'), TRUE)
+		|| (isset($_SERVER['SERVER_ADDR']) && in_array($_SERVER['SERVER_ADDR'], array('127.0.0.1', '::1'), TRUE));
+	$__default_env = $__is_local ? 'development' : 'production';
+
+	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : $__default_env);
 
 /*
  *---------------------------------------------------------------

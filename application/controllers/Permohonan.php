@@ -13,8 +13,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Permohonan extends MY_Controller
 {
-	const MAX_PER_HOUR_IP   = 5;
-	const MAX_PER_DAY_IP    = 15;
+	// Disesuaikan untuk jaringan Wi-Fi sekolah / Lab (NAT 1 IP bersama)
+	const MAX_PER_HOUR_IP   = 50;
+	const MAX_PER_DAY_IP    = 200;
 	const MAX_PENDING_PHONE = 3;
 
 	public function __construct()

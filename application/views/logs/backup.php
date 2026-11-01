@@ -51,6 +51,26 @@
 	</div>
 
 	<div class="col-lg-4">
+		<div class="card mb-3">
+			<div class="card-header bg-white py-3">
+				<h2 class="h6 card-title mb-0 text-navy"><i class="fa-solid fa-hard-drive text-primary me-2"></i>Kapasitas Penyimpanan</h2>
+			</div>
+			<div class="card-body">
+				<div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+					<span class="small text-muted"><i class="fa-solid fa-file-pdf text-danger me-2"></i>Arsip Surat Keluar</span>
+					<span class="badge text-bg-light border fw-semibold"><?= e($storage_stats['letters']) ?></span>
+				</div>
+				<div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+					<span class="small text-muted"><i class="fa-solid fa-file-import text-info me-2"></i>Berkas Surat Masuk</span>
+					<span class="badge text-bg-light border fw-semibold"><?= e($storage_stats['incoming']) ?></span>
+				</div>
+				<div class="d-flex justify-content-between align-items-center">
+					<span class="small text-muted"><i class="fa-solid fa-database text-warning me-2"></i>Cadangan Database</span>
+					<span class="badge text-bg-light border fw-semibold"><?= e($storage_stats['backups']) ?></span>
+				</div>
+			</div>
+		</div>
+
 		<div class="card">
 			<div class="card-header bg-white py-3">
 				<h2 class="h6 card-title mb-0 text-navy"><i class="fa-solid fa-shield-halved text-success me-2"></i>Keamanan Cadangan</h2>

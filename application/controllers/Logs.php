@@ -96,9 +96,16 @@ class Logs extends Admin_Controller
 			usort($files, function ($a, $b) { return strcmp($b['name'], $a['name']); });
 		}
 
+		$storage_stats = array(
+			'letters'  => $this->dir_size(storage_path('letters')),
+			'incoming' => $this->dir_size(storage_path('incoming_letters')),
+			'backups'  => $this->dir_size($backup_dir),
+		);
+
 		$this->render('logs/backup', array(
-			'page_title' => 'Backup Database & Pemeliharaan',
-			'files'      => $files,
+			'page_title'    => 'Backup Database & Pemeliharaan',
+			'files'         => $files,
+			'storage_stats' => $storage_stats,
 		));
 	}
 
@@ -146,4 +153,43 @@ class Logs extends Admin_Controller
 			->set_header('Content-Length: '.filesize($path))
 			->set_output(file_get_contents($path));
 	}
+
+	public function clean_logs()
+	{
+		$this->require_post();
+		$log_dir = APPPATH.'logs';
+		$deleted = 0;
+		$today = date('Y-m-d');
+		if (is_dir($log_dir))
+		{
+			foreach (scandir($log_dir) as $f)
+			{
+				if (preg_match('/^log-(\d{4}-\d{2}-\d{2})\.php$/', $f, $m))
+				{
+					if ($m[1] !== $today)
+					{
+						@unlink($log_dir.'/'.$f);
+						$deleted++;
+					}
+				}
+			}
+		}
+		audit_log('CLEAN_LOGS', 'system', NULL, 'Membersihkan '.$deleted.' file log lama.');
+		set_flash('success', $deleted.' file log lama berhasil dibersihkan.');
+		redirect('log-sistem');
+	}
+
+	private function dir_size($dir)
+	{
+		$size = 0;
+		if (is_dir($dir))
+		{
+			foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)) as $file)
+			{
+				$size += $file->getSize();
+			}
+		}
+		return format_bytes($size);
+	}
+
 }

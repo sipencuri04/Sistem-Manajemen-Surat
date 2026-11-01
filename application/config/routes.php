@@ -112,6 +112,7 @@ $route['notifikasi/baca-semua']           = 'notifications/mark_all_read';
 // Log & Backup Sistem (Superuser)
 $route['log-aktivitas']                   = 'logs/audit';
 $route['log-sistem']                      = 'logs/system';
+$route['log-sistem/bersihkan']            = 'logs/clean_logs';
 $route['backup']                          = 'logs/backup';
 $route['backup/buat']                     = 'logs/create_backup';
 $route['backup/unduh/(:any)']             = 'logs/download_backup/$1';

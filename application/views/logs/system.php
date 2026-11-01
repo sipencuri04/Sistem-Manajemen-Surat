@@ -4,6 +4,13 @@
 		<h1 class="h4 fw-bold text-navy mb-1"><i class="fa-solid fa-triangle-exclamation me-2 text-danger"></i>Log Sistem &amp; Error</h1>
 		<p class="text-muted small mb-0">Pemantauan pesan error runtime, peringatan PHP, dan aktivitas background CodeIgniter.</p>
 	</div>
+	<?php if (!empty($files) && count($files) > 1): ?>
+		<?= form_open('log-sistem/bersihkan', array('data-confirm' => 'Bersihkan file log lama? Log hari ini tetap disimpan.')) ?>
+			<button type="submit" class="btn btn-outline-danger btn-sm">
+				<i class="fa-solid fa-broom me-1"></i> Bersihkan Log Lama
+			</button>
+		<?= form_close() ?>
+	<?php endif; ?>
 </div>
 
 <div class="row g-3">
