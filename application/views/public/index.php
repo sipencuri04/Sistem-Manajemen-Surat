@@ -4,20 +4,6 @@ $icons = array(
 	'selesai_pkl' => 'fa-certificate', 'rekomendasi' => 'fa-thumbs-up', 'izin' => 'fa-door-open',
 );
 ?>
-<!-- Hero Banner / Greeting -->
-<div class="d-flex align-items-center justify-content-between mb-3">
-	<div>
-		<h1 class="h5 fw-bold text-navy mb-0"><i class="fa-solid fa-file-circle-plus text-primary me-2"></i>Ajukan Surat Sekolah</h1>
-		<small class="text-muted">Pilih jenis surat yang Anda butuhkan</small>
-	</div>
-	<a href="<?= site_url('permohonan/cek') ?>" class="btn-app-track" aria-label="Cek status permohonan">
-		<i class="fa-solid fa-magnifying-glass"></i>
-		<span>Cek Status</span>
-	</a>
-</div>
-
-
-
 <!-- Card Instansi -->
 <div class="d-flex align-items-center gap-3 p-3 rounded-3 border mb-3" style="background:#f8faff;">
 	<i class="fa-solid fa-building-columns fa-lg text-primary flex-shrink-0"></i>
