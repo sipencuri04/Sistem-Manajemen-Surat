@@ -81,13 +81,6 @@ $icons = array(
 							</div>
 						</div>
 
-						<?php if ( ! empty($t['guide']['when'])): ?>
-							<div class="letter-card-chips">
-								<?php foreach (array_slice($t['guide']['when'], 0, 3) as $w): ?>
-									<span class="app-chip"><i class="fa-solid fa-check text-success me-1"></i><?= e($w) ?></span>
-								<?php endforeach; ?>
-							</div>
-						<?php endif; ?>
 					</div>
 
 					<a href="<?= site_url('permohonan/ajukan/'.(int) $t['id']) ?>" class="btn-app-action">
