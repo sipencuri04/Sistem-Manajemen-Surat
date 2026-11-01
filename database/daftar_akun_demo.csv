@@ -1,0 +1,7 @@
+﻿No;Peran (Role);Nama Lengkap & Gelar;NIP;Jabatan;Username;Password;Email Akun;No. WhatsApp / HP;Tugas Utama & Skenario Demo
+1;Kepala Sekolah;Drs. H. Ahmad Dahlan, M.Pd;'19680512 199403 1 005;Kepala Sekolah;kepsek;kepsek123;kepsek@sekolah.sch.id;'081234567801;Menyetujui draf surat keluar (Acc/Tolak), menandatangani digital/QR, dan mendisposisikan surat masuk ke guru.
+2;Petugas Tata Usaha;Siti Rahmawati, S.AP;'19820715 200604 2 018;Staf Tata Usaha / Persuratan;tu;tu123;tu@sekolah.sch.id;'081234567802;Memverifikasi permohonan surat siswa, menerbitkan nomor surat otomatis, mengarsipkan PDF, dan kirim notifikasi WA.
+3;Guru / Pegawai;Bambang Wijaya, S.Pd;'19850320 200902 1 004;Guru / Koordinator Kurikulum;pegawai1;pegawai123;bambang@sekolah.sch.id;'081234567803;Menerima lembar disposisi tugas dari Kepala Sekolah, memperbarui status progres kerja, dan upload bukti kegiatan.
+4;Superuser / IT;Superuser Sistem / IT;-;Administrator Sistem & TI;superuser;superuser123;superuser@sekolah.sch.id;'081234567800;Mengatur identitas/kop surat sekolah, backup database, kelola user, dan memantau audit log aktivitas sistem.
+5;Siswa / Pemohon (Publik);Layanan Mandiri Siswa;-;Siswa Aktif / Alumni;(Tanpa Login);(Tanpa Login);-;-;Akses portal publik /permohonan untuk mengajukan surat keterangan aktif, cek status antrean resi, dan download PDF.
+6;Instansi Luar (Publik);Layanan Kedinasan Eksternal;-;Dinas / DUDI / Mitra;(Tanpa Login);(Tanpa Login);-;-;Akses portal publik /kirim-surat untuk mengunggah surat dinas resmi (PDF) langsung ke sistem Tata Usaha.
