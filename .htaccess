@@ -8,6 +8,9 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Mencegah redirect loop pada Apache/LiteSpeed (penyebab Error 500 pada subfolder)
+    RewriteRule ^index\.php - [L]
+
     # Tolak akses langsung ke folder internal
     RewriteRule ^(application|system|vendor|database|storage)(/|$) - [F,L,NC]
     # Tolak file sensitif
