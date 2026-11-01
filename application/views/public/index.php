@@ -6,20 +6,25 @@ $icons = array(
 ?>
 <!-- Card Instansi -->
 <div class="instansi-card mb-4">
-	<div class="instansi-card-badge">
-		<i class="fa-solid fa-shield-halved me-1"></i> KHUSUS INSTANSI / LEMBAGA LAIN
+	<div class="instansi-card-content">
+		<div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+			<div class="instansi-card-badge">
+				<i class="fa-solid fa-shield-halved me-1"></i> KHUSUS INSTANSI / LEMBAGA LAIN
+			</div>
+			<span class="instansi-card-chip">Bukan Siswa</span>
+		</div>
+		<h2 class="instansi-card-title">Kirim Surat Masuk Kedinasan <span class="instansi-card-sub">(Format PDF)</span></h2>
+		<p class="instansi-card-desc">Bagi <strong>Dinas Pendidikan, Instansi Pemerintah, Dunia Usaha (DUDI), Puskesmas, Kepolisian,</strong> atau <strong>Sekolah Mitra</strong> yang ingin mengirimkan surat resmi, undangan kedinasan, atau permohonan kerjasama secara online langsung ke Bagian Tata Usaha.</p>
 	</div>
-	<span class="instansi-card-chip">Bukan Siswa</span>
-	<h2 class="instansi-card-title">Kirim Surat Masuk Kedinasan<br><span style="font-weight:700;">(Format PDF)</span></h2>
-	<p class="instansi-card-desc">Bagi <strong>Dinas Pendidikan, Instansi Pemerintah, Dunia Usaha (DUDI), Puskesmas, Kepolisian,</strong> atau <strong>Sekolah Mitra</strong> yang ingin mengirimkan surat resmi, undangan kedinasan, atau permohonan kerjasama secara online langsung ke Bagian Tata Usaha.</p>
-	<a href="<?= site_url('kirim-surat') ?>" class="instansi-card-btn-primary">
-		<i class="fa-solid fa-file-arrow-up me-1"></i> Kirim Surat Sekarang &raquo;
-	</a>
-	<a href="<?= site_url('permohonan/cek') ?>" class="instansi-card-btn-outline">
-		<i class="fa-solid fa-receipt me-1"></i> Cek Resi Surat
-	</a>
+	<div class="instansi-card-actions">
+		<a href="<?= site_url('kirim-surat') ?>" class="instansi-card-btn-primary">
+			<i class="fa-solid fa-file-arrow-up me-1"></i> Kirim Surat Sekarang &raquo;
+		</a>
+		<a href="<?= site_url('kirim-surat/status') ?>" class="instansi-card-btn-outline">
+			<i class="fa-solid fa-receipt me-1"></i> Cek Resi Surat
+		</a>
+	</div>
 </div>
-
 
 
 <!-- Section: Letter Types -->
