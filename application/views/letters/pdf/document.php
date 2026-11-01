@@ -133,7 +133,22 @@ ob_start(); ?>
 	<?php /* ---------------- PENUTUP & TANDA TANGAN ---------------- */ ?>
 	<table class="sign">
 		<tr>
-			<td style="width:55%"></td>
+			<td style="width:55%; vertical-align:bottom; padding-bottom:2pt; padding-right:15pt;">
+				<?php if ( ! empty($images['qrcode'])): ?>
+				<table style="width:100%; border:1px solid #cbd5e1; background:#f8fafc; padding:3pt; border-radius:4px;">
+					<tr>
+						<td style="width:2.2cm; vertical-align:middle; text-align:center;">
+							<img src="<?= $images['qrcode'] ?>" style="width:2.1cm; height:2.1cm;" alt="QR Validasi">
+						</td>
+						<td style="vertical-align:middle; padding-left:5pt; font-family:Arial, Helvetica, sans-serif; font-size:7pt; line-height:1.25; color:#334155;">
+							<div style="font-weight:bold; font-size:7.5pt; text-transform:uppercase; color:#0f172a;">Validasi Dokumen Digital</div>
+							<div style="color:#64748b; margin:1pt 0 2pt;">Scan QR Code untuk memverifikasi keaslian dan legalitas dokumen ini dari server sekolah.</div>
+							<div style="font-family:monospace; font-size:6.5pt; color:#1d4ed8; font-weight:bold;">No: <?= e($letter['letter_number']) ?></div>
+						</td>
+					</tr>
+				</table>
+				<?php endif; ?>
+			</td>
 			<td>
 				<?php if ($tpl['layout'] === 'keterangan'): ?><div><?= $place_date ?></div><?php endif; ?>
 				<div><?= e($letter['signer_title']) ?>,</div>

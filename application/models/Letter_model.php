@@ -205,4 +205,21 @@ class Letter_model extends CI_Model
 	{
 		return $this->search(array(), $limit, 0);
 	}
+
+	public function find_by_number($number)
+	{
+		$row = $this->db->select('l.*, t.name AS type_name, t.code AS type_code, t.template_key,
+				u.full_name AS created_by_name')
+			->from($this->table.' l')
+			->join('letter_types t', 't.id = l.letter_type_id', 'inner')
+			->join('users u', 'u.id = l.created_by', 'left')
+			->where('l.letter_number', trim($number))
+			->get()->row_array();
+
+		if ($row)
+		{
+			$row['data'] = $this->decode($row['content_data']);
+		}
+		return $row;
+	}
 }

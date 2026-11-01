@@ -3,6 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 
 /**
  * Menyusun HTML surat (dipakai untuk pratinjau & PDF) dan mengubahnya menjadi
@@ -42,6 +44,29 @@ class Letter_renderer
 	 * @param string $mode    'pdf' | 'html'
 	 * @param array  $opts    ['watermark' => string|null]
 	 */
+		/**
+	 * Hasilkan QR Code sebagai Base64 Data URI PNG untuk dicetak di lembar PDF surat.
+	 */
+	public function generate_qr($text)
+	{
+		try
+		{
+			$options = new QROptions(array(
+				'version'     => 5,
+				'outputType'  => QRCode::OUTPUT_IMAGE_PNG,
+				'eccLevel'    => QRCode::ECC_M,
+				'scale'       => 4,
+				'imageBase64' => TRUE,
+			));
+			return (new QRCode($options))->render($text);
+		}
+		catch (Exception $e)
+		{
+			log_message('error', 'Gagal membuat QR Code verifikasi: ' . $e->getMessage());
+			return NULL;
+		}
+	}
+
 	public function html(array $letter, array $type, array $school, $mode = 'pdf', array $opts = array())
 	{
 		$registry = $this->CI->template_registry;
@@ -77,11 +102,19 @@ class Letter_renderer
 		$is_basah = (isset($opts['blank_signature']) && $opts['blank_signature']) 
 			|| (isset($letter['signature_type']) && $letter['signature_type'] === 'basah' && ! (isset($opts['force_signature']) && $opts['force_signature']));
 
+		// URL & Hash verifikasi anti-pemalsuan untuk di-scan via QR Code
+		$letter_id   = isset($letter['id']) ? (int) $letter['id'] : 0;
+		$letter_num  = isset($letter['letter_number']) ? $letter['letter_number'] : '';
+		$verify_hash = substr(md5($letter_num . 'PERSURATAN_SMK_' . $letter_id), 0, 8);
+		$verify_url  = site_url('verifikasi/' . $letter_id . '/' . $verify_hash);
+
 		$images = array(
 			'logo'       => $this->image_data_uri($S->image_file('logo_path')),
 			'logo_right' => $this->image_data_uri($S->image_file('logo_right_path')),
 			'signature'  => $is_basah ? NULL : $this->image_data_uri($S->image_file('signature_path')),
 			'stamp'      => $is_basah ? NULL : $this->image_data_uri($S->image_file('stamp_path')),
+			'qrcode'     => $this->generate_qr($verify_url),
+			'verify_url' => $verify_url,
 		);
 
 		$view = array(

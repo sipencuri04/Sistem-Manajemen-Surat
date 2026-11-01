@@ -78,3 +78,4 @@ ON DUPLICATE KEY UPDATE
   `failed_attempts` = 0,
   `locked_until`    = NULL,
   `updated_at`      = NOW();
+

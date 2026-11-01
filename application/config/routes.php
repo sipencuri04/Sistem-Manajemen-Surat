@@ -29,6 +29,11 @@ $route['surat/pdf/(:num)/(:any)']        = 'letters/pdf/$1/$2';
 $route['surat/arsipkan-pdf/(:num)']      = 'letters/regenerate/$1';
 $route['surat/nomor-berikutnya/(:num)']  = 'letters/next_number/$1';
 
+// Verifikasi & Validasi Dokumen Digital (Scan Barcode / QR Code Anti-Pemalsuan)
+$route['verifikasi']                     = 'verifikasi/index';
+$route['verifikasi/(:num)/(:any)']       = 'verifikasi/cek/$1/$2';
+$route['verifikasi/(:num)']              = 'verifikasi/cek/$1';
+
 // Portal publik permohonan surat oleh siswa (tanpa login)
 $route['permohonan']                     = 'permohonan/index';
 $route['permohonan/ajukan/(:num)']       = 'permohonan/form/$1';
