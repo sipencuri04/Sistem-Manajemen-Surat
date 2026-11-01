@@ -4,3 +4,6 @@ deployment:
     - /bin/mkdir -p ~/public_html/sistem-manajemen-surat
     - /bin/cp -R * ~/public_html/sistem-manajemen-surat/
     - /bin/chmod -R 755 ~/public_html/sistem-manajemen-surat
+    - /bin/mkdir -p ~/public_html/Sistem-Manajemen-Surat
+    - /bin/cp -R * ~/public_html/Sistem-Manajemen-Surat/
+    - /bin/chmod -R 755 ~/public_html/Sistem-Manajemen-Surat

@@ -81,10 +81,15 @@ $default_user = $is_cpanel ? 'trisnait_smkmuhammadiyah' : 'root';
 $default_pass = $is_cpanel ? '@Grandart2025' : '';
 $default_name = $is_cpanel ? 'trisnait_manajemensurat' : 'db_persuratan_smk';
 
+$actual_user = getenv('DB_USER') ?: (isset($_ENV['DB_USER']) ? $_ENV['DB_USER'] : $default_user);
+if ($actual_user === 'trisnait') {
+	$actual_user = 'trisnait_smkmuhammadiyah';
+}
+
 $db['default'] = array(
 	'dsn'	=> '',
 	'hostname' => getenv('DB_HOST') ?: (isset($_ENV['DB_HOST']) ? $_ENV['DB_HOST'] : $default_host),
-	'username' => getenv('DB_USER') ?: (isset($_ENV['DB_USER']) ? $_ENV['DB_USER'] : $default_user),
+	'username' => $actual_user,
 	'password' => (getenv('DB_PASS') !== FALSE && getenv('DB_PASS') !== '') ? getenv('DB_PASS') : (isset($_ENV['DB_PASS']) ? $_ENV['DB_PASS'] : $default_pass),
 	'database' => getenv('DB_NAME') ?: (isset($_ENV['DB_NAME']) ? $_ENV['DB_NAME'] : $default_name),
 	'dbdriver' => 'mysqli',
