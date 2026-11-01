@@ -1,0 +1,20 @@
+# Environment Variables (Kredensial Rahasia)
+.env
+
+# Large Binary Archives
+*.zip
+
+# Application Storage & Temporary Files
+/storage/cache/*
+!/storage/cache/index.html
+/storage/logs/*
+!/storage/logs/index.html
+/storage/sessions/*
+!/storage/sessions/index.html
+
+# IDE & OS Files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+*.log

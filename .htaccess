@@ -1,0 +1,36 @@
+# =============================================================
+# Sistem Manajemen Persuratan SMK - Apache (XAMPP / shared hosting)
+# =============================================================
+Options -Indexes
+DirectoryIndex index.php
+
+# Mode aplikasi. Untuk hosting/produksi aktifkan baris di bawah (pesan error disembunyikan):
+# SetEnv CI_ENV production
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Jika aplikasi berada di subfolder dan URL tidak berjalan,
+    # aktifkan & sesuaikan baris berikut, contoh:
+    # RewriteBase /Sistem-Manajemen-Surat/
+
+    # Tolak akses langsung ke folder internal
+    RewriteRule ^(application|system|vendor|database|storage)(/|$) - [F,L,NC]
+    # Tolak file sensitif
+    RewriteRule (^|/)(composer\.(json|lock)|README\.md|\.env|\.git) - [F,L,NC]
+
+    # Teruskan semua request non-file ke index.php (hapus index.php dari URL)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php/$1 [L,QSA]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    # mod_rewrite tidak aktif: set $config['index_page'] = 'index.php'
+    ErrorDocument 404 /index.php
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "same-origin"
+</IfModule>

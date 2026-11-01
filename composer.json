@@ -1,0 +1,14 @@
+{
+    "name": "smk/sistem-manajemen-persuratan",
+    "description": "Sistem Manajemen Persuratan SMK (CodeIgniter 3)",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=7.4",
+        "dompdf/dompdf": "^3.1"
+    },
+    "config": {
+        "platform": { "php": "7.4.0" },
+        "optimize-autoloader": true
+    }
+}
