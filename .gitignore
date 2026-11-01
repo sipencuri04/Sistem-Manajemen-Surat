@@ -4,7 +4,12 @@
 # Large Binary Archives
 *.zip
 
-# Application Storage & Temporary Files
+# Cache and Sessions
+/application/cache/sessions/*
+!/application/cache/sessions/index.html
+/application/cache/*.flag
+
+# Storage & Temporary Files
 /storage/cache/*
 !/storage/cache/index.html
 /storage/logs/*
