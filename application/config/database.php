@@ -77,7 +77,7 @@ $query_builder = TRUE;
 $is_cpanel = (strpos(__DIR__, 'trisnait') !== FALSE || strpos(__DIR__, 'public_html') !== FALSE);
 
 $default_host = 'localhost';
-$default_user = $is_cpanel ? 'trisnait' : 'root';
+$default_user = $is_cpanel ? 'trisnait_smkmuhammadiyah' : 'root';
 $default_pass = $is_cpanel ? '@Grandart2025' : '';
 $default_name = $is_cpanel ? 'trisnait_manajemensurat' : 'db_persuratan_smk';
 
