@@ -212,32 +212,38 @@ class Requests extends Admin_Controller
 		);
 
 		$this->load->library('email');
+		$this->load->library('email_theme');
 		$this->email->initialize($config);
 		$this->email->from($from_email, $from_name);
 		$this->email->to($to_email);
 		$this->email->subject($subject);
 
 		$status_label = isset(Letter_request_model::$statuses[$req['status']]) ? Letter_request_model::$statuses[$req['status']] : ucfirst($req['status']);
+		$badge_type = ($req['status'] === 'approved') ? 'success' : (($req['status'] === 'rejected') ? 'danger' : 'info');
+		$badge_text = ($req['status'] === 'approved') ? 'SURAT RESMI TELAH DITERBITKAN' : (($req['status'] === 'rejected') ? 'PERMOHONAN PERLU PERBAIKAN' : 'PEMBERITAHUAN TATA USAHA');
 
-		$html_body = '
-		<div style="font-family:Arial, Helvetica, sans-serif; max-width:600px; margin:0 auto; padding:22px; border:1px solid #e2e8f0; border-radius:8px; background:#ffffff;">
-			<div style="border-bottom:2px solid #1e3a8a; padding-bottom:12px; margin-bottom:18px;">
-				<h3 style="color:#1e3a8a; margin:0 0 4px 0; font-size:18px;">' . htmlspecialchars($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') . '</h3>
-				<div style="font-size:12px; color:#64748b;">Layanan Persuratan &amp; Tata Usaha Sekolah</div>
-			</div>
-			<div style="font-size:14px; line-height:1.6; color:#334155; margin-bottom:20px;">
-				' . nl2br(htmlspecialchars($message)) . '
-			</div>
-			<div style="background:#f8fafc; border-left:4px solid #3b82f6; padding:12px; font-size:13px; color:#475569; margin:18px 0; border-radius:0 6px 6px 0;">
-				<div><strong>Kode Lacak:</strong> ' . htmlspecialchars($req['tracking_code']) . '</div>
-				<div><strong>Jenis Surat:</strong> ' . htmlspecialchars($req['type_name']) . '</div>
-				' . (!empty($req['letter_number']) ? '<div><strong>Nomor Surat:</strong> ' . htmlspecialchars($req['letter_number']) . '</div>' : '') . '
-				<div><strong>Status:</strong> ' . htmlspecialchars($status_label) . '</div>
-			</div>
-			<div style="border-top:1px solid #e2e8f0; padding-top:12px; font-size:11px; color:#94a3b8; text-align:center;">
-				Email ini dikirim resmi oleh Tata Usaha ' . htmlspecialchars($school['school_name'] ?: 'Sekolah') . ' melalui Sistem Persuratan Digital.
-			</div>
-		</div>';
+		$details = array(
+			'Kode Lacak' => '<code style="font-family:monospace; font-size:14px; background:#e2e8f0; padding:2px 8px; border-radius:4px; font-weight:700; color:#0f172a;">' . htmlspecialchars($req['tracking_code']) . '</code>',
+			'Jenis Surat' => htmlspecialchars($req['type_name']),
+		);
+		if (!empty($req['letter_number'])) {
+			$details['Nomor Surat'] = '<strong style="color:#1e3a8a;">' . htmlspecialchars($req['letter_number']) . '</strong>';
+		}
+		$details['Status Permohonan'] = '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:11.5px; font-weight:700; background:#e0f2fe; color:#0369a1;">' . htmlspecialchars($status_label) . '</span>';
+
+		$cek_url = site_url('permohonan/cek?kode=' . $req['tracking_code']);
+		$html_body = $this->email_theme->render(array(
+			'title'          => $subject,
+			'recipient_name' => $req['requester_name'],
+			'badge_type'     => $badge_type,
+			'badge_text'     => $badge_text,
+			'message'        => nl2br(htmlspecialchars($message)),
+			'details'        => $details,
+			'has_attachment' => ($attach_pdf && !empty($req['letter_id'])),
+			'attachment_name'=> !empty($req['letter_number']) ? 'Surat_' . preg_replace('/[^a-zA-Z0-9_\-]/', '_', $req['letter_number']) . '.pdf' : 'Dokumen_Surat_Resmi.pdf',
+			'button_url'     => $cek_url,
+			'button_text'    => 'Lacak Status Permohonan Online',
+		));
 
 		$this->email->message($html_body);
 
@@ -297,27 +303,31 @@ class Requests extends Admin_Controller
 		);
 
 		$this->load->library('email');
+		$this->load->library('email_theme');
 		$this->email->initialize($config);
 		$this->email->from($from_email, $from_name);
 		$this->email->to($req['requester_email']);
-		$this->email->subject('[' . $from_name . '] Pemberitahuan Permohonan Surat Belum Dapat Diproses - ' . $req['tracking_code']);
+		$this->email->subject('[' . $from_name . '] Pemberitahuan Permohonan Belum Dapat Diproses - ' . $req['tracking_code']);
 
-		$body = '
-		<div style="font-family:Arial, Helvetica, sans-serif; max-width:600px; margin:0 auto; padding:22px; border:1px solid #fee2e2; border-radius:8px; background:#ffffff;">
-			<div style="border-bottom:2px solid #dc2626; padding-bottom:12px; margin-bottom:18px;">
-				<h3 style="color:#991b1b; margin:0 0 4px 0; font-size:18px;">' . htmlspecialchars($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') . '</h3>
-				<div style="font-size:12px; color:#64748b;">Layanan Persuratan &amp; Tata Usaha</div>
-			</div>
-			<p style="color:#334155; font-size:14px; line-height:1.5;">Halo <strong>' . htmlspecialchars($req['requester_name']) . '</strong>,</p>
-			<p style="color:#334155; font-size:14px; line-height:1.5;">Mohon maaf, permohonan surat <strong>' . htmlspecialchars($req['type_name']) . '</strong> Anda dengan Kode Lacak <strong>' . htmlspecialchars($req['tracking_code']) . '</strong> belum dapat diproses oleh petugas Tata Usaha karena alasan berikut:</p>
-			<div style="background:#fef2f2; border-left:4px solid #dc2626; padding:12px 15px; font-size:14px; color:#991b1b; margin:16px 0; border-radius:0 6px 6px 0;">
-				' . nl2br(htmlspecialchars($reason)) . '
-			</div>
-			<p style="color:#475569; font-size:13px; line-height:1.5;">Silakan lengkapi berkas dan ajukan permohonan ulang melalui portal sekolah atau datang langsung ke ruang Tata Usaha pada jam kerja operasional sekolah.</p>
-			<div style="border-top:1px solid #e2e8f0; padding-top:12px; font-size:11px; color:#94a3b8; text-align:center;">
-				Email resmi dari Tata Usaha ' . htmlspecialchars($school['school_name'] ?: 'Sekolah') . '.
-			</div>
-		</div>';
+		$cek_url = site_url('permohonan/cek?kode=' . $req['tracking_code']);
+		$body = $this->email_theme->render(array(
+			'title'          => 'Pemberitahuan Permohonan Surat - ' . $req['tracking_code'],
+			'recipient_name' => $req['requester_name'],
+			'badge_type'     => 'danger',
+			'badge_text'     => 'PERMOHONAN BELUM DAPAT DIPROSES',
+			'message'        => 'Mohon maaf, permohonan surat <strong>' . htmlspecialchars($req['type_name']) . '</strong> Anda dengan Kode Lacak <strong>' . htmlspecialchars($req['tracking_code']) . '</strong> belum dapat diproses oleh petugas Tata Usaha sekolah karena alasan berikut:',
+			'callout_type'   => 'danger',
+			'callout_title'  => 'Alasan dari Petugas Tata Usaha:',
+			'callout_text'   => $reason,
+			'details'        => array(
+				'Kode Lacak' => '<code style="font-family:monospace; font-size:14px; background:#e2e8f0; padding:2px 8px; border-radius:4px; font-weight:700; color:#0f172a;">' . htmlspecialchars($req['tracking_code']) . '</code>',
+				'Jenis Surat' => htmlspecialchars($req['type_name']),
+				'Status Permohonan' => '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:11.5px; font-weight:700; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca;">Ditolak / Belum Dapat Diproses</span>',
+			),
+			'button_url'     => $cek_url,
+			'button_text'    => 'Perbaiki & Ajukan Ulang Permohonan',
+			'closing_note'   => 'Silakan perbaiki kekurangan data/dokumen di atas dan ajukan kembali permohonan secara online melalui portal sekolah atau datang langsung ke ruang Tata Usaha pada jam operasional sekolah.',
+		));
 
 		$this->email->message($body);
 		@$this->email->send();

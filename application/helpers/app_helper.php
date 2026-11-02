@@ -399,17 +399,18 @@ if ( ! function_exists('mail_notification'))
 		$ci->email->to($user['email']);
 		$ci->email->subject('[' . $from_name . '] ' . $title);
 
-		$body = '<div style="font-family:sans-serif; max-width:600px; margin:auto; padding:20px; border:1px solid #e2e8f0; border-radius:8px;">';
-		$body .= '<h2 style="color:#0f172a; margin-top:0;">' . e($title) . '</h2>';
-		$body .= '<p style="color:#334155; line-height:1.6;">Halo <strong>' . e($user['full_name']) . '</strong>,</p>';
-		$body .= '<div style="background:#f8fafc; padding:15px; border-left:4px solid #3b82f6; margin:15px 0;">' . nl2br(e($message)) . '</div>';
-		if ($link) {
-			$url = filter_var($link, FILTER_VALIDATE_URL) ? $link : site_url($link);
-			$body .= '<p style="margin-top:20px;"><a href="' . $url . '" style="background:#2563eb; color:#ffffff; padding:10px 18px; text-decoration:none; border-radius:6px; display:inline-block; font-weight:bold;">Buka di Sistem Persuratan</a></p>';
-		}
-		$body .= '<hr style="border:none; border-top:1px solid #e2e8f0; margin:25px 0 10px;">';
-		$body .= '<p style="font-size:12px; color:#94a3b8; margin:0;">Email ini dikirim otomatis oleh Sistem Manajemen Persuratan Sekolah. Jangan membalas email ini.</p>';
-		$body .= '</div>';
+		$ci->load->library('email_theme');
+		$url = $link ? (filter_var($link, FILTER_VALIDATE_URL) ? $link : site_url($link)) : null;
+		$body = $ci->email_theme->render(array(
+			'title'          => $title,
+			'recipient_name' => $user['full_name'],
+			'badge_type'     => 'info',
+			'badge_text'     => 'PEMBERITAHUAN SISTEM PERSURATAN',
+			'message'        => nl2br(e($message)),
+			'button_url'     => $url,
+			'button_text'    => 'Buka di Sistem Persuratan',
+			'closing_note'   => 'Notifikasi resmi dari Sistem Manajemen Persuratan Sekolah.',
+		));
 
 		$ci->email->message($body);
 		return @$ci->email->send();

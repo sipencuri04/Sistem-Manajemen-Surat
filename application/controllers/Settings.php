@@ -297,21 +297,25 @@ class Settings extends Admin_Controller
 		$this->email->from($from_email, $from_name);
 		$this->email->to($to);
 		$this->email->subject('[' . $from_name . '] Uji Coba Koneksi Gmail / SMTP Berhasil');
-		$this->email->message('
-		<div style="font-family:Arial, Helvetica, sans-serif; max-width:550px; margin:0 auto; padding:24px; border:1px solid #93c5fd; border-radius:10px; background:#f0fdf4;">
-			<div style="text-align:center; margin-bottom:16px;">
-				<span style="display:inline-block; background:#16a34a; color:#ffffff; font-weight:bold; font-size:12px; padding:5px 14px; border-radius:20px; text-transform:uppercase;">✓ Uji Coba Berhasil</span>
-			</div>
-			<h3 style="color:#1e3a8a; margin-top:0; text-align:center;">Koneksi Gmail TU Resmi Terhubung!</h3>
-			<p style="color:#334155; font-size:14px; line-height:1.5;">Pengaturan Gmail / SMTP pada <strong>' . htmlspecialchars($from_name) . '</strong> telah berhasil diverifikasi dan aktif.</p>
-			<div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:12px; font-size:12px; color:#475569; margin:15px 0;">
-				<div><strong>Pengirim:</strong> ' . htmlspecialchars($from_email) . '</div>
-				<div><strong>Penerima:</strong> ' . htmlspecialchars($to) . '</div>
-				<div><strong>Host SMTP:</strong> ' . htmlspecialchars($smtp_host) . ':' . $smtp_port . ' (' . strtoupper($smtp_crypto ?: 'PLAIN') . ')</div>
-				<div><strong>Waktu Kirim:</strong> ' . date('d/m/Y H:i:s') . ' WIB</div>
-			</div>
-			<small style="color:#64748b;">Sistem siap mengirimkan notifikasi surat masuk, disposisi, dan pengajuan surat siswa secara otomatis.</small>
-		</div>');
+		$this->load->library('email_theme');
+		$body = $this->email_theme->render(array(
+			'title'          => 'Uji Coba Koneksi Gmail / SMTP Berhasil',
+			'recipient_name' => 'Administrator Persuratan',
+			'badge_type'     => 'success',
+			'badge_text'     => 'KONEKSI GMAIL RESMI TERHUBUNG 100%',
+			'message'        => 'Selamat! Pengaturan Gmail SMTP pada <strong>' . htmlspecialchars($from_name) . '</strong> telah berhasil diverifikasi dan siap digunakan untuk pengiriman notifikasi otomatis.',
+			'details'        => array(
+				'Alamat Gmail TU' => htmlspecialchars($from_email),
+				'Penerima Uji Coba' => htmlspecialchars($to),
+				'Host SMTP' => htmlspecialchars($smtp_host) . ':' . $smtp_port . ' (' . strtoupper($smtp_crypto ?: 'PLAIN') . ')',
+				'Status Protokol' => '<span style="color:#15803d; font-weight:700;">Aktif &amp; Terenkripsi</span>',
+				'Waktu Uji Coba' => date('d/m/Y H:i:s') . ' WIB',
+			),
+			'button_url'     => site_url('pengaturan#email_section'),
+			'button_text'    => 'Kelola Pengaturan Sistem',
+			'closing_note'   => 'Sistem Manajemen Persuratan kini siap secara penuh mengirimkan notifikasi surat masuk, disposisi pimpinan, dan berkas surat resmi kepada siswa secara real-time.',
+		));
+		$this->email->message($body);
 
 		if ($this->email->send())
 		{

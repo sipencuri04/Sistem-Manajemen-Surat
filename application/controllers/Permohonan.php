@@ -312,27 +312,24 @@ class Permohonan extends MY_Controller
 			$this->email->to($to);
 			$this->email->subject('[' . $from_name . '] Tanda Terima Permohonan Surat - ' . $code);
 
+			$this->load->library('email_theme');
 			$cek_url = site_url('permohonan/cek?kode=' . $code);
-			$body = '
-			<div style="font-family:Arial, Helvetica, sans-serif; max-width:580px; margin:0 auto; padding:22px; border:1px solid #e2e8f0; border-radius:10px; background:#ffffff;">
-				<div style="border-bottom:2px solid #2563eb; padding-bottom:12px; margin-bottom:16px;">
-					<h3 style="color:#1e3a8a; margin:0 0 4px 0; font-size:18px;">' . htmlspecialchars($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') . '</h3>
-					<div style="font-size:12px; color:#64748b;">Layanan Tata Usaha &amp; Persuratan Siswa</div>
-				</div>
-				<p style="color:#334155; font-size:14px; line-height:1.5;">Halo <strong>' . htmlspecialchars($name) . '</strong>,</p>
-				<p style="color:#334155; font-size:14px; line-height:1.5;">Permohonan surat <strong>' . htmlspecialchars($type_name) . '</strong> Anda telah berhasil kami terima dan saat ini sedang menunggu antrean verifikasi oleh petugas Tata Usaha.</p>
-				<div style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:8px; padding:15px; margin:20px 0; text-align:center;">
-					<div style="font-size:12px; color:#64748b; text-transform:uppercase; letter-spacing:0.5px;">Kode Lacak Anda</div>
-					<div style="font-size:24px; font-weight:bold; color:#1e293b; font-family:monospace; margin:5px 0;">' . htmlspecialchars($code) . '</div>
-					<div style="font-size:12px; color:#64748b;">Simpan kode ini untuk memantau status atau mengambil berkas fisik di ruang TU.</div>
-				</div>
-				<div style="text-align:center; margin:22px 0;">
-					<a href="' . $cek_url . '" style="background:#2563eb; color:#ffffff; padding:10px 22px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:13px; display:inline-block;">Cek Status Permohonan Online</a>
-				</div>
-				<p style="color:#64748b; font-size:12px; line-height:1.4; border-top:1px solid #e2e8f0; padding-top:14px; margin-bottom:0;">
-					Jika ada pertanyaan, silakan hubungi ruang Tata Usaha pada jam operasional sekolah.
-				</p>
-			</div>';
+			$body = $this->email_theme->render(array(
+				'title'          => 'Tanda Terima Permohonan Surat - ' . $code,
+				'recipient_name' => $name,
+				'badge_type'     => 'success',
+				'badge_text'     => 'PERMOHONAN BERHASIL DITERIMA SISTEM',
+				'message'        => 'Permohonan surat <strong>' . htmlspecialchars($type_name) . '</strong> Anda telah berhasil kami terima dalam antrean sistem persuratan sekolah. Petugas Tata Usaha akan segera memverifikasi kelengkapan berkas Anda.',
+				'details'        => array(
+					'Kode Lacak' => '<code style="font-family:monospace; font-size:15px; background:#e2e8f0; padding:2px 8px; border-radius:4px; font-weight:700; color:#0f172a;">' . htmlspecialchars($code) . '</code>',
+					'Jenis Surat' => htmlspecialchars($type_name),
+					'Waktu Pengajuan' => date('d/m/Y H:i') . ' WIB',
+					'Status' => '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:11.5px; font-weight:700; background:#fef3c7; color:#b45309;">Menunggu Verifikasi TU</span>',
+				),
+				'button_url'     => $cek_url,
+				'button_text'    => 'Pantau Status Permohonan Online',
+				'closing_note'   => 'Simpan Kode Lacak di atas untuk memantau perkembangan status atau sebagai bukti verifikasi saat mengambil berkas fisik di ruang Tata Usaha.',
+			));
 
 			$this->email->message($body);
 			@$this->email->send();
