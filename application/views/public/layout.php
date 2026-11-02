@@ -36,6 +36,7 @@ $school_name = trim($school['school_name']) !== '' ? $school['school_name'] : 'L
 			<a href="<?= site_url('permohonan') ?>" class="<?= current_url() == site_url('permohonan') ? 'active' : '' ?>"><i class="fa-solid fa-house me-1"></i>Beranda</a>
 			<a href="<?= site_url('permohonan') ?>#daftarSurat"><i class="fa-solid fa-file-circle-plus me-1"></i>Ajukan Surat</a>
 			<a href="<?= site_url('kirim-surat') ?>" class="<?= strpos(current_url(), 'kirim-surat') !== false ? 'active' : '' ?>"><i class="fa-solid fa-building-columns me-1"></i>Kirim Surat Instansi</a>
+			<a href="<?= site_url('verifikasi') ?>" class="<?= strpos(current_url(), 'verifikasi') !== false ? 'active' : '' ?>"><i class="fa-solid fa-shield-halved me-1"></i>Verifikasi Surat</a>
 			<a href="#modalAlur" data-bs-toggle="modal"><i class="fa-regular fa-circle-question me-1"></i>Bantuan</a>
 		</nav>
 		<div class="d-flex align-items-center gap-2 flex-shrink-0">
@@ -125,12 +126,17 @@ $school_name = trim($school['school_name']) !== '' ? $school['school_name'] : 'L
 						</div>
 					</div>
 				</div>
-				<div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
-					<a href="<?= site_url('kirim-surat') ?>" class="small text-primary text-decoration-none fw-semibold">
-						<i class="fa-solid fa-building-columns me-1"></i>Portal Kirim Surat Dinas
-					</a>
+				<div class="mt-4 pt-3 border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
+					<div class="d-flex gap-3">
+						<a href="<?= site_url('kirim-surat') ?>" class="small text-primary text-decoration-none fw-semibold">
+							<i class="fa-solid fa-building-columns me-1"></i>Kirim Surat Dinas
+						</a>
+						<a href="<?= site_url('verifikasi') ?>" class="small text-success text-decoration-none fw-semibold">
+							<i class="fa-solid fa-qrcode me-1"></i>Verifikasi Keaslian
+						</a>
+					</div>
 					<a href="<?= site_url('login') ?>" class="small text-muted text-decoration-none">
-						<i class="fa-solid fa-shield-halved me-1"></i>Login Petugas TU
+						<i class="fa-solid fa-lock me-1"></i>Login Petugas TU
 					</a>
 				</div>
 			</div>

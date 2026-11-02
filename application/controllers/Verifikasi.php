@@ -74,3 +74,4 @@ class Verifikasi extends MY_Controller
 		));
 	}
 }
+

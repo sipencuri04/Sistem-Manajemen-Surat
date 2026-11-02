@@ -14,7 +14,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Schema_upgrade
 {
-	const VERSION = 6;
+	const VERSION = 7;
 
 	protected $CI;
 
@@ -336,6 +336,9 @@ class Schema_upgrade
 		// 12. Akun demo untuk kelima role (bila belum ada)
 		$this->seed_demo_roles($db);
 
+		// 13. Injeksi Profil Resmi SMK Muhammadiyah Bandongan
+		$this->seed_school_profile($db);
+
 		$db->db_debug = $debug;
 		$db->data_cache = array(); // reset cache CI
 
@@ -413,4 +416,49 @@ class Schema_upgrade
 			}
 		}
 	}
+
+	/** Injeksi profil resmi SMK Muhammadiyah Bandongan bila masih kosong atau generic. */
+	protected function seed_school_profile($db)
+	{
+		if ( ! $db->table_exists('school_settings')) return;
+
+		$curr = $db->get_where('school_settings', array('id' => 1))->row_array();
+		if ( ! $curr || empty($curr['school_name']) || $curr['school_name'] === 'Layanan Persuratan Sekolah' || strpos($curr['school_name'], 'Contoh') !== FALSE)
+		{
+			$school_data = array(
+				'kop_line1'       => 'PIMPINAN DAERAH MUHAMMADIYAH KABUPATEN MAGELANG',
+				'kop_line2'       => 'MAJELIS PENDIDIKAN DASAR DAN MENENGAH',
+				'school_name'     => 'SMK MUHAMMADIYAH BANDONGAN',
+				'school_code'     => 'SMK-MUH',
+				'npsn'            => '20307689',
+				'address'         => 'Jl. Bandongan - Windusari Km. 1, Bandongan',
+				'city'            => 'Kabupaten Magelang',
+				'postal_code'     => '56152',
+				'phone'           => '081234567800',
+				'email'           => 'smkmuhbandongan@gmail.com',
+				'website'         => 'smkmuhbandongan.sch.id',
+				'kop_template'    => 'logo_kiri',
+				'headmaster_name' => 'Drs. H. Ahmad Dahlan, M.Pd',
+				'headmaster_nip'  => '19680512 199403 1 005',
+				'signer_title'    => 'Kepala Sekolah',
+				'show_nip'        => 1,
+				'number_format'   => '421.5/{NO}/SMK-MUH/{BULAN_ROMAWI}/{TAHUN}',
+				'number_padding'  => 3,
+				'number_reset'    => 'yearly',
+				'number_scope'    => 'global',
+				'updated_at'      => date('Y-m-d H:i:s'),
+			);
+
+			if ($curr)
+			{
+				$db->where('id', 1)->update('school_settings', $school_data);
+			}
+			else
+			{
+				$school_data['id'] = 1;
+				$db->insert('school_settings', $school_data);
+			}
+		}
+	}
+
 }
