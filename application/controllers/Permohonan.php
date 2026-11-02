@@ -79,6 +79,7 @@ class Permohonan extends MY_Controller
 		// 3. Validasi isian.
 		$fv = $this->form_validation;
 		$fv->set_rules('requester_phone', 'Nomor WhatsApp/HP', 'trim|required|max_length[20]|callback__valid_phone');
+		$fv->set_rules('requester_email', 'Alamat Email/Gmail', 'trim|valid_email|max_length[150]');
 		$fv->set_rules('requester_note', 'Catatan untuk TU', 'trim|max_length[500]');
 		$fv->set_rules('captcha', 'Jawaban hitungan', 'trim|required|callback__check_captcha');
 		$fv->set_rules('agree', 'Pernyataan kebenaran data', 'required',
@@ -111,17 +112,24 @@ class Permohonan extends MY_Controller
 		try
 		{
 			$code = $this->Letter_request_model->generate_code();
+			$email = trim((string) $this->input->post('requester_email'));
 			$id = $this->Letter_request_model->insert(array(
 				'tracking_code'   => $code,
 				'letter_type_id'  => (int) $type['id'],
 				'requester_name'  => mb_substr($name, 0, 150),
 				'requester_class' => mb_substr($class, 0, 50),
 				'requester_phone' => $phone,
+				'requester_email' => $email !== '' ? $email : NULL,
 				'content_data'    => json_encode($data, JSON_UNESCAPED_UNICODE),
 				'requester_note'  => trim((string) $this->input->post('requester_note')) ?: NULL,
 				'status'          => 'pending',
 				'ip_address'      => $ip,
 			));
+
+			if ($id && $email !== '')
+			{
+				$this->send_receipt_email($code, $email, $name, $type['name'], $school);
+			}
 			if ( ! $id) throw new RuntimeException('insert gagal');
 		}
 		catch (Exception $ex)
@@ -263,5 +271,75 @@ class Permohonan extends MY_Controller
 			return FALSE;
 		}
 		return TRUE;
+	}
+	/** Kirim tanda terima otomatis ke Gmail siswa saat permohonan berhasil dikirim. */
+	protected function send_receipt_email($code, $to, $name, $type_name, $school)
+	{
+		$smtp_user = !empty($school['smtp_user']) ? $school['smtp_user'] : (getenv('SMTP_USER') ?: (isset($_ENV['SMTP_USER']) ? $_ENV['SMTP_USER'] : ''));
+		$smtp_pass = !empty($school['smtp_pass']) ? $school['smtp_pass'] : (getenv('SMTP_PASS') ?: (isset($_ENV['SMTP_PASS']) ? $_ENV['SMTP_PASS'] : ''));
+		if (empty($smtp_user) || empty($smtp_pass) || empty($school['smtp_enabled']))
+		{
+			return;
+		}
+
+		$smtp_host   = !empty($school['smtp_host']) ? $school['smtp_host'] : (getenv('SMTP_HOST') ?: (isset($_ENV['SMTP_HOST']) ? $_ENV['SMTP_HOST'] : 'smtp.gmail.com'));
+		$smtp_port   = !empty($school['smtp_port']) ? (int) $school['smtp_port'] : 587;
+		$smtp_crypto = !empty($school['smtp_crypto']) ? $school['smtp_crypto'] : 'tls';
+		if ($smtp_crypto === 'none') $smtp_crypto = '';
+
+		$from_email  = $smtp_user;
+		$from_name   = !empty($school['smtp_from_name']) ? $school['smtp_from_name'] : (!empty($school['school_name']) ? $school['school_name'] : 'Tata Usaha');
+
+		$config = array(
+			'protocol'    => 'smtp',
+			'smtp_host'   => $smtp_host,
+			'smtp_port'   => $smtp_port,
+			'smtp_user'   => $smtp_user,
+			'smtp_pass'   => $smtp_pass,
+			'smtp_crypto' => $smtp_crypto,
+			'mailtype'    => 'html',
+			'charset'     => 'utf-8',
+			'newline'     => "\r\n",
+			'crlf'        => "\r\n",
+			'wordwrap'    => TRUE,
+		);
+
+		try
+		{
+			$this->load->library('email');
+			$this->email->initialize($config);
+			$this->email->from($from_email, $from_name);
+			$this->email->to($to);
+			$this->email->subject('[' . $from_name . '] Tanda Terima Permohonan Surat - ' . $code);
+
+			$cek_url = site_url('permohonan/cek?kode=' . $code);
+			$body = '
+			<div style="font-family:Arial, Helvetica, sans-serif; max-width:580px; margin:0 auto; padding:22px; border:1px solid #e2e8f0; border-radius:10px; background:#ffffff;">
+				<div style="border-bottom:2px solid #2563eb; padding-bottom:12px; margin-bottom:16px;">
+					<h3 style="color:#1e3a8a; margin:0 0 4px 0; font-size:18px;">' . htmlspecialchars($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') . '</h3>
+					<div style="font-size:12px; color:#64748b;">Layanan Tata Usaha &amp; Persuratan Siswa</div>
+				</div>
+				<p style="color:#334155; font-size:14px; line-height:1.5;">Halo <strong>' . htmlspecialchars($name) . '</strong>,</p>
+				<p style="color:#334155; font-size:14px; line-height:1.5;">Permohonan surat <strong>' . htmlspecialchars($type_name) . '</strong> Anda telah berhasil kami terima dan saat ini sedang menunggu antrean verifikasi oleh petugas Tata Usaha.</p>
+				<div style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:8px; padding:15px; margin:20px 0; text-align:center;">
+					<div style="font-size:12px; color:#64748b; text-transform:uppercase; letter-spacing:0.5px;">Kode Lacak Anda</div>
+					<div style="font-size:24px; font-weight:bold; color:#1e293b; font-family:monospace; margin:5px 0;">' . htmlspecialchars($code) . '</div>
+					<div style="font-size:12px; color:#64748b;">Simpan kode ini untuk memantau status atau mengambil berkas fisik di ruang TU.</div>
+				</div>
+				<div style="text-align:center; margin:22px 0;">
+					<a href="' . $cek_url . '" style="background:#2563eb; color:#ffffff; padding:10px 22px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:13px; display:inline-block;">Cek Status Permohonan Online</a>
+				</div>
+				<p style="color:#64748b; font-size:12px; line-height:1.4; border-top:1px solid #e2e8f0; padding-top:14px; margin-bottom:0;">
+					Jika ada pertanyaan, silakan hubungi ruang Tata Usaha pada jam operasional sekolah.
+				</p>
+			</div>';
+
+			$this->email->message($body);
+			@$this->email->send();
+		}
+		catch (Exception $e)
+		{
+			log_message('error', 'Gagal kirim email tanda terima permohonan: ' . $e->getMessage());
+		}
 	}
 }

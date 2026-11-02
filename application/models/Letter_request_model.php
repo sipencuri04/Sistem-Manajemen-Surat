@@ -72,7 +72,7 @@ class Letter_request_model extends CI_Model
 		{
 			return NULL;
 		}
-		return $this->db->select('r.id, r.tracking_code, r.requester_name, r.status, r.admin_note, r.created_at,
+		return $this->db->select('r.id, r.tracking_code, r.requester_name, r.requester_email, r.status, r.admin_note, r.created_at,
 				r.processed_at, r.letter_id, t.name AS type_name, l.letter_number, l.signature_type')
 			->from($this->table.' r')
 			->join('letter_types t', 't.id = r.letter_type_id', 'inner')
@@ -93,13 +93,14 @@ class Letter_request_model extends CI_Model
 				->like('r.requester_name', $f['q'])
 				->or_like('r.tracking_code', $f['q'])
 				->or_like('r.requester_phone', $f['q'])
+				->or_like('r.requester_email', $f['q'])
 				->group_end();
 		}
 	}
 
 	public function search(array $f, $limit, $offset)
 	{
-		$this->db->select('r.id, r.tracking_code, r.requester_name, r.requester_class, r.requester_phone, r.status,
+		$this->db->select('r.id, r.tracking_code, r.requester_name, r.requester_class, r.requester_phone, r.requester_email, r.status,
 				r.created_at, r.letter_id, t.name AS type_name, t.code AS type_code, l.letter_number')
 			->from($this->table.' r')
 			->join('letter_types t', 't.id = r.letter_type_id', 'inner')

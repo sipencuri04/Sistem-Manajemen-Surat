@@ -78,8 +78,21 @@ $id = (int) $req['id'];
 						?>
 						<?php if (!empty($req['requester_phone'])): ?>
 							<a class="btn btn-sm btn-outline-success ms-2 shadow-sm" href="<?= $wa_siswa_href ?>" target="_blank" rel="noopener">
-								<i class="fa-brands fa-whatsapp me-1"></i> Kirim Notifikasi WA
+								<i class="fa-brands fa-whatsapp me-1"></i> WhatsApp
 							</a>
+						<?php endif; ?>
+					</dd>
+					<dt>Email / Gmail</dt><dd>
+						<?php if (!empty($req['requester_email'])): ?>
+							<strong><?= e($req['requester_email']) ?></strong>
+							<button type="button" class="btn btn-sm btn-outline-primary ms-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalKirimEmailSiswa">
+								<i class="fa-solid fa-paper-plane me-1"></i> Kirim ke Gmail
+							</button>
+						<?php else: ?>
+							<span class="text-muted fst-italic">Belum dicantumkan</span>
+							<button type="button" class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#modalKirimEmailSiswa">
+								<i class="fa-solid fa-plus me-1"></i> Kirim Email
+							</button>
 						<?php endif; ?>
 					</dd>
 					<dt>Catatan pemohon</dt><dd><?= $req['requester_note'] ? e($req['requester_note']) : '-' ?></dd>
@@ -105,5 +118,66 @@ $id = (int) $req['id'];
 			</div>
 		</div>
 		<?php endif; ?>
+	</div>
+</div>
+
+<!-- Modal Kirim Email ke Siswa -->
+<div class="modal fade" id="modalKirimEmailSiswa" tabindex="-1" aria-labelledby="modalKirimEmailSiswaLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content border-0 shadow">
+			<div class="modal-header border-bottom">
+				<h5 class="modal-title fs-6 fw-bold text-navy" id="modalKirimEmailSiswaLabel">
+					<i class="fa-solid fa-paper-plane text-primary me-2"></i>Kirim Berkas / Notifikasi ke Gmail Siswa
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+			</div>
+			<?= form_open('permohonan-masuk/kirim-email/'.$req['id']) ?>
+				<div class="modal-body p-4">
+					<div class="mb-3">
+						<label class="form-label required fw-semibold small" for="recipient_email">Alamat Gmail / Email Siswa:</label>
+						<div class="input-group">
+							<span class="input-group-text bg-light"><i class="fa-solid fa-envelope text-primary"></i></span>
+							<input type="email" class="form-control" id="recipient_email" name="recipient_email" required value="<?= e($req['requester_email']) ?>" placeholder="siswa@gmail.com">
+						</div>
+						<div class="form-text small">Email tujuan pemberitahuan atau berkas resmi PDF.</div>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label required fw-semibold small" for="email_subject">Subjek Pesan:</label>
+						<input type="text" class="form-control" id="email_subject" name="email_subject" required 
+							value="[<?= e($school['school_name'] ?: 'SMK') ?>] Status Permohonan Surat <?= e($req['type_name']) ?> - <?= e($req['tracking_code']) ?>">
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label required fw-semibold small" for="email_message">Isi Pesan:</label>
+						<?php
+						if ($req['status'] === 'approved') {
+							$default_msg = "Halo " . $req['requester_name'] . ",\n\nPermohonan surat " . $req['type_name'] . " Anda di " . $school['school_name'] . " telah SELESAI DIPROSES oleh Tata Usaha dengan Nomor Surat: " . ($req['letter_number'] ?: '-') . ".\n\nBerkas surat resmi (PDF) dapat Anda unduh dari lampiran email ini atau diambil langsung fisiknya di ruang TU sekolah pada jam kerja dengan menyebutkan Kode: " . $req['tracking_code'] . ".\n\nTerima kasih.\nTata Usaha " . $school['school_name'];
+						} elseif ($req['status'] === 'rejected') {
+							$default_msg = "Halo " . $req['requester_name'] . ",\n\nMohon maaf, permohonan surat " . $req['type_name'] . " Anda (Kode: " . $req['tracking_code'] . ") belum dapat diproses karena alasan berikut:\n\"" . $req['admin_note'] . "\"\n\nSilakan lengkapi data dan ajukan ulang atau hubungi petugas Tata Usaha.\n\nTerima kasih.\nTata Usaha " . $school['school_name'];
+						} else {
+							$default_msg = "Halo " . $req['requester_name'] . ",\n\nPermohonan surat " . $req['type_name'] . " Anda dengan Kode Lacak " . $req['tracking_code'] . " saat ini sedang dalam proses pemeriksaan berkas oleh staf Tata Usaha.\n\nKami akan memberitahukan kembali segera setelah surat disahkan.\n\nTerima kasih.\nTata Usaha " . $school['school_name'];
+						}
+						?>
+						<textarea class="form-control" id="email_message" name="email_message" rows="5" required><?= e($default_msg) ?></textarea>
+					</div>
+
+					<?php if (!empty($req['letter_id'])): ?>
+					<div class="form-check form-switch p-3 bg-light rounded-3 border">
+						<input class="form-check-input ms-0 me-2" type="checkbox" role="switch" id="attach_pdf" name="attach_pdf" value="1" checked>
+						<label class="form-check-label fw-semibold small" for="attach_pdf">
+							<i class="fa-solid fa-file-pdf text-danger me-1"></i> Lampirkan File PDF Surat Resmi (<?= e($req['letter_number']) ?>)
+						</label>
+					</div>
+					<?php endif; ?>
+				</div>
+				<div class="modal-footer border-top bg-light">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+					<button type="submit" class="btn btn-primary fw-semibold">
+						<i class="fa-solid fa-paper-plane me-1"></i> Kirim Sekarang
+					</button>
+				</div>
+			<?= form_close() ?>
+		</div>
 	</div>
 </div>

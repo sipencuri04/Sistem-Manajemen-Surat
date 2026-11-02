@@ -110,6 +110,12 @@ $badges = array(
 									<td class="text-muted small py-2">Nama Siswa</td>
 									<td class="py-2"><?= e($mask($request['requester_name'])) ?></td>
 								</tr>
+								<?php if (!empty($request['requester_email'])): ?>
+									<tr>
+										<td class="text-muted small py-2">Gmail Siswa</td>
+										<td class="py-2 small text-muted"><i class="fa-solid fa-envelope text-primary me-1"></i><?= e($request['requester_email']) ?></td>
+									</tr>
+								<?php endif; ?>
 								<tr>
 									<td class="text-muted small py-2">Waktu Pengajuan</td>
 									<td class="py-2 small text-muted"><?= e(tgl_indo($request['created_at'])) ?> &bull; <?= e(substr($request['created_at'], 11, 5)) ?> WIB</td>

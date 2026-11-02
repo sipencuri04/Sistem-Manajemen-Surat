@@ -42,7 +42,13 @@ $tabs = array('pending' => 'Menunggu', 'approved' => 'Siap Diambil', 'taken' => 
 						<td class="text-muted"><?= $offset + $i + 1 ?></td>
 						<td class="letter-number"><?= e($r['tracking_code']) ?></td>
 						<td class="text-nowrap small"><?= e(tgl_indo($r['created_at'])) ?><br><span class="text-muted"><?= e(substr($r['created_at'], 11, 5)) ?></span></td>
-						<td><?= e($r['requester_name']) ?><br><a class="small text-muted text-decoration-none" href="https://wa.me/62<?= e(substr($r['requester_phone'], 1)) ?>" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp text-success"></i> <?= e($r['requester_phone']) ?></a></td>
+						<td>
+							<?= e($r['requester_name']) ?><br>
+							<a class="small text-muted text-decoration-none me-2" href="https://wa.me/62<?= e(substr($r['requester_phone'], 1)) ?>" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp text-success"></i> <?= e($r['requester_phone']) ?></a>
+							<?php if (!empty($r['requester_email'])): ?>
+								<span class="small text-muted" title="<?= e($r['requester_email']) ?>"><i class="fa-solid fa-envelope text-primary"></i> <?= e($r['requester_email']) ?></span>
+							<?php endif; ?>
+						</td>
 						<td><?= e($r['requester_class'] ?: '-') ?></td>
 						<td><span class="badge text-bg-light border" title="<?= e($r['type_name']) ?>"><?= e($r['type_code']) ?></span></td>
 						<td><span class="badge rounded-pill text-bg-<?= $colors[$r['status']] ?>"><?= e($labels[$r['status']]) ?></span>
@@ -64,7 +70,10 @@ $tabs = array('pending' => 'Menunggu', 'approved' => 'Siap Diambil', 'taken' => 
 				<div class="d-flex justify-content-between align-items-start gap-2">
 					<div class="min-w-0">
 						<div class="fw-semibold text-truncate"><?= e($r['requester_name']) ?></div>
-						<div class="small text-muted"><?= e($r['requester_class'] ?: '-') ?> &middot; <span class="badge text-bg-light border"><?= e($r['type_code']) ?></span></div>
+						<div class="small text-muted">
+							<?= e($r['requester_class'] ?: '-') ?> &middot; <span class="badge text-bg-light border"><?= e($r['type_code']) ?></span>
+							<?php if (!empty($r['requester_email'])): ?> &middot; <i class="fa-solid fa-envelope text-primary"></i> <?= e($r['requester_email']) ?><?php endif; ?>
+						</div>
 					</div>
 					<span class="badge rounded-pill text-bg-<?= $colors[$r['status']] ?> flex-shrink-0"><?= e($labels[$r['status']]) ?></span>
 				</div>

@@ -97,11 +97,21 @@ $has_errors = validation_errors() !== '' || ! empty($f_errors);
 						<div class="col-12 col-md-6">
 							<label class="form-label fw-semibold small required" for="requester_phone">Nomor WhatsApp Aktif</label>
 							<div class="input-group">
-								<span class="input-group-text bg-light border-end-0 rounded-start-3"><i class="fa-solid fa-phone text-muted"></i></span>
+								<span class="input-group-text bg-light border-end-0 rounded-start-3"><i class="fa-brands fa-whatsapp text-success"></i></span>
 								<input type="tel" class="form-control rounded-end-3<?= $inv('requester_phone') ?>" id="requester_phone" name="requester_phone" maxlength="20" inputmode="tel" placeholder="Contoh: 081234567890" value="<?= e(set_value('requester_phone', '', FALSE)) ?>">
 							</div>
 							<?= $err('requester_phone') ?>
-							<div class="form-text small">Petugas TU akan menghubungi nomor ini jika ada data yang perlu diverifikasi.</div>
+							<div class="form-text small">Nomor WhatsApp aktif untuk konfirmasi cepat dari TU.</div>
+						</div>
+
+						<div class="col-12 col-md-6">
+							<label class="form-label fw-semibold small" for="requester_email">Alamat Email / Gmail <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1">Disarankan</span></label>
+							<div class="input-group">
+								<span class="input-group-text bg-light border-end-0 rounded-start-3"><i class="fa-solid fa-envelope text-primary"></i></span>
+								<input type="email" class="form-control rounded-end-3<?= $inv('requester_email') ?>" id="requester_email" name="requester_email" maxlength="150" inputmode="email" placeholder="nama.siswa@gmail.com" value="<?= e(set_value('requester_email', '', FALSE)) ?>">
+							</div>
+							<?= $err('requester_email') ?>
+							<div class="form-text small">TU dapat mengirim berkas surat PDF &amp; bukti resi ke Gmail Anda.</div>
 						</div>
 
 						<div class="col-12 col-md-6">

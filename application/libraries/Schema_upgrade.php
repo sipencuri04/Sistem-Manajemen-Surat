@@ -14,7 +14,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Schema_upgrade
 {
-	const VERSION = 7;
+	const VERSION = 8;
 
 	protected $CI;
 
@@ -59,6 +59,10 @@ class Schema_upgrade
 			{
 				$ok = $db->query($m[0]) && $ok;
 			}
+		}
+		elseif ( ! $db->field_exists('requester_email', 'letter_requests'))
+		{
+			$ok = $db->query("ALTER TABLE `letter_requests` ADD COLUMN `requester_email` VARCHAR(150) NULL DEFAULT NULL COMMENT 'Email/Gmail Siswa' AFTER `requester_phone`") && $ok;
 		}
 
 		// 3. Kolom profil & role di tabel users
