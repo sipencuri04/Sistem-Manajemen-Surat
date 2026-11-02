@@ -65,7 +65,7 @@ class Requests extends Admin_Controller
 		));
 	}
 
-	/** Tolak permohonan dengan alasan (wajib). */
+	/** Tolak permohonan dengan alasan (wajib) dan siapkan notifikasi WhatsApp / Gmail. */
 	public function reject($id = 0)
 	{
 		$this->require_post();
@@ -87,8 +87,48 @@ class Requests extends Admin_Controller
 			'processed_by' => (int) $this->current_user['id'],
 			'processed_at' => date('Y-m-d H:i:s'),
 		));
-		set_flash('success', 'Permohonan '.$req['tracking_code'].' ditolak.');
-		redirect('permohonan-masuk');
+
+		$this->load->model('Settings_model');
+		$school = $this->Settings_model->get(TRUE);
+		$school_name = !empty($school['school_name']) ? $school['school_name'] : 'SMK Muhammadiyah Bandongan';
+
+		$send_wa = (bool) $this->input->post('send_wa');
+		$send_email = (bool) $this->input->post('send_email');
+
+		// 1. Siapkan tautan WhatsApp prefilled dengan alasan penolakan
+		$wa_url = '';
+		if ($send_wa && !empty($req['requester_phone']))
+		{
+			$msg_wa = "Halo *" . $req['requester_name'] . "*," . "\n\n"
+				. "Mohon maaf, permohonan surat *" . $req['type_name'] . "* Anda di *" . $school_name . "* (Kode: *" . $req['tracking_code'] . "*) *BELUM DAPAT KAMI PROSES* karena alasan berikut:" . "\n\n"
+				. "\"" . $reason . "\"" . "\n\n"
+				. "Silakan perbaiki data dan ajukan ulang secara online atau datang langsung ke ruang Tata Usaha." . "\n\n"
+				. "Terima kasih." . "\n"
+				. "- *Tata Usaha " . $school_name . "*";
+			$wa_url = build_wa_link($req['requester_phone'], $msg_wa);
+			$this->session->set_flashdata('open_wa_url', $wa_url);
+		}
+
+		// 2. Kirim email penolakan otomatis jika dicentang dan siswa memiliki email
+		$email_sent_text = '';
+		if ($send_email && !empty($req['requester_email']) && !empty($school['smtp_user']) && !empty($school['smtp_pass']) && !empty($school['smtp_enabled']))
+		{
+			try {
+				$this->send_reject_email($req, $reason, $school);
+				$email_sent_text = ' &amp; email pemberitahuan ke <u>' . htmlspecialchars($req['requester_email']) . '</u>';
+			} catch (Exception $e) {
+				log_message('error', 'Gagal kirim email penolakan: ' . $e->getMessage());
+			}
+		}
+
+		$wa_btn = '';
+		if (!empty($wa_url))
+		{
+			$wa_btn = '<div class="mt-2"><a href="' . $wa_url . '" target="_blank" class="btn btn-sm btn-success fw-bold shadow-sm"><i class="fa-brands fa-whatsapp me-1"></i> Buka WhatsApp &amp; Kirim Alasan ke ' . htmlspecialchars($req['requester_phone']) . '</a></div>';
+		}
+
+		set_flash('success', '<strong>Permohonan ' . $req['tracking_code'] . ' Ditolak.</strong> Alasan penolakan telah disimpan' . $email_sent_text . '.' . $wa_btn, TRUE);
+		redirect('permohonan-masuk/'.(int) $req['id']);
 	}
 
 	/** Tandai surat sudah diambil siswa. */
@@ -227,6 +267,60 @@ class Requests extends Admin_Controller
 		}
 
 		redirect('permohonan-masuk/'.(int) $req['id']);
+	}
+
+	/** Kirim email pemberitahuan penolakan otomatis ke Gmail siswa. */
+	protected function send_reject_email($req, $reason, $school)
+	{
+		$smtp_host   = !empty($school['smtp_host']) ? $school['smtp_host'] : (getenv('SMTP_HOST') ?: (isset($_ENV['SMTP_HOST']) ? $_ENV['SMTP_HOST'] : 'smtp.gmail.com'));
+		$smtp_user   = !empty($school['smtp_user']) ? $school['smtp_user'] : (getenv('SMTP_USER') ?: (isset($_ENV['SMTP_USER']) ? $_ENV['SMTP_USER'] : ''));
+		$smtp_pass   = !empty($school['smtp_pass']) ? $school['smtp_pass'] : (getenv('SMTP_PASS') ?: (isset($_ENV['SMTP_PASS']) ? $_ENV['SMTP_PASS'] : ''));
+		$smtp_port   = !empty($school['smtp_port']) ? (int) $school['smtp_port'] : 587;
+		$smtp_crypto = !empty($school['smtp_crypto']) ? $school['smtp_crypto'] : 'tls';
+		if ($smtp_crypto === 'none') $smtp_crypto = '';
+
+		$from_email  = $smtp_user;
+		$from_name   = !empty($school['smtp_from_name']) ? $school['smtp_from_name'] : (!empty($school['school_name']) ? $school['school_name'] : 'Tata Usaha');
+
+		$config = array(
+			'protocol'    => 'smtp',
+			'smtp_host'   => $smtp_host,
+			'smtp_port'   => $smtp_port,
+			'smtp_user'   => $smtp_user,
+			'smtp_pass'   => $smtp_pass,
+			'smtp_crypto' => $smtp_crypto,
+			'mailtype'    => 'html',
+			'charset'     => 'utf-8',
+			'newline'     => "\r\n",
+			'crlf'        => "\r\n",
+			'wordwrap'    => TRUE,
+		);
+
+		$this->load->library('email');
+		$this->email->initialize($config);
+		$this->email->from($from_email, $from_name);
+		$this->email->to($req['requester_email']);
+		$this->email->subject('[' . $from_name . '] Pemberitahuan Permohonan Surat Belum Dapat Diproses - ' . $req['tracking_code']);
+
+		$body = '
+		<div style="font-family:Arial, Helvetica, sans-serif; max-width:600px; margin:0 auto; padding:22px; border:1px solid #fee2e2; border-radius:8px; background:#ffffff;">
+			<div style="border-bottom:2px solid #dc2626; padding-bottom:12px; margin-bottom:18px;">
+				<h3 style="color:#991b1b; margin:0 0 4px 0; font-size:18px;">' . htmlspecialchars($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') . '</h3>
+				<div style="font-size:12px; color:#64748b;">Layanan Persuratan &amp; Tata Usaha</div>
+			</div>
+			<p style="color:#334155; font-size:14px; line-height:1.5;">Halo <strong>' . htmlspecialchars($req['requester_name']) . '</strong>,</p>
+			<p style="color:#334155; font-size:14px; line-height:1.5;">Mohon maaf, permohonan surat <strong>' . htmlspecialchars($req['type_name']) . '</strong> Anda dengan Kode Lacak <strong>' . htmlspecialchars($req['tracking_code']) . '</strong> belum dapat diproses oleh petugas Tata Usaha karena alasan berikut:</p>
+			<div style="background:#fef2f2; border-left:4px solid #dc2626; padding:12px 15px; font-size:14px; color:#991b1b; margin:16px 0; border-radius:0 6px 6px 0;">
+				' . nl2br(htmlspecialchars($reason)) . '
+			</div>
+			<p style="color:#475569; font-size:13px; line-height:1.5;">Silakan lengkapi berkas dan ajukan permohonan ulang melalui portal sekolah atau datang langsung ke ruang Tata Usaha pada jam kerja operasional sekolah.</p>
+			<div style="border-top:1px solid #e2e8f0; padding-top:12px; font-size:11px; color:#94a3b8; text-align:center;">
+				Email resmi dari Tata Usaha ' . htmlspecialchars($school['school_name'] ?: 'Sekolah') . '.
+			</div>
+		</div>';
+
+		$this->email->message($body);
+		@$this->email->send();
 	}
 
 	protected function load_request($id)

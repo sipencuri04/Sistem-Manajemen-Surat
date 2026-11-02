@@ -107,13 +107,36 @@ $id = (int) $req['id'];
 		</div>
 
 		<?php if ($req['status'] === 'pending'): ?>
-		<div class="card border-danger-subtle">
-			<div class="card-header"><h3 class="card-title text-danger"><i class="fa-solid fa-ban me-1"></i> Tolak Permohonan</h3></div>
+		<div class="card border-danger-subtle shadow-sm">
+			<div class="card-header bg-danger-subtle text-danger"><h3 class="card-title text-danger fs-6 fw-bold mb-0"><i class="fa-solid fa-ban me-1"></i> Tolak Permohonan</h3></div>
 			<div class="card-body">
-				<?= form_open('permohonan-masuk/tolak/'.$id, array('data-confirm' => 'Tolak permohonan '.$req['tracking_code'].'? Alasan akan terlihat oleh siswa saat cek status.')) ?>
-					<label class="form-label" for="admin_note">Alasan (terlihat oleh siswa)</label>
-					<textarea class="form-control mb-2" id="admin_note" name="admin_note" rows="3" maxlength="500" required placeholder="Contoh: NIS tidak sesuai data sekolah. Silakan ajukan ulang atau datang ke ruang TU."></textarea>
-					<button class="btn btn-outline-danger" type="submit">Tolak Permohonan</button>
+				<?= form_open('permohonan-masuk/tolak/'.$id, array('data-confirm' => 'Tolak permohonan '.$req['tracking_code'].'? Alasan penolakan akan disimpan dan dapat langsung dikirim ke WhatsApp siswa.')) ?>
+					<div class="mb-3">
+						<label class="form-label required fw-semibold small" for="admin_note">Alasan Penolakan:</label>
+						<textarea class="form-control" id="admin_note" name="admin_note" rows="3" maxlength="500" required placeholder="Contoh: NIS tidak sesuai data buku induk sekolah. Silakan ajukan ulang atau hubungi petugas TU."></textarea>
+						<div class="form-text small">Alasan ini akan otomatis dimasukkan ke pesan WhatsApp &amp; Gmail siswa.</div>
+					</div>
+
+					<div class="p-2 mb-3 bg-light rounded-3 border">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" name="send_wa" id="send_wa" value="1" <?= !empty($req['requester_phone']) ? 'checked' : 'disabled' ?>>
+							<label class="form-check-label small fw-semibold text-success" for="send_wa">
+								<i class="fa-brands fa-whatsapp me-1"></i> Langsung buka WhatsApp &amp; kirim alasan ke nomor siswa (<?= e($req['requester_phone'] ?: '-') ?>)
+							</label>
+						</div>
+						<?php if (!empty($req['requester_email'])): ?>
+						<div class="form-check mt-1">
+							<input class="form-check-input" type="checkbox" name="send_email" id="send_email" value="1" checked>
+							<label class="form-check-label small text-primary" for="send_email">
+								<i class="fa-solid fa-envelope me-1"></i> Kirim juga email pemberitahuan ke Gmail siswa
+							</label>
+						</div>
+						<?php endif; ?>
+					</div>
+
+					<button class="btn btn-outline-danger w-100 fw-semibold" type="submit">
+						<i class="fa-solid fa-ban me-1"></i> Tolak &amp; Buka WhatsApp Siswa
+					</button>
 				<?= form_close() ?>
 			</div>
 		</div>
@@ -181,3 +204,18 @@ $id = (int) $req['id'];
 		</div>
 	</div>
 </div>
+
+<?php $open_wa_url = $this->session->flashdata('open_wa_url'); ?>
+<?php if (!empty($open_wa_url)): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	// Otomatis buka WhatsApp di tab baru saat penolakan berhasil disimpan
+	try {
+		var w = window.open('<?= $open_wa_url ?>', '_blank');
+		if (w) w.focus();
+	} catch (e) {
+		console.log('Popup diblokir peramban, tombol manual tersedia di banner atas.');
+	}
+});
+</script>
+<?php endif; ?>
