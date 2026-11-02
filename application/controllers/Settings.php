@@ -143,6 +143,15 @@ class Settings extends Admin_Controller
 				if (is_file($path)) @unlink($path);
 			}
 			$this->school = $this->Settings_model->get(TRUE);
+
+			if ($this->input->post('save_email_config'))
+			{
+				$status_txt = !empty($data['smtp_enabled']) ? 'Aktif' : 'Nonaktif';
+				set_flash('success', '<strong>Konfigurasi Email Berhasil Disimpan!</strong> Kredensial Gmail TU (<strong>' . htmlspecialchars($data['smtp_user'] ?: '-') . '</strong>) kini berstatus <strong>' . $status_txt . '</strong>. Silakan klik tombol <u>Uji Coba Kirim Email</u> untuk memverifikasi koneksi.', TRUE);
+				redirect('pengaturan#email_section');
+				return;
+			}
+
 			set_flash('success', 'Pengaturan sekolah berhasil disimpan. Perubahan langsung dipakai pada PDF surat.');
 			redirect('pengaturan');
 		}
@@ -225,25 +234,46 @@ class Settings extends Admin_Controller
 
 		if ( ! filter_var($to, FILTER_VALIDATE_EMAIL))
 		{
-			set_flash('danger', 'Alamat email tujuan uji coba tidak valid.');
+			set_flash('danger', '<strong>Alamat Email Tidak Valid!</strong> Silakan masukkan alamat email tujuan yang benar (contoh: nama@gmail.com).', TRUE);
 			redirect('pengaturan#email_section');
 			return;
 		}
 
 		$s = $this->Settings_model->get(TRUE);
-		$smtp_host   = !empty($s['smtp_host']) ? $s['smtp_host'] : (getenv('SMTP_HOST') ?: (isset($_ENV['SMTP_HOST']) ? $_ENV['SMTP_HOST'] : ''));
-		$smtp_user   = !empty($s['smtp_user']) ? $s['smtp_user'] : (getenv('SMTP_USER') ?: (isset($_ENV['SMTP_USER']) ? $_ENV['SMTP_USER'] : ''));
-		$smtp_pass   = !empty($s['smtp_pass']) ? $s['smtp_pass'] : (getenv('SMTP_PASS') ?: (isset($_ENV['SMTP_PASS']) ? $_ENV['SMTP_PASS'] : ''));
-		$smtp_port   = !empty($s['smtp_port']) ? (int) $s['smtp_port'] : 587;
-		$smtp_crypto = !empty($s['smtp_crypto']) ? $s['smtp_crypto'] : 'tls';
+
+		// Prioritaskan kredensial langsung dari modal jika user menguji sebelum simpan
+		$smtp_user   = trim((string) $this->input->post('test_smtp_user', TRUE));
+		if ($smtp_user === '') {
+			$smtp_user = !empty($s['smtp_user']) ? $s['smtp_user'] : (getenv('SMTP_USER') ?: (isset($_ENV['SMTP_USER']) ? $_ENV['SMTP_USER'] : ''));
+		}
+
+		$smtp_pass   = trim((string) $this->input->post('test_smtp_pass', TRUE));
+		if ($smtp_pass === '') {
+			$smtp_pass = !empty($s['smtp_pass']) ? $s['smtp_pass'] : (getenv('SMTP_PASS') ?: (isset($_ENV['SMTP_PASS']) ? $_ENV['SMTP_PASS'] : ''));
+		}
+
+		$smtp_host   = trim((string) $this->input->post('test_smtp_host', TRUE));
+		if ($smtp_host === '') {
+			$smtp_host = !empty($s['smtp_host']) ? $s['smtp_host'] : (getenv('SMTP_HOST') ?: (isset($_ENV['SMTP_HOST']) ? $_ENV['SMTP_HOST'] : 'smtp.gmail.com'));
+		}
+
+		$smtp_port   = (int) $this->input->post('test_smtp_port', TRUE);
+		if ($smtp_port <= 0) {
+			$smtp_port = !empty($s['smtp_port']) ? (int) $s['smtp_port'] : 587;
+		}
+
+		$smtp_crypto = trim((string) $this->input->post('test_smtp_crypto', TRUE));
+		if ($smtp_crypto === '') {
+			$smtp_crypto = !empty($s['smtp_crypto']) ? $s['smtp_crypto'] : 'tls';
+		}
 		if ($smtp_crypto === 'none') $smtp_crypto = '';
 
-		$from_email  = !empty($s['smtp_from_email']) ? $s['smtp_from_email'] : (!empty($smtp_user) ? $smtp_user : 'noreply@sekolah.sch.id');
-		$from_name   = !empty($s['smtp_from_name']) ? $s['smtp_from_name'] : (!empty($s['school_name']) ? $s['school_name'] : 'Sistem Persuratan');
+		$from_email  = !empty($smtp_user) ? $smtp_user : 'noreply@smk.sch.id';
+		$from_name   = !empty($s['smtp_from_name']) ? $s['smtp_from_name'] : (!empty($s['school_name']) ? $s['school_name'] : 'SMK Muhammadiyah Bandongan');
 
 		if (empty($smtp_user) || empty($smtp_pass))
 		{
-			set_flash('danger', 'Gagal: Email pengirim (Gmail TU) dan Sandi Aplikasi Google belum diisi. Simpan pengaturan terlebih dahulu.');
+			set_flash('danger', '<strong>Gagal Uji Coba:</strong> Alamat Gmail TU dan Sandi Aplikasi Google (App Password) belum terisi. Silakan isi form lalu klik <strong>Simpan Konfigurasi Email</strong> terlebih dahulu.', TRUE);
 			redirect('pengaturan#email_section');
 			return;
 		}
@@ -266,17 +296,53 @@ class Settings extends Admin_Controller
 		$this->email->initialize($config);
 		$this->email->from($from_email, $from_name);
 		$this->email->to($to);
-		$this->email->subject('[' . $from_name . '] Uji Coba Koneksi Gmail / SMTP');
-		$this->email->message('<div style="font-family:sans-serif; max-width:550px; padding:20px; border:1px solid #3b82f6; border-radius:8px; background:#f8fafc;"><h3 style="color:#1e3a8a; margin-top:0;">Koneksi Email Berhasil!</h3><p style="color:#334155;">Selamat! Pengaturan Gmail / SMTP pada Sistem Persuratan Sekolah telah berhasil terhubung dan siap mengirimkan notifikasi ke guru, staf, maupun Kepala Sekolah.</p><hr style="border:none; border-top:1px solid #e2e8f0; margin:15px 0;"><small style="color:#64748b;">Dikirim dari: ' . htmlspecialchars($from_email) . ' &middot; ' . date('d/m/Y H:i:s') . '</small></div>');
+		$this->email->subject('[' . $from_name . '] Uji Coba Koneksi Gmail / SMTP Berhasil');
+		$this->email->message('
+		<div style="font-family:Arial, Helvetica, sans-serif; max-width:550px; margin:0 auto; padding:24px; border:1px solid #93c5fd; border-radius:10px; background:#f0fdf4;">
+			<div style="text-align:center; margin-bottom:16px;">
+				<span style="display:inline-block; background:#16a34a; color:#ffffff; font-weight:bold; font-size:12px; padding:5px 14px; border-radius:20px; text-transform:uppercase;">✓ Uji Coba Berhasil</span>
+			</div>
+			<h3 style="color:#1e3a8a; margin-top:0; text-align:center;">Koneksi Gmail TU Resmi Terhubung!</h3>
+			<p style="color:#334155; font-size:14px; line-height:1.5;">Pengaturan Gmail / SMTP pada <strong>' . htmlspecialchars($from_name) . '</strong> telah berhasil diverifikasi dan aktif.</p>
+			<div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:6px; padding:12px; font-size:12px; color:#475569; margin:15px 0;">
+				<div><strong>Pengirim:</strong> ' . htmlspecialchars($from_email) . '</div>
+				<div><strong>Penerima:</strong> ' . htmlspecialchars($to) . '</div>
+				<div><strong>Host SMTP:</strong> ' . htmlspecialchars($smtp_host) . ':' . $smtp_port . ' (' . strtoupper($smtp_crypto ?: 'PLAIN') . ')</div>
+				<div><strong>Waktu Kirim:</strong> ' . date('d/m/Y H:i:s') . ' WIB</div>
+			</div>
+			<small style="color:#64748b;">Sistem siap mengirimkan notifikasi surat masuk, disposisi, dan pengajuan surat siswa secara otomatis.</small>
+		</div>');
 
 		if ($this->email->send())
 		{
-			set_flash('success', 'Email uji coba berhasil dikirim ke ' . htmlspecialchars($to) . '! Silakan periksa kotak masuk Gmail Anda.');
+			set_flash('success', '<strong>Koneksi Gmail Berhasil 100%!</strong> Email uji coba berhasil dikirim ke <u>' . htmlspecialchars($to) . '</u> dari <u>' . htmlspecialchars($from_email) . '</u>. Silakan periksa Kotak Masuk (Inbox) atau folder Spam akun Anda.', TRUE);
 		}
 		else
 		{
-			$debug_msg = $this->email->print_debugger(array('headers', 'subject', 'body'));
-			set_flash('danger', 'Gagal mengirim email uji coba. Keterangan error: ' . strip_tags($debug_msg));
+			$raw_debug = $this->email->print_debugger(array('headers', 'subject', 'body'));
+			$clean_debug = trim(strip_tags($raw_debug));
+
+			// Analisis diagnosa penyebab gagal
+			$diagnosis = 'Terjadi kendala saat menghubungi server Google SMTP.';
+			$solusi = 'Pastikan server memiliki koneksi internet keluar (outbound connection).';
+
+			if (stripos($clean_debug, '535') !== FALSE || stripos($clean_debug, 'Username and Password not accepted') !== FALSE || stripos($clean_debug, 'BadCredentials') !== FALSE)
+			{
+				$diagnosis = '<strong>Autentikasi Gagal (Kode 535):</strong> Sandi Aplikasi Google (App Password) atau Alamat Gmail salah / ditolak.';
+				$solusi = 'Pastikan menggunakan 16 karakter Sandi Aplikasi dari Akun Google (<a href="https://myaccount.google.com/apppasswords" target="_blank" class="alert-link">myaccount.google.com/apppasswords</a>) tanpa spasi. Bukan password login biasa.';
+			}
+			elseif (stripos($clean_debug, 'timed out') !== FALSE || stripos($clean_debug, 'Connection refused') !== FALSE || stripos($clean_debug, 'fsockopen') !== FALSE)
+			{
+				$diagnosis = '<strong>Koneksi Timeout / Terblokir:</strong> Server tidak dapat terhubung ke ' . htmlspecialchars($smtp_host) . ':' . $smtp_port . '.';
+				$solusi = 'Port ' . $smtp_port . ' mungkin dibatasi oleh firewall provider hosting. Coba buka "Pengaturan SMTP Lanjutan", ganti Port ke <strong>465</strong> dan Protokol ke <strong>SSL</strong>, lalu simpan.';
+			}
+			elseif (stripos($clean_debug, 'from') !== FALSE || stripos($clean_debug, 'sender') !== FALSE)
+			{
+				$diagnosis = '<strong>Alamat Pengirim Ditolak:</strong> Google menolak alamat email pengirim.';
+				$solusi = 'Pastikan "Alamat Gmail TU" sama persis dengan akun Google pemilik Sandi Aplikasi.';
+			}
+
+			set_flash('danger', '<strong>Uji Coba Gagal Dikirim!</strong><br>' . $diagnosis . '<br><span class="small">' . $solusi . '</span><details class="mt-2"><summary class="small text-muted" style="cursor:pointer;"><i class="fa-solid fa-code me-1"></i>Lihat Rincian Teknis Error (Debug Log)</summary><pre class="p-2 bg-dark text-light rounded mt-1 text-wrap" style="font-size:11px; max-height:160px; overflow-y:auto;">' . htmlspecialchars($clean_debug) . '</pre></details>', TRUE);
 		}
 
 		redirect('pengaturan#email_section');

@@ -161,7 +161,11 @@ $menu[] = array('url' => 'akun', 'icon' => 'fa-user-gear', 'label' => 'Pengatura
 				<div class="alert alert-<?= e($flash['type']) ?> alert-dismissible fade show" role="alert">
 					<?php $icons = array('success' => 'fa-circle-check', 'danger' => 'fa-circle-xmark', 'warning' => 'fa-triangle-exclamation', 'info' => 'fa-circle-info'); ?>
 					<i class="fa-solid <?= isset($icons[$flash['type']]) ? $icons[$flash['type']] : 'fa-circle-info' ?> me-1"></i>
-					<?= e($flash['message']) ?>
+					<?php if ( ! empty($flash['is_html'])): ?>
+						<?= $flash['message'] ?>
+					<?php else: ?>
+						<?= e($flash['message']) ?>
+					<?php endif; ?>
 					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
 				</div>
 			<?php endif; ?>

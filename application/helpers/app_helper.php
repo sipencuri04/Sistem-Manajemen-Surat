@@ -92,10 +92,10 @@ if ( ! function_exists('bulan_romawi'))
 if ( ! function_exists('set_flash'))
 {
 	/** type: success | danger | warning | info */
-	function set_flash($type, $message)
+	function set_flash($type, $message, $is_html = FALSE)
 	{
 		$CI =& get_instance();
-		$CI->session->set_flashdata('flash', array('type' => $type, 'message' => $message));
+		$CI->session->set_flashdata('flash', array('type' => $type, 'message' => $message, 'is_html' => (bool)$is_html));
 	}
 }
 

@@ -110,8 +110,12 @@ $text = function ($k, $label, $opts = array()) use ($val, $inv, $fb) {
 		<div class="form-section" id="email_section">
 			<div class="form-section-title d-flex align-items-center justify-content-between">
 				<span><i class="fa-solid fa-envelope text-primary"></i> Email Notifikasi (Gmail TU / SMTP)</span>
-				<?php if (!empty($s['smtp_user'])): ?>
-					<span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Terhubung</span>
+				<?php if (!empty($s['smtp_enabled']) && !empty($s['smtp_user']) && !empty($s['smtp_pass'])): ?>
+					<span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i> Terhubung &amp; Aktif</span>
+				<?php elseif (!empty($s['smtp_user']) && empty($s['smtp_pass'])): ?>
+					<span class="badge bg-warning text-dark"><i class="fa-solid fa-key me-1"></i> Sandi Belum Tersimpan</span>
+				<?php elseif (empty($s['smtp_enabled']) && !empty($s['smtp_user'])): ?>
+					<span class="badge bg-secondary"><i class="fa-solid fa-power-off me-1"></i> Dinonaktifkan</span>
 				<?php else: ?>
 					<span class="badge bg-warning text-dark"><i class="fa-solid fa-triangle-exclamation me-1"></i> Belum Dikonfigurasi</span>
 				<?php endif; ?>
@@ -146,14 +150,8 @@ $text = function ($k, $label, $opts = array()) use ($val, $inv, $fb) {
 						<?= $fb('smtp_pass') ?>
 						<div class="form-text">Dibuat dari <em>Akun Google &rarr; Keamanan &rarr; Sandi Aplikasi</em>. Kosongkan bila tidak diubah.</div>
 					</div>
-					<div class="col-md-6">
-						<?= $text('smtp_from_name', 'Nama Pengirim yang Ditampilkan', array('ph' => 'SMK Muhammadiyah Bandongan', 'help' => 'Nama instansi/sekolah di email masuk.')) ?>
-					</div>
-					<div class="col-md-6">
-						<label class="form-label d-block text-muted small">&nbsp;</label>
-						<button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#testEmailModal">
-							<i class="fa-solid fa-paper-plane me-1"></i> Uji Coba Kirim Email
-						</button>
+					<div class="col-12">
+						<?= $text('smtp_from_name', 'Nama Pengirim yang Ditampilkan', array('ph' => 'SMK Muhammadiyah Bandongan', 'help' => 'Nama instansi/sekolah yang akan muncul di kotak masuk email penerima.')) ?>
 					</div>
 				</div>
 
@@ -171,7 +169,7 @@ $text = function ($k, $label, $opts = array()) use ($val, $inv, $fb) {
 										<?= $text('smtp_host', 'Host SMTP', array('ph' => 'smtp.gmail.com', 'help' => 'Default Gmail: smtp.gmail.com')) ?>
 									</div>
 									<div class="col-md-3">
-										<?= $text('smtp_port', 'Port SMTP', array('type' => 'number', 'ph' => '587', 'help' => 'Default: 587')) ?>
+										<?= $text('smtp_port', 'Port SMTP', array('type' => 'number', 'ph' => '587', 'help' => 'Default: 587 (TLS) atau 465 (SSL)')) ?>
 									</div>
 									<div class="col-md-4">
 										<label class="form-label" for="smtp_crypto">Protokol Enkripsi</label>
@@ -184,6 +182,20 @@ $text = function ($k, $label, $opts = array()) use ($val, $inv, $fb) {
 								</div>
 							</div>
 						</div>
+					</div>
+				</div>
+
+				<div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mt-3 pt-3 border-top">
+					<div class="small text-muted">
+						<i class="fa-solid fa-shield-halved text-success me-1"></i> Sandi disimpan aman di database aplikasi.
+					</div>
+					<div class="d-flex gap-2">
+						<button type="submit" name="save_email_config" value="1" class="btn btn-primary fw-bold shadow-sm">
+							<i class="fa-solid fa-floppy-disk me-1"></i> Simpan Konfigurasi Email
+						</button>
+						<button type="button" class="btn btn-outline-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#testEmailModal">
+							<i class="fa-solid fa-paper-plane me-1"></i> Uji Coba Kirim Email
+						</button>
 					</div>
 				</div>
 			</div>
@@ -245,21 +257,32 @@ $text = function ($k, $label, $opts = array()) use ($val, $inv, $fb) {
 				<h5 class="modal-title fs-6 fw-bold text-navy" id="testEmailModalLabel"><i class="fa-solid fa-paper-plane text-primary me-2"></i>Uji Coba Kirim Email</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
 			</div>
-			<?= form_open('pengaturan/tes-email') ?>
+			<?= form_open('pengaturan/tes-email', array('id' => 'formTestEmail')) ?>
+				<input type="hidden" name="test_smtp_user" id="test_smtp_user" value="">
+				<input type="hidden" name="test_smtp_pass" id="test_smtp_pass" value="">
+				<input type="hidden" name="test_smtp_host" id="test_smtp_host" value="">
+				<input type="hidden" name="test_smtp_port" id="test_smtp_port" value="">
+				<input type="hidden" name="test_smtp_crypto" id="test_smtp_crypto" value="">
 				<div class="modal-body p-4">
-					<p class="small text-muted mb-3">Sistem akan melakukan koneksi ke Gmail TU dan mengirim email uji coba untuk memverifikasi apakah pengaturan sudah benar.</p>
+					<p class="small text-muted mb-3">Sistem akan melakukan koneksi ke Gmail TU dan mengirim email uji coba untuk memverifikasi apakah akun dan sandi aplikasi sudah bekerja.</p>
+					
+					<div class="p-2 mb-3 rounded bg-light border text-secondary small" id="test_sender_preview">
+						<i class="fa-solid fa-circle-user text-primary me-1"></i> Akun Pengirim: <strong class="text-dark" id="preview_smtp_user"><?= !empty($s['smtp_user']) ? e($s['smtp_user']) : '(Belum diisi)' ?></strong>
+					</div>
+
 					<div class="mb-3">
 						<label for="test_recipient" class="form-label required fw-semibold small">Kirim Email Percobaan Ke:</label>
 						<input type="email" class="form-control" id="test_recipient" name="test_recipient" required placeholder="nama@gmail.com" value="<?= !empty($current_user['email']) ? e($current_user['email']) : '' ?>">
-						<div class="form-text">Masukkan alamat email pribadi atau email Anda untuk melihat apakah pesan masuk.</div>
+						<div class="form-text">Masukkan alamat email tujuan (misal email pribadi Anda) untuk memeriksa apakah pesan masuk.</div>
 					</div>
-					<div class="alert alert-warning small mb-0">
-						<i class="fa-solid fa-triangle-exclamation me-1"></i> Jika Anda baru saja mengubah akun/password di atas, klik tombol <strong>Simpan Pengaturan</strong> di bawah terlebih dahulu sebelum melakukan uji coba.
+					
+					<div class="alert alert-info py-2 small mb-0">
+						<i class="fa-solid fa-circle-info me-1"></i> Jika uji coba berhasil, notifikasi sukses hijau akan muncul dan pesan tes akan masuk ke Inbox Gmail Anda.
 					</div>
 				</div>
 				<div class="modal-footer border-top bg-light">
 					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-					<button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane me-1"></i> Kirim Email Tes</button>
+					<button type="submit" class="btn btn-primary fw-semibold"><i class="fa-solid fa-paper-plane me-1"></i> Kirim Email Tes</button>
 				</div>
 			<?= form_close() ?>
 		</div>
@@ -275,6 +298,34 @@ document.addEventListener('DOMContentLoaded', function() {
 			var isPass = passInput.type === 'password';
 			passInput.type = isPass ? 'text' : 'password';
 			toggleBtn.innerHTML = isPass ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+		});
+	}
+
+	var testModal = document.getElementById('testEmailModal');
+	if (testModal) {
+		testModal.addEventListener('show.bs.modal', function() {
+			var smtpUserEl = document.getElementById('smtp_user');
+			var smtpPassEl = document.getElementById('smtp_pass');
+			var smtpHostEl = document.getElementById('smtp_host');
+			var smtpPortEl = document.getElementById('smtp_port');
+			var smtpCryptoEl = document.getElementById('smtp_crypto');
+
+			var uVal = smtpUserEl ? smtpUserEl.value.trim() : '';
+			var pVal = smtpPassEl ? smtpPassEl.value.trim() : '';
+			var hVal = smtpHostEl ? smtpHostEl.value.trim() : '';
+			var portVal = smtpPortEl ? smtpPortEl.value.trim() : '';
+			var cVal = smtpCryptoEl ? smtpCryptoEl.value.trim() : '';
+
+			if (document.getElementById('test_smtp_user')) document.getElementById('test_smtp_user').value = uVal;
+			if (document.getElementById('test_smtp_pass')) document.getElementById('test_smtp_pass').value = pVal;
+			if (document.getElementById('test_smtp_host')) document.getElementById('test_smtp_host').value = hVal;
+			if (document.getElementById('test_smtp_port')) document.getElementById('test_smtp_port').value = portVal;
+			if (document.getElementById('test_smtp_crypto')) document.getElementById('test_smtp_crypto').value = cVal;
+
+			var previewEl = document.getElementById('preview_smtp_user');
+			if (previewEl && uVal) {
+				previewEl.textContent = uVal;
+			}
 		});
 	}
 });
