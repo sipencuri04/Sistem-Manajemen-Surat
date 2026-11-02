@@ -14,7 +14,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Schema_upgrade
 {
-	const VERSION = 8;
+	const VERSION = 9;
 
 	protected $CI;
 
@@ -285,7 +285,20 @@ class Schema_upgrade
 			if ( ! $db->field_exists('signature_type', 'letters'))
 			{
 				$db->query("ALTER TABLE `letters` ADD COLUMN `signature_type` VARCHAR(20) NOT NULL DEFAULT 'digital'
-					COMMENT 'digital = ttd & stempel sistem | basah = wajib ttd basah fisik' AFTER `status`");
+					COMMENT 'digital = ttd digital | basah = wajib ttd basah fisik' AFTER `status`");
+			}
+			if ( ! $db->field_exists('stamp_type', 'letters'))
+			{
+				$db->query("ALTER TABLE `letters` ADD COLUMN `stamp_type` VARCHAR(20) NOT NULL DEFAULT 'digital'
+					COMMENT 'digital = stempel digital TU | basah = stempel basah fisik | belum_stempel = belum distempel' AFTER `signature_type`");
+			}
+			if ( ! $db->field_exists('stamped_by', 'letters'))
+			{
+				$db->query("ALTER TABLE `letters` ADD COLUMN `stamped_by` INT UNSIGNED NULL DEFAULT NULL AFTER `stamp_type`");
+			}
+			if ( ! $db->field_exists('stamped_at', 'letters'))
+			{
+				$db->query("ALTER TABLE `letters` ADD COLUMN `stamped_at` DATETIME NULL DEFAULT NULL AFTER `stamped_by`");
 			}
 		}
 

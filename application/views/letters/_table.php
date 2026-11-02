@@ -26,7 +26,12 @@
 				<td><?= e($r['recipient'] !== NULL && $r['recipient'] !== '' ? $r['recipient'] : '-') ?></td>
 				<td class="text-nowrap"><?= status_badge($r['status']) ?>
 					<?php if (isset($r['signature_type']) && $r['signature_type'] === 'basah'): ?>
-						<span class="badge bg-warning-subtle text-warning border border-warning-subtle ms-1" title="Mode Tanda Tangan Basah (Fisik)"><i class="fa-solid fa-pen-nib"></i> Basah</span>
+						<span class="badge bg-warning-subtle text-warning border border-warning-subtle ms-1" title="Mode Tanda Tangan Basah (Kepsek)"><i class="fa-solid fa-pen-nib"></i> Basah</span>
+					<?php elseif (isset($r['approval_status']) && $r['approval_status'] === 'disetujui'): ?>
+						<span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1" title="Disetujui Kepsek (e-Sign Digital)"><i class="fa-solid fa-signature"></i> e-Sign</span>
+					<?php endif; ?>
+					<?php if (isset($r['stamp_type']) && $r['stamp_type'] === 'digital'): ?>
+						<span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-1" title="Stempel Digital TU"><i class="fa-solid fa-stamp"></i> Stempel</span>
 					<?php endif; ?>
 					<?php if ((int) $r['pdf_count'] > 0): ?><i class="fa-solid fa-file-pdf text-danger ms-1" title="PDF arsip tersimpan"></i><?php endif; ?></td>
 				<td class="text-end text-nowrap">

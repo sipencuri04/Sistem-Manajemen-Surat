@@ -594,6 +594,7 @@ class Letters extends Admin_Controller
 			'signer_nip'        => $post('signer_nip'),
 			'notes'             => $post('notes') !== '' ? $post('notes') : NULL,
 			'signature_type'    => in_array($post('signature_type'), array('digital', 'basah'), TRUE) ? $post('signature_type') : 'digital',
+			'stamp_type'        => in_array($post('stamp_type'), array('digital', 'basah', 'belum_stempel'), TRUE) ? $post('stamp_type') : 'digital',
 			'content_data'      => json_encode($data, JSON_UNESCAPED_UNICODE),
 			'data_array'        => $data,
 			'number_mode'       => $mode,
@@ -649,5 +650,52 @@ class Letters extends Admin_Controller
 				? $this->letter_numbering->preview($this->school, $type, ! empty($values['letter_date']) && valid_date_string($values['letter_date']) ? $values['letter_date'] : date('Y-m-d'))
 				: NULL,
 		));
+	}
+	/** Pembubuhan stempel resmi sekolah oleh Tata Usaha (TU). */
+	public function stempel($id = 0)
+	{
+		$this->require_post();
+		$this->require_role(array('tu', 'superuser', 'admin'));
+
+		$letter = $this->Letter_model->find((int) $id);
+		if ( ! $letter)
+		{
+			$this->not_found('Surat tidak ditemukan.');
+		}
+
+		$stamp_action = (string) $this->input->post('stamp_action', TRUE);
+		if ($stamp_action === 'digital')
+		{
+			$new_stamp = 'digital';
+			$msg = 'Stempel Digital resmi sekolah berhasil dibubuhkan oleh Tata Usaha.';
+		}
+		elseif ($stamp_action === 'basah')
+		{
+			$new_stamp = 'basah';
+			$msg = 'Surat ditandai untuk dicap stempel basah fisik oleh Tata Usaha.';
+		}
+		else
+		{
+			$new_stamp = 'belum_stempel';
+			$msg = 'Stempel resmi surat dicabut oleh Tata Usaha.';
+		}
+
+		$this->db->where('id', $letter['id'])->update('letters', array(
+			'stamp_type' => $new_stamp,
+			'stamped_by' => $new_stamp !== 'belum_stempel' ? (int) $this->current_user['id'] : NULL,
+			'stamped_at' => $new_stamp !== 'belum_stempel' ? date('Y-m-d H:i:s') : NULL,
+			'updated_at' => date('Y-m-d H:i:s'),
+		));
+
+		// Perbarui PDF arsip jika surat sudah berstatus final
+		if ($letter['status'] === 'final')
+		{
+			$updated_letter = $this->Letter_model->find($letter['id']);
+			$this->archive_pdf($updated_letter);
+		}
+
+		audit_log('LETTER_STAMP', 'letters', $letter['id'], 'TU memperbarui stempel (' . $new_stamp . ') pada surat ' . $letter['letter_number']);
+		set_flash('success', $msg);
+		redirect('surat/detail/'.$letter['id']);
 	}
 }

@@ -164,34 +164,45 @@ $has_errors = (validation_errors() !== '' || ! empty($f_errors));
 					<input type="text" class="form-control<?= $inv('signer_nip') ?>" id="signer_nip" name="signer_nip" maxlength="30" value="<?= e($v('signer_nip')) ?>" placeholder="Opsional">
 					<?= $fb('signer_nip') ?>
 				</div>
+				<!-- Pemisahan Wewenang: TTD Kepala Sekolah vs Stempel TU -->
 				<div class="col-12">
+					<div class="p-3 bg-light rounded-3 border mb-3">
+						<div class="d-flex align-items-center gap-2 mb-1">
+							<i class="fa-solid fa-signature text-primary fs-5"></i>
+							<strong class="text-navy">Wewenang Tanda Tangan: Kepala Sekolah</strong>
+						</div>
+						<div class="small text-muted ps-4">
+							Surat keluar akan diajukan ke Kepala Sekolah untuk diperiksa. <strong>Kepala Sekolah yang berhak memutuskan dan memilih</strong> apakah menandatangani secara Digital (e-Sign) atau Tanda Tangan Basah Fisik saat menyetujui surat.
+						</div>
+					</div>
+
 					<label class="form-label required fw-bold text-navy">
-						<i class="fa-solid fa-stamp text-primary me-1"></i> Mode Pengesahan &amp; Tanda Tangan
+						<i class="fa-solid fa-stamp text-danger me-1"></i> Pengaturan Stempel Resmi Sekolah (Wewenang Tata Usaha)
 					</label>
 					<div class="row g-2">
 						<div class="col-md-6">
 							<div class="border rounded-3 p-3 bg-white h-100 shadow-sm">
 								<div class="form-check mb-1">
-									<input class="form-check-input" type="radio" name="signature_type" id="sig_digital" value="digital" <?= $v('signature_type', 'digital') === 'digital' ? 'checked' : '' ?>>
-									<label class="form-check-label fw-bold text-primary" for="sig_digital">
-										<i class="fa-solid fa-file-circle-check me-1"></i> Tanda Tangan &amp; Stempel Digital (Online)
+									<input class="form-check-input" type="radio" name="stamp_type" id="stamp_digital" value="digital" <?= $v('stamp_type', 'digital') === 'digital' ? 'checked' : '' ?>>
+									<label class="form-check-label fw-bold text-primary" for="stamp_digital">
+										<i class="fa-solid fa-stamp me-1"></i> Stempel Digital TU
 									</label>
 								</div>
 								<div class="small text-muted ps-4">
-									Surat otomatis mencantumkan scan tanda tangan Kepala Sekolah &amp; cap stempel resmi sekolah. Siswa dapat langsung mengunduh/mencetak dokumen PDF resmi mandiri.
+									Cap stempel resmi sekolah dibubuhkan secara digital pada dokumen PDF resmi.
 								</div>
 							</div>
 						</div>
 						<div class="col-md-6">
 							<div class="border rounded-3 p-3 bg-white h-100 shadow-sm">
 								<div class="form-check mb-1">
-									<input class="form-check-input" type="radio" name="signature_type" id="sig_basah" value="basah" <?= $v('signature_type') === 'basah' ? 'checked' : '' ?>>
-									<label class="form-check-label fw-bold text-danger" for="sig_basah">
-										<i class="fa-solid fa-pen-fancy me-1"></i> Wajib Tanda Tangan Basah (Fisik)
+									<input class="form-check-input" type="radio" name="stamp_type" id="stamp_basah" value="basah" <?= $v('stamp_type') === 'basah' ? 'checked' : '' ?>>
+									<label class="form-check-label fw-bold text-secondary" for="stamp_basah">
+										<i class="fa-solid fa-hand-holding-hand me-1"></i> Wajib Stempel Basah Fisik
 									</label>
 								</div>
 								<div class="small text-muted ps-4">
-									Kolom tanda tangan &amp; stempel sengaja <strong>dikosongkan</strong> untuk diprint fisik lalu dibubuhi tinta basah dan stempel asli TU. Siswa diinstruksikan mengambil fisik surat di ruang TU.
+									Kolom stempel di PDF dikosongkan untuk dicap basah fisik menggunakan stempel asli di ruang TU.
 								</div>
 							</div>
 						</div>

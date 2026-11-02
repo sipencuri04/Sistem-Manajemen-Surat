@@ -9,19 +9,20 @@ class Letter_model extends CI_Model
 	protected $fillable = array(
 		'letter_type_id', 'letter_number', 'number_mode', 'sequence_no', 'number_year',
 		'letter_date', 'place', 'subject', 'attachment_text', 'recipient', 'recipient_address',
-		'content_data', 'signer_name', 'signer_nip', 'signer_title', 'status', 'signature_type', 'approval_status',
-		'approved_by', 'approved_at', 'rejection_reason', 'notes',
+		'content_data', 'signer_name', 'signer_nip', 'signer_title', 'status', 'signature_type', 'stamp_type', 'approval_status',
+		'approved_by', 'approved_at', 'rejection_reason', 'stamped_by', 'stamped_at', 'notes',
 		'created_by', 'updated_by',
 	);
 
 	public function find($id)
 	{
 		$row = $this->db->select('l.*, t.name AS type_name, t.code AS type_code, t.template_key,
-				u.full_name AS created_by_name, u2.full_name AS updated_by_name')
+				u.full_name AS created_by_name, u2.full_name AS updated_by_name, u3.full_name AS stamped_by_name')
 			->from($this->table.' l')
 			->join('letter_types t', 't.id = l.letter_type_id', 'inner')
 			->join('users u', 'u.id = l.created_by', 'left')
 			->join('users u2', 'u2.id = l.updated_by', 'left')
+			->join('users u3', 'u3.id = l.stamped_by', 'left')
 			->where('l.id', (int) $id)
 			->get()->row_array();
 		if ( ! $row)

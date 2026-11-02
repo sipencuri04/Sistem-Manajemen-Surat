@@ -99,8 +99,41 @@ class Letter_renderer
 		);
 
 		$S = $this->CI->Settings_model;
-		$is_basah = (isset($opts['blank_signature']) && $opts['blank_signature']) 
-			|| (isset($letter['signature_type']) && $letter['signature_type'] === 'basah' && ! (isset($opts['force_signature']) && $opts['force_signature']));
+
+		// 1. TANDA TANGAN: Diputuskan oleh Kepala Sekolah
+		$show_signature = FALSE;
+		if (isset($opts['force_signature']) && $opts['force_signature'])
+		{
+			$show_signature = TRUE;
+		}
+		elseif (empty($opts['blank_signature']))
+		{
+			$is_approved = TRUE;
+			if (isset($letter['id']) && (int)$letter['id'] > 0 && isset($letter['approval_status']))
+			{
+				$is_approved = ($letter['approval_status'] === 'disetujui');
+			}
+			$is_digital_sig = !isset($letter['signature_type']) || $letter['signature_type'] === 'digital';
+			$show_signature = $is_approved && $is_digital_sig;
+		}
+
+		// 2. STEMPEL RESMI: Diputuskan & Dibubuhkan oleh Tata Usaha (TU)
+		$show_stamp = FALSE;
+		if (isset($opts['force_stamp']) && $opts['force_stamp'])
+		{
+			$show_stamp = TRUE;
+		}
+		elseif (empty($opts['blank_signature']) && empty($opts['blank_stamp']))
+		{
+			if (isset($letter['stamp_type']))
+			{
+				$show_stamp = ($letter['stamp_type'] === 'digital');
+			}
+			else
+			{
+				$show_stamp = !isset($letter['signature_type']) || $letter['signature_type'] === 'digital';
+			}
+		}
 
 		// URL & Hash verifikasi anti-pemalsuan untuk di-scan via QR Code
 		$letter_id   = isset($letter['id']) ? (int) $letter['id'] : 0;
@@ -111,8 +144,8 @@ class Letter_renderer
 		$images = array(
 			'logo'       => $this->image_data_uri($S->image_file('logo_path')),
 			'logo_right' => $this->image_data_uri($S->image_file('logo_right_path')),
-			'signature'  => $is_basah ? NULL : $this->image_data_uri($S->image_file('signature_path')),
-			'stamp'      => $is_basah ? NULL : $this->image_data_uri($S->image_file('stamp_path')),
+			'signature'  => $show_signature ? $this->image_data_uri($S->image_file('signature_path')) : NULL,
+			'stamp'      => $show_stamp ? $this->image_data_uri($S->image_file('stamp_path')) : NULL,
 			'qrcode'     => $this->generate_qr($verify_url),
 			'verify_url' => $verify_url,
 		);

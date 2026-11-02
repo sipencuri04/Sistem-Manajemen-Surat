@@ -28,6 +28,7 @@ $route['surat/pdf/(:num)']               = 'letters/pdf/$1';
 $route['surat/pdf/(:num)/(:any)']        = 'letters/pdf/$1/$2';
 $route['surat/arsipkan-pdf/(:num)']      = 'letters/regenerate/$1';
 $route['surat/nomor-berikutnya/(:num)']  = 'letters/next_number/$1';
+$route['surat/stempel/(:num)']           = 'letters/stempel/$1';
 
 // Verifikasi & Validasi Dokumen Digital (Scan Barcode / QR Code Anti-Pemalsuan)
 $route['verifikasi']                     = 'verifikasi/index';

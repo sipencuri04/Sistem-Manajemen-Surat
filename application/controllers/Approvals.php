@@ -49,24 +49,31 @@ class Approvals extends Admin_Controller
 			redirect('persetujuan-surat');
 		}
 
+		$sig_type = $this->input->post('signature_type') === 'basah' ? 'basah' : 'digital';
+
 		$this->db->where('id', $letter['id'])->update('letters', array(
 			'approval_status' => 'disetujui',
 			'status'          => 'final',
+			'signature_type'  => $sig_type,
 			'approved_by'     => (int) $this->current_user['id'],
 			'approved_at'     => date('Y-m-d H:i:s'),
 			'updated_at'      => date('Y-m-d H:i:s'),
 		));
 
-		// Buat PDF arsip
-		$this->archive_approved_pdf($letter);
+		// Muat data surat terbaru dengan tanda tangan yang sudah disetujui
+		$updated_letter = $this->Letter_model->find($letter['id']);
 
-		// Notifikasi pembuat surat (TU)
+		// Buat PDF arsip
+		$this->archive_approved_pdf($updated_letter);
+
+		// Notifikasi ke pembuat surat (TU)
 		if ($letter['created_by'])
 		{
+			$sig_note = $sig_type === 'digital' ? 'ditandatangani secara digital' : 'disetujui untuk tanda tangan basah fisik';
 			send_notification(
 				(int) $letter['created_by'],
 				'Surat Disetujui Kepala Sekolah',
-				'Surat No. '.$letter['letter_number'].' perihal "'.$letter['subject'].'" telah disetujui oleh Kepala Sekolah dan berstatus Final.',
+				'Surat No. '.$letter['letter_number'].' perihal "'.$letter['subject'].'" telah ' . $sig_note . ' oleh Kepala Sekolah. Silakan periksa dan bubuhkan stempel TU.',
 				site_url('surat/detail/'.$letter['id']),
 				'persetujuan'
 			);

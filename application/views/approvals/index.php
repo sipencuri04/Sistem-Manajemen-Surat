@@ -55,15 +55,55 @@
 						<td class="small text-muted"><?= e($l['created_by_name'] ?: 'TU') ?></td>
 						<td class="text-end">
 							<div class="btn-group btn-group-sm">
-								<a href="<?= site_url('surat/pdf/'.$l['id'].'/lihat') ?>" target="_blank" class="btn btn-outline-primary" title="Lihat Pratinjau PDF">
-									<i class="fa-solid fa-eye"></i>
+								<a href="<?= site_url('surat/pdf/'.$l['id'].'/lihat') ?>" target="_blank" class="btn btn-outline-primary" title="Lihat Pratinjau Dokumen">
+									<i class="fa-solid fa-eye me-1"></i> Pratinjau
 								</a>
-								<?= form_open('persetujuan-surat/setujui/'.$l['id'], array('class' => 'd-inline', 'data-confirm' => 'Setujui surat No. '.$l['letter_number'].'? Surat akan otomatis berstatus Final dan PDF arsip diterbitkan.')) ?>
-									<button type="submit" class="btn btn-success" title="Setujui Surat"><i class="fa-solid fa-check"></i></button>
-								<?= form_close() ?>
-								<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal_<?= $l['id'] ?>" title="Tolak / Minta Revisi">
-									<i class="fa-solid fa-xmark"></i>
+								<button type="button" class="btn btn-success fw-semibold" data-bs-toggle="modal" data-bs-target="#approveModal_<?= $l['id'] ?>" title="Setujui & Tanda Tangani Surat">
+									<i class="fa-solid fa-signature me-1"></i> Tanda Tangani
 								</button>
+								<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal_<?= $l['id'] ?>" title="Tolak / Minta Revisi">
+									<i class="fa-solid fa-ban"></i>
+								</button>
+							</div>
+
+							<!-- Modal Setujui & Putuskan TTD (Wewenang Kepala Sekolah) -->
+							<div class="modal fade text-start" id="approveModal_<?= $l['id'] ?>" tabindex="-1" aria-hidden="true">
+								<div class="modal-dialog modal-dialog-centered">
+									<div class="modal-content shadow border-0">
+										<div class="modal-header border-bottom">
+											<h5 class="modal-title h6 fw-bold text-navy"><i class="fa-solid fa-signature text-primary me-2"></i>Persetujuan &amp; Tanda Tangan Kepala Sekolah</h5>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+										</div>
+										<?= form_open('persetujuan-surat/setujui/'.$l['id']) ?>
+										<div class="modal-body p-4">
+											<p class="small text-muted mb-3">Sebagai Kepala Sekolah, Anda memutuskan pengesahan surat <strong><?= e($l['letter_number']) ?></strong>:</p>
+											<div class="mb-3">
+												<div class="form-check p-3 border rounded-3 bg-light mb-2">
+													<input class="form-check-input ms-0 me-2" type="radio" name="signature_type" id="approve_sig_digital_<?= $l['id'] ?>" value="digital" checked>
+													<label class="form-check-label fw-bold text-primary" for="approve_sig_digital_<?= $l['id'] ?>">
+														<i class="fa-solid fa-file-signature me-1"></i> Tanda Tangani Secara Digital (e-Sign)
+													</label>
+													<div class="small text-muted ps-4">Scan tanda tangan resmi Kepala Sekolah otomatis dibubuhkan ke dokumen PDF.</div>
+												</div>
+												<div class="form-check p-3 border rounded-3 bg-light">
+													<input class="form-check-input ms-0 me-2" type="radio" name="signature_type" id="approve_sig_basah_<?= $l['id'] ?>" value="basah">
+													<label class="form-check-label fw-bold text-secondary" for="approve_sig_basah_<?= $l['id'] ?>">
+														<i class="fa-solid fa-pen-fancy me-1"></i> Setujui untuk Tanda Tangan Basah Fisik
+													</label>
+													<div class="small text-muted ps-4">Surat disetujui untuk dicetak fisik dan ditandatangani manual menggunakan tinta basah di meja kerja.</div>
+												</div>
+											</div>
+											<div class="alert alert-info py-2 small mb-0">
+												<i class="fa-solid fa-info-circle me-1"></i> <strong>Catatan Stempel:</strong> Cap stempel resmi sekolah adalah wewenang Tata Usaha (TU) dan akan dibubuhkan oleh TU setelah surat ini Anda sahkan.
+											</div>
+										</div>
+										<div class="modal-footer border-top bg-light">
+											<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+											<button type="submit" class="btn btn-success fw-semibold"><i class="fa-solid fa-signature me-1"></i> Sahkan &amp; Tandatangani</button>
+										</div>
+										<?= form_close() ?>
+									</div>
+								</div>
 							</div>
 
 							<!-- Modal Tolak Surat -->

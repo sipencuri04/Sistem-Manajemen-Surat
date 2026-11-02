@@ -26,10 +26,17 @@ $id = (int) $letter['id'];
 		</div>
 	</div>
 	<?php if (is_kepala_sekolah() && isset($letter['approval_status']) && $letter['approval_status'] === 'menunggu_persetujuan'): ?>
-		<?= form_open('persetujuan-surat/setujui/'.$id, array('class' => 'd-inline', 'data-confirm' => 'Setujui dan terbitkan surat ini?')) ?>
-			<button type="submit" class="btn btn-success"><i class="fa-solid fa-check me-1"></i> Setujui Surat</button>
-		<?= form_close() ?>
-		<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectModal"><i class="fa-solid fa-ban me-1"></i> Tolak / Minta Revisi</button>
+		<button type="button" class="btn btn-success fw-semibold" data-bs-toggle="modal" data-bs-target="#kepsekApproveModal">
+			<i class="fa-solid fa-signature me-1"></i> Tanda Tangani Surat
+		</button>
+		<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+			<i class="fa-solid fa-ban me-1"></i> Tolak / Minta Revisi
+		</button>
+	<?php endif; ?>
+	<?php if (is_tu() || is_superuser() || is_admin()): ?>
+		<button type="button" class="btn btn-outline-danger fw-semibold" data-bs-toggle="modal" data-bs-target="#tuStempelModal">
+			<i class="fa-solid fa-stamp me-1"></i> Kelola Stempel TU
+		</button>
 	<?php endif; ?>
 	<a href="<?= site_url('surat/edit/'.$id) ?>" class="btn btn-outline-primary"><i class="fa-solid fa-pen me-1"></i> Edit</a>
 	<div class="btn-group">
@@ -105,15 +112,45 @@ $id = (int) $letter['id'];
 						<?php elseif ($letter['approval_status'] === 'ditolak'): ?>
 							<span class="badge bg-danger">Ditolak</span>
 						<?php endif; ?>
-					<dt>Mode Pengesahan</dt>
+					<dt>Tanda Tangan (Kepala Sekolah)</dt>
 					<dd>
-						<?php if (isset($letter['signature_type']) && $letter['signature_type'] === 'basah'): ?>
+						<?php if ($letter['approval_status'] === 'menunggu_persetujuan'): ?>
+							<span class="badge bg-warning-subtle text-warning border border-warning-subtle fw-semibold">
+								<i class="fa-solid fa-clock me-1"></i> Menunggu Tanda Tangan Kepala Sekolah
+							</span>
+						<?php elseif ($letter['approval_status'] === 'disetujui'): ?>
+							<?php if (isset($letter['signature_type']) && $letter['signature_type'] === 'basah'): ?>
+								<span class="badge bg-warning-subtle text-warning border border-warning-subtle fw-semibold">
+									<i class="fa-solid fa-pen-fancy me-1"></i> Disetujui untuk TTD Basah Fisik
+								</span>
+							<?php else: ?>
+								<span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold">
+									<i class="fa-solid fa-signature me-1"></i> Ditandatangani Digital (e-Sign)
+								</span>
+							<?php endif; ?>
+						<?php elseif ($letter['approval_status'] === 'ditolak'): ?>
 							<span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-semibold">
-								<i class="fa-solid fa-pen-fancy me-1"></i> Wajib Tanda Tangan Basah (Fisik)
+								<i class="fa-solid fa-circle-xmark me-1"></i> Ditolak Kepala Sekolah
 							</span>
 						<?php else: ?>
+							<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Draft</span>
+						<?php endif; ?>
+					</dd>
+					<dt>Stempel Resmi (Wewenang TU)</dt>
+					<dd>
+						<?php $st_type = isset($letter['stamp_type']) ? $letter['stamp_type'] : 'digital'; ?>
+						<?php if ($st_type === 'digital'): ?>
 							<span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold">
-								<i class="fa-solid fa-stamp me-1"></i> Tanda Tangan &amp; Stempel Digital
+								<i class="fa-solid fa-stamp me-1"></i> Telah Dibubuhi Stempel Digital TU
+							</span>
+							<?php if (!empty($letter['stamped_by_name'])): ?><small class="text-muted ms-1">(oleh <?= e($letter['stamped_by_name']) ?>)</small><?php endif; ?>
+						<?php elseif ($st_type === 'basah'): ?>
+							<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-semibold">
+								<i class="fa-solid fa-hand-holding-hand me-1"></i> Mode Stempel Basah Fisik
+							</span>
+						<?php else: ?>
+							<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-semibold">
+								<i class="fa-solid fa-triangle-exclamation me-1"></i> Belum Distempel oleh TU
 							</span>
 						<?php endif; ?>
 					</dd>
@@ -220,3 +257,87 @@ $id = (int) $letter['id'];
 	</div>
 </div>
 <?php endif; ?>
+
+<!-- Modal Persetujuan & Keputusan TTD Kepala Sekolah -->
+<div class="modal fade" id="kepsekApproveModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content shadow border-0">
+			<div class="modal-header border-bottom">
+				<h5 class="modal-title h6 fw-bold text-navy"><i class="fa-solid fa-signature text-primary me-2"></i>Persetujuan &amp; Tanda Tangan Kepala Sekolah</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+			</div>
+			<?= form_open('persetujuan-surat/setujui/'.$id) ?>
+			<div class="modal-body p-4">
+				<p class="small text-muted mb-3">Sebagai Kepala Sekolah, silakan tentukan cara pengesahan tanda tangan surat ini:</p>
+				<div class="mb-3">
+					<div class="form-check p-3 border rounded-3 bg-light mb-2">
+						<input class="form-check-input ms-0 me-2" type="radio" name="signature_type" id="dtl_sig_digital" value="digital" checked>
+						<label class="form-check-label fw-bold text-primary" for="dtl_sig_digital">
+							<i class="fa-solid fa-file-signature me-1"></i> Tanda Tangani Secara Digital (e-Sign)
+						</label>
+						<div class="small text-muted ps-4">Scan tanda tangan resmi Kepala Sekolah langsung tercantum pada dokumen PDF surat.</div>
+					</div>
+					<div class="form-check p-3 border rounded-3 bg-light">
+						<input class="form-check-input ms-0 me-2" type="radio" name="signature_type" id="dtl_sig_basah" value="basah">
+						<label class="form-check-label fw-bold text-secondary" for="dtl_sig_basah">
+							<i class="fa-solid fa-pen-fancy me-1"></i> Setujui untuk Tanda Tangan Basah Fisik
+						</label>
+						<div class="small text-muted ps-4">Surat disetujui untuk diprint fisik dan ditandatangani basah manual menggunakan bolpoin di meja Kepala Sekolah.</div>
+					</div>
+				</div>
+				<div class="alert alert-info py-2 small mb-0">
+					<i class="fa-solid fa-info-circle me-1"></i> <strong>Catatan Stempel:</strong> Cap stempel sekolah adalah wewenang bagian Tata Usaha (TU) dan akan dibubuhkan oleh petugas TU.
+				</div>
+			</div>
+			<div class="modal-footer border-top bg-light">
+				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+				<button type="submit" class="btn btn-success fw-semibold"><i class="fa-solid fa-signature me-1"></i> Sahkan &amp; Tandatangani</button>
+			</div>
+			<?= form_close() ?>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Kelola Stempel Resmi TU -->
+<div class="modal fade" id="tuStempelModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content shadow border-0">
+			<div class="modal-header border-bottom">
+				<h5 class="modal-title h6 fw-bold text-danger"><i class="fa-solid fa-stamp text-danger me-2"></i>Pengelolaan Stempel Resmi (Wewenang Tata Usaha)</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+			</div>
+			<?= form_open('surat/stempel/'.$id) ?>
+			<div class="modal-body p-4">
+				<p class="small text-muted mb-3">Sebagai petugas Tata Usaha, tentukan status cap stempel resmi sekolah untuk surat ini:</p>
+				<div class="mb-3">
+					<div class="form-check p-3 border rounded-3 bg-light mb-2">
+						<input class="form-check-input ms-0 me-2" type="radio" name="stamp_action" id="tu_stamp_digital" value="digital" <?= (!isset($letter['stamp_type']) || $letter['stamp_type'] === 'digital') ? 'checked' : '' ?>>
+						<label class="form-check-label fw-bold text-primary" for="tu_stamp_digital">
+							<i class="fa-solid fa-stamp me-1"></i> Bubuhkan Stempel Digital TU
+						</label>
+						<div class="small text-muted ps-4">Cap stempel resmi sekolah dibubuhkan secara digital pada berkas PDF.</div>
+					</div>
+					<div class="form-check p-3 border rounded-3 bg-light mb-2">
+						<input class="form-check-input ms-0 me-2" type="radio" name="stamp_action" id="tu_stamp_basah" value="basah" <?= (isset($letter['stamp_type']) && $letter['stamp_type'] === 'basah') ? 'checked' : '' ?>>
+						<label class="form-check-label fw-bold text-secondary" for="tu_stamp_basah">
+							<i class="fa-solid fa-hand-holding-hand me-1"></i> Mode Stempel Basah Fisik
+						</label>
+						<div class="small text-muted ps-4">Surat dicetak fisik lalu dicap basah menggunakan stempel asli di ruang TU.</div>
+					</div>
+					<div class="form-check p-3 border rounded-3 bg-light">
+						<input class="form-check-input ms-0 me-2" type="radio" name="stamp_action" id="tu_stamp_cabut" value="cabut" <?= (isset($letter['stamp_type']) && $letter['stamp_type'] === 'belum_stempel') ? 'checked' : '' ?>>
+						<label class="form-check-label fw-bold text-danger" for="tu_stamp_cabut">
+							<i class="fa-solid fa-ban me-1"></i> Cabut Stempel (Belum Distempel)
+						</label>
+						<div class="small text-muted ps-4">Menghilangkan stempel dari surat ini sampai TU membubuhkannya kembali.</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer border-top bg-light">
+				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+				<button type="submit" class="btn btn-danger fw-semibold"><i class="fa-solid fa-stamp me-1"></i> Simpan Status Stempel TU</button>
+			</div>
+			<?= form_close() ?>
+		</div>
+	</div>
+</div>
