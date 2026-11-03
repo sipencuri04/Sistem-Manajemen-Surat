@@ -196,6 +196,15 @@ class Template_registry
 		foreach ($tpl['fields'] as $name => $field)
 		{
 			$v = isset($data[$name]) ? $data[$name] : '';
+
+			// Dukungan fallback alias jika kunci field menggunakan varian nama/jurusan
+			if ($v === '')
+			{
+				if ($name === 'nama_siswa' && ! empty($data['nama'])) $v = $data['nama'];
+				elseif ($name === 'kompetensi_keahlian' && ! empty($data['jurusan'])) $v = $data['jurusan'];
+				elseif ($name === 'alamat_instansi' && ! empty($data['alamat'])) $v = $data['alamat'];
+			}
+
 			if ($field['type'] === 'rows')
 			{
 				$out[$name] = is_array($v) ? $v : array();

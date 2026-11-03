@@ -87,31 +87,31 @@ INSERT INTO `letter_requests` (
 ) VALUES 
 (
   'REQ-NOXA01', 1, 'Noxa Aulia Pratama', 'XII TKJ 1', '+62 877-4177-7837', 'noxapremia02@gmail.com',
-  '{"nama":"Noxa Aulia Pratama","nis":"10895","nisn":"0068492088","tempat_lahir":"Magelang","tanggal_lahir":"2008-04-18","kelas":"XII TKJ 1","jurusan":"Teknik Komputer dan Jaringan","nama_orang_tua":"Bambang Premia S.","keperluan":"Persyaratan Pengajuan Beasiswa Pendidikan Prestasi & Bantuan Kuliah Tahun 2026","tahun_pelajaran":"2025/2026"}',
+  '{"nama_siswa":"Noxa Aulia Pratama","nama":"Noxa Aulia Pratama","nis":"10895","nisn":"0068492088","tempat_lahir":"Magelang","tanggal_lahir":"2008-04-18","jenis_kelamin":"Laki-laki","kelas":"XII TKJ 1","tahun_pelajaran":"2025/2026","kompetensi_keahlian":"Teknik Komputer dan Jaringan","jurusan":"Teknik Komputer dan Jaringan","nama_orang_tua":"Bambang Premia S.","alamat":"Jl. Bandongan No. 45, RT 02/RW 03, Bandongan, Magelang","keperluan":"Persyaratan Pengajuan Beasiswa Pendidikan Prestasi & Bantuan Kuliah"}',
   'Mohon dibantu proses surat keterangan aktif ini Bapak/Ibu TU, berkas beasiswa harus segera saya unggah. Terima kasih.',
   'pending', '127.0.0.1', NOW()
 ),
 (
   'REQ-PREM02', 11, 'Premia Bagus Saputra', 'XII TKR 2', '+62 877-4177-7837', 'noxapremia02@gmail.com',
-  '{"nama":"Premia Bagus Saputra","nis":"10912","nisn":"0069321455","tempat_lahir":"Magelang","tanggal_lahir":"2008-07-22","kelas":"XII TKR 2","jurusan":"Teknik Kendaraan Ringan Otomotif","nama_instansi":"PT Nasmoco Magelang","tanggal_mulai":"2025-07-01","tanggal_selesai":"2025-12-31","keperluan":"Kelengkapan Berkas Lamaran Pekerjaan di Industri Otomotif"}',
+  '{"nama_siswa":"Premia Bagus Saputra","nama":"Premia Bagus Saputra","nis":"10912","kelas":"XII TKR 2","kompetensi_keahlian":"Teknik Kendaraan Ringan Otomotif","jurusan":"Teknik Kendaraan Ringan Otomotif","nama_instansi":"PT Nasmoco Magelang","alamat_instansi":"Jl. Urip Sumoharjo No. 88, Magelang","alamat":"Jl. Urip Sumoharjo No. 88, Magelang","tanggal_mulai":"2025-07-01","tanggal_selesai":"2025-12-31","predikat":"Sangat Baik (A)","keperluan":"Kelengkapan Berkas Lamaran Pekerjaan di Industri Otomotif"}',
   'Untuk lampiran melamar kerja di bengkel resmi, mohon surat selesai PKL-nya diproses. Terima kasih banyak TU.',
   'pending', '127.0.0.1', NOW()
 ),
 (
   'REQ-ANIN03', 1, 'Anindya Zahra Kirana', 'XI TKJ 2', '+62 877-4177-7837', 'noxapremia02@gmail.com',
-  '{"nama":"Anindya Zahra Kirana","nis":"11045","nisn":"0078129034","tempat_lahir":"Semarang","tanggal_lahir":"2009-02-14","kelas":"XI TKJ 2","jurusan":"Teknik Komputer dan Jaringan","nama_orang_tua":"Agus Prasetyo","keperluan":"Pengurusan Tunjangan Gaji Anak pada Instansi Tempat Kerja Orang Tua","tahun_pelajaran":"2025/2026"}',
+  '{"nama_siswa":"Anindya Zahra Kirana","nama":"Anindya Zahra Kirana","nis":"11045","nisn":"0078129034","tempat_lahir":"Semarang","tanggal_lahir":"2009-02-14","jenis_kelamin":"Perempuan","kelas":"XI TKJ 2","tahun_pelajaran":"2025/2026","kompetensi_keahlian":"Teknik Komputer dan Jaringan","jurusan":"Teknik Komputer dan Jaringan","nama_orang_tua":"Agus Prasetyo","alamat":"Dusun Trasan, RT 01/RW 04, Bandongan, Magelang","keperluan":"Pengurusan Tunjangan Gaji Anak pada Instansi Tempat Kerja Orang Tua (KP4)"}',
   'Surat aktif untuk syarat KP4 tunjangan keluarga instansi ayah saya. Mohon bantuannya Bapak/Ibu.',
   'pending', '127.0.0.1', NOW()
 ),
 (
   'REQ-RIZK04', 2, 'Rizky Aditya Nugroho', 'XII TBSM 1', '+62 877-4177-7837', 'noxapremia02@gmail.com',
-  '{"nama":"Rizky Aditya Nugroho","nis":"10834","nisn":"0067451299","tempat_lahir":"Magelang","tanggal_lahir":"2008-01-30","kelas":"XII TBSM 1","jurusan":"Teknik Bisnis Sepeda Motor","nama_orang_tua":"Supriyadi","keperluan":"Persyaratan Pendaftaran Calon Bintara TNI Angkatan Darat","tahun_pelajaran":"2025/2026"}',
+  '{"nama_siswa":"Rizky Aditya Nugroho","nama":"Rizky Aditya Nugroho","nis":"10834","nisn":"0067451299","tempat_lahir":"Magelang","tanggal_lahir":"2008-01-30","nama_orang_tua":"Supriyadi","kompetensi_keahlian":"Teknik Bisnis Sepeda Motor","jurusan":"Teknik Bisnis Sepeda Motor","tahun_pelajaran":"2025/2026","tanggal_kelulusan":"2026-05-08","nomor_ijazah":"DN-03/M-SMK/K13/2026/012984","keperluan":"Persyaratan Pendaftaran Calon Bintara TNI Angkatan Darat"}',
   'Surat keterangan untuk pendaftaran Secaba TNI AD di Kodim, batas akhir pengumpulan minggu ini. Terima kasih.',
   'pending', '127.0.0.1', NOW()
 ),
 (
   'REQ-SALS05', 1, 'Salsabila Putri Maharani', 'X AKL 1', '+62 877-4177-7837', 'noxapremia02@gmail.com',
-  '{"nama":"Salsabila Putri Maharani","nis":"11280","nisn":"0089123847","tempat_lahir":"Yogyakarta","tanggal_lahir":"2010-09-05","kelas":"X AKL 1","jurusan":"Akuntansi dan Keuangan Lembaga","nama_orang_tua":"Siti Rohmah","keperluan":"Pembuatan Rekening Tabungan SimPel Bank Jateng dan Aktivasi Kartu Indonesia Pintar (KIP)","tahun_pelajaran":"2025/2026"}',
+  '{"nama_siswa":"Salsabila Putri Maharani","nama":"Salsabila Putri Maharani","nis":"11280","nisn":"0089123847","tempat_lahir":"Yogyakarta","tanggal_lahir":"2010-09-05","jenis_kelamin":"Perempuan","kelas":"X AKL 1","tahun_pelajaran":"2025/2026","kompetensi_keahlian":"Akuntansi dan Keuangan Lembaga","jurusan":"Akuntansi dan Keuangan Lembaga","nama_orang_tua":"Siti Rohmah","alamat":"Desa Rejosari, RT 03/RW 01, Bandongan, Magelang","keperluan":"Pembuatan Rekening Tabungan SimPel Bank Jateng dan Aktivasi Kartu Indonesia Pintar (KIP)"}',
   'Untuk aktivasi buku tabungan Bank Jateng pencairan dana bantuan KIP. Mohon bantuannya Bapak/Ibu TU.',
   'pending', '127.0.0.1', NOW()
 );

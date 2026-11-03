@@ -81,6 +81,23 @@ class Letters extends Admin_Controller
 		if ($req)
 		{
 			$f = $req['data'];
+			if (empty($f['nama_siswa']) && ! empty($req['requester_name']))
+			{
+				$f['nama_siswa'] = $req['requester_name'];
+			}
+			if (empty($f['kelas']) && ! empty($req['requester_class']))
+			{
+				$f['kelas'] = $req['requester_class'];
+			}
+			if (empty($f['kompetensi_keahlian']) && ! empty($f['jurusan']))
+			{
+				$f['kompetensi_keahlian'] = $f['jurusan'];
+			}
+			if (empty($f['alamat_instansi']) && ! empty($f['alamat']))
+			{
+				$f['alamat_instansi'] = $f['alamat'];
+			}
+
 			$defaults['notes'] = 'Dari permohonan siswa kode '.$req['tracking_code'];
 			if ($req['requester_note'])
 			{

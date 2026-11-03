@@ -56,12 +56,24 @@ class Requests extends Admin_Controller
 		$req = $this->load_request($id);
 		$type = $this->Letter_type_model->find($req['letter_type_id']);
 		$tpl  = $this->template_registry->get($req['template_key']);
+
+		$data = $req['data'];
+		// Pastikan data penting selalu terisi dari identitas pemohon jika belum ada di data JSON
+		if (empty($data['nama_siswa']) && ! empty($req['requester_name']))
+		{
+			$data['nama_siswa'] = $req['requester_name'];
+		}
+		if (empty($data['kelas']) && ! empty($req['requester_class']))
+		{
+			$data['kelas'] = $req['requester_class'];
+		}
+
 		$this->render('requests/detail', array(
 			'page_title' => 'Detail Permohonan',
 			'req'        => $req,
 			'type'       => $type,
 			'tpl'        => $tpl,
-			'values'     => $tpl ? $this->template_registry->formatted_values($tpl, $req['data']) : array(),
+			'values'     => $tpl ? $this->template_registry->formatted_values($tpl, $data) : array(),
 		));
 	}
 
