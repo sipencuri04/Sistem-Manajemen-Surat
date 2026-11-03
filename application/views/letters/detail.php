@@ -34,9 +34,15 @@ $id = (int) $letter['id'];
 		</button>
 	<?php endif; ?>
 	<?php if (is_tu() || is_superuser() || is_admin()): ?>
-		<button type="button" class="btn btn-outline-danger fw-semibold" data-bs-toggle="modal" data-bs-target="#tuStempelModal">
-			<i class="fa-solid fa-stamp me-1"></i> Kelola Stempel TU
-		</button>
+		<?php if (isset($letter['approval_status']) && $letter['approval_status'] === 'disetujui'): ?>
+			<button type="button" class="btn btn-danger fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#tuStempelModal">
+				<i class="fa-solid fa-stamp me-1"></i> Beri Stempel TU
+			</button>
+		<?php else: ?>
+			<button type="button" class="btn btn-outline-secondary" disabled title="Surat harus ditandatangani Kepala Sekolah terlebih dahulu sebelum distempel TU">
+				<i class="fa-solid fa-stamp me-1"></i> Stempel TU (Menunggu TTD Kepsek)
+			</button>
+		<?php endif; ?>
 	<?php endif; ?>
 	<a href="<?= site_url('surat/edit/'.$id) ?>" class="btn btn-outline-primary"><i class="fa-solid fa-pen me-1"></i> Edit</a>
 	<div class="btn-group">

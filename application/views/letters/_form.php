@@ -220,8 +220,12 @@ $has_errors = (validation_errors() !== '' || ! empty($f_errors));
 			<a href="<?= $is_edit ? site_url('surat/detail/'.(int) $letter['id']) : site_url('surat/buat') ?>" class="btn btn-light me-auto"><i class="fa-solid fa-arrow-left me-1"></i> Batal</a>
 			<button type="button" class="btn btn-outline-primary" data-preview-action="<?= site_url('surat/pratinjau') ?>"><i class="fa-solid fa-eye me-1"></i> Pratinjau</button>
 			<button type="submit" name="save_as" value="draft" class="btn btn-outline-secondary"><i class="fa-regular fa-floppy-disk me-1"></i> Simpan Draft</button>
-			<button type="submit" name="save_as" value="approval" class="btn btn-warning text-dark"><i class="fa-solid fa-paper-plane me-1"></i> Ajukan ke Kepala Sekolah</button>
-			<button type="submit" name="save_as" value="final" class="btn btn-primary"><i class="fa-solid fa-check me-1"></i> Simpan &amp; Finalkan</button>
+			<?php if (is_kepala_sekolah() || is_superuser()): ?>
+				<button type="submit" name="save_as" value="final" class="btn btn-primary"><i class="fa-solid fa-signature me-1"></i> Sahkan &amp; Tandatangani (Kepsek)</button>
+			<?php else: ?>
+				<!-- TU & Pegawai Wajib Mengajukan ke Kepala Sekolah untuk Ditandatangani -->
+				<button type="submit" name="save_as" value="approval" class="btn btn-warning text-dark fw-bold"><i class="fa-solid fa-paper-plane me-1"></i> Ajukan ke Kepala Sekolah (TTD)</button>
+			<?php endif; ?>
 		</div>
 	</div>
 <?= form_close() ?>

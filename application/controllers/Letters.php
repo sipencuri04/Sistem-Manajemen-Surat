@@ -127,6 +127,12 @@ class Letters extends Admin_Controller
 
 		$row['letter_type_id'] = (int) $type['id'];
 		$save_as               = $this->input->post('save_as');
+		$can_sign = in_array(strtolower($this->current_user['role']), array('kepala_sekolah', 'superuser'), TRUE);
+		// TU dan Pegawai tidak bisa mengesahkan tanda tangan sendiri, wajib diajukan ke Kepala Sekolah
+		if ($save_as === 'final' && ! $can_sign) {
+			$save_as = 'approval';
+		}
+		
 		if ($save_as === 'approval')
 		{
 			$row['status']          = 'draft';
@@ -325,6 +331,12 @@ class Letters extends Admin_Controller
 			unset($row['letter_number'], $row['number_mode'], $row['sequence_no'], $row['number_year']);
 		}
 		$save_as = $this->input->post('save_as');
+		$can_sign = in_array(strtolower($this->current_user['role']), array('kepala_sekolah', 'superuser'), TRUE);
+		// TU dan Pegawai tidak bisa mengesahkan tanda tangan sendiri, wajib diajukan ke Kepala Sekolah
+		if ($save_as === 'final' && ! $can_sign) {
+			$save_as = 'approval';
+		}
+		
 		if ($save_as === 'approval')
 		{
 			$row['status']          = 'draft';
@@ -662,6 +674,14 @@ class Letters extends Admin_Controller
 		{
 			$this->not_found('Surat tidak ditemukan.');
 		}
+
+		// Validasi Wewenang: TU hanya boleh membubuhkan stempel jika surat sudah disetujui/ditandatangani Kepala Sekolah
+		if ( ! isset($letter['approval_status']) || $letter['approval_status'] !== 'disetujui') {
+			set_flash('danger', 'Surat belum ditandatangani oleh Kepala Sekolah. Stempel TU hanya dapat dibubuhkan setelah surat disahkan Kepala Sekolah.');
+			redirect('surat/detail/'.$letter['id']);
+			return;
+		}
+		
 
 		$stamp_action = (string) $this->input->post('stamp_action', TRUE);
 		if ($stamp_action === 'digital')
