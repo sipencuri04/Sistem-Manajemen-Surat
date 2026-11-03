@@ -6,33 +6,40 @@
 	<title>Tiket Antrean <?= e($ticket['ticket_number']) ?></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style>
-		@page { margin: 0; size: 80mm auto; }
+		@page { 
+			margin: 0; 
+			size: 58mm auto; 
+		}
+		* {
+			box-sizing: border-box;
+		}
 		body {
 			font-family: Arial, Helvetica, sans-serif;
-			margin: 0;
-			padding: 12px 10px;
+			margin: 0 auto;
+			padding: 4px 6px;
 			color: #000000;
 			background: #ffffff;
-			width: 72mm;
-			max-width: 100%;
+			width: 48mm;
+			max-width: 48mm;
 			text-align: center;
 			-webkit-print-color-adjust: exact;
 			print-color-adjust: exact;
 		}
-		.title { font-size: 13.5px; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 0.5px; }
-		.sub { font-size: 11px; margin-bottom: 6px; font-weight: 600; }
-		.line-solid { border-top: 2px solid #000000; margin: 8px 0; }
-		.line-thin { border-top: 1px solid #000000; margin: 6px 0; }
-		.num-caption { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-		.num { font-size: 48px; font-weight: 900; margin: 4px 0; font-family: Arial, sans-serif; letter-spacing: 2px; line-height: 1.1; }
-		.service { font-size: 13.5px; font-weight: 800; text-transform: uppercase; margin-top: 2px; }
-		.loket { font-size: 15px; font-weight: 900; margin-top: 4px; letter-spacing: 1px; }
-		.meta { font-size: 11.5px; text-align: left; margin: 8px 0; font-weight: 600; }
+		.title { font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 2px; line-height: 1.2; word-wrap: break-word; }
+		.sub { font-size: 8.5px; margin-bottom: 4px; font-weight: 600; line-height: 1.2; }
+		.line-solid { border-top: 2px solid #000000; margin: 5px 0; }
+		.line-thin { border-top: 1px solid #000000; margin: 4px 0; }
+		.num-caption { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+		.num { font-size: 34px; font-weight: 900; margin: 2px 0; font-family: Arial, sans-serif; letter-spacing: 1px; line-height: 1.1; }
+		.service { font-size: 11px; font-weight: 800; text-transform: uppercase; margin-top: 2px; line-height: 1.2; }
+		.loket { font-size: 12px; font-weight: 900; margin-top: 3px; letter-spacing: 0.5px; }
+		.meta { font-size: 9.5px; text-align: left; margin: 5px 0; font-weight: 700; }
 		.meta table { width: 100%; border-collapse: collapse; }
-		.meta td { padding: 3px 0; font-size: 11.5px; }
-		.footer { font-size: 10.5px; margin-top: 8px; font-weight: 600; line-height: 1.35; }
+		.meta td { padding: 2px 0; font-size: 9.5px; }
+		.footer { font-size: 8px; margin-top: 5px; font-weight: 600; line-height: 1.3; }
 		@media print {
 			.no-print { display: none !important; }
+			body { width: 100%; max-width: 48mm; margin: 0; padding: 2px 4px; }
 		}
 	</style>
 </head>
