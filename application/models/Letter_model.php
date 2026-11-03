@@ -77,10 +77,19 @@ class Letter_model extends CI_Model
 	{
 		if ( ! empty($f['q']))
 		{
-			$this->db->group_start()
-				->like('l.letter_number', $f['q'])
-				->or_like('l.subject', $f['q'])
-				->or_like('l.recipient', $f['q'])
+			$q = trim($f['q']);
+			$this->db->group_start();
+			if (preg_match('/^[A-Za-z0-9\/\.\-]+$/', $q))
+			{
+				$this->db->like('l.letter_number', $q, 'after')
+					->or_like('l.letter_number', $q, 'both');
+			}
+			else
+			{
+				$this->db->like('l.letter_number', $q);
+			}
+			$this->db->or_like('l.subject', $q)
+				->or_like('l.recipient', $q)
 				->group_end();
 		}
 		if ( ! empty($f['type']))
