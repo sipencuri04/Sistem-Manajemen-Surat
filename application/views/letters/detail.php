@@ -149,22 +149,44 @@ $id = (int) $letter['id'];
 						$st_type = isset($letter['stamp_type']) ? $letter['stamp_type'] : 'belum_stempel'; 
 						?>
 						<?php if ( ! $is_approved_letter): ?>
-							<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-semibold">
-								<i class="fa-solid fa-clock me-1"></i> Menunggu TTD Kepala Sekolah (Belum Distempel)
+							<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-semibold d-inline-block mb-1">
+								<i class="fa-solid fa-clock me-1"></i> Menunggu TTD Kepala Sekolah
 							</span>
+							<div class="small text-muted mt-1"><i class="fa-solid fa-lock me-1"></i> Tombol stempel TU otomatis aktif setelah Kepala Sekolah menyetujui surat ini.</div>
 						<?php elseif ($st_type === 'digital' && ! empty($letter['stamped_at'])): ?>
-							<span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold">
+							<span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold d-inline-block mb-1">
 								<i class="fa-solid fa-stamp me-1"></i> Telah Dibubuhi Stempel Digital TU
 							</span>
-							<?php if (!empty($letter['stamped_by_name'])): ?><small class="text-muted ms-1">(oleh <?= e($letter['stamped_by_name']) ?>)</small><?php endif; ?>
+							<?php if (!empty($letter['stamped_by_name'])): ?><small class="text-muted d-block">(oleh <?= e($letter['stamped_by_name']) ?>)</small><?php endif; ?>
+							<?php if (is_tu() || is_superuser() || is_admin()): ?>
+								<div class="mt-2">
+									<button type="button" class="btn btn-sm btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#tuStempelModal">
+										<i class="fa-solid fa-stamp me-1"></i> Ubah / Cabut Stempel TU
+									</button>
+								</div>
+							<?php endif; ?>
 						<?php elseif ($st_type === 'basah'): ?>
-							<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-semibold">
+							<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-semibold d-inline-block mb-1">
 								<i class="fa-solid fa-hand-holding-hand me-1"></i> Mode Stempel Basah Fisik
 							</span>
+							<?php if (is_tu() || is_superuser() || is_admin()): ?>
+								<div class="mt-2">
+									<button type="button" class="btn btn-sm btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#tuStempelModal">
+										<i class="fa-solid fa-stamp me-1"></i> Ubah Status Stempel TU
+									</button>
+								</div>
+							<?php endif; ?>
 						<?php else: ?>
-							<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-semibold">
+							<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-semibold d-inline-block mb-1">
 								<i class="fa-solid fa-triangle-exclamation me-1"></i> Belum Distempel oleh TU
 							</span>
+							<?php if (is_tu() || is_superuser() || is_admin()): ?>
+								<div class="mt-2">
+									<button type="button" class="btn btn-sm btn-danger fw-bold shadow-sm w-100" data-bs-toggle="modal" data-bs-target="#tuStempelModal">
+										<i class="fa-solid fa-stamp me-1"></i> Beri Stempel TU Sekarang
+									</button>
+								</div>
+							<?php endif; ?>
 						<?php endif; ?>
 					</dd>
 					<dt>Tempat, Tanggal</dt><dd><?= e($letter['place']) ?>, <?= e(tgl_indo($letter['letter_date'])) ?></dd>
