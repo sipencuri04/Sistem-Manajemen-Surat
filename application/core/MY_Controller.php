@@ -160,8 +160,9 @@ class Admin_Controller extends MY_Controller
 
 		$this->current_user = $user;
 
-		// Cegah browser menyimpan halaman terproteksi (tombol Back setelah logout).
-		$this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+		// Izinkan browser menyimpan cache privat lokal untuk bfcache & instant prerender (<0.10s LCP),
+		// sembari tetap aman (private, no-cache memaksa browser memverifikasi sesi).
+		$this->output->set_header('Cache-Control: private, no-cache, must-revalidate');
 		$this->output->set_header('Pragma: no-cache');
 		$this->output->set_header('X-Frame-Options: SAMEORIGIN');
 		$this->output->set_header('X-Content-Type-Options: nosniff');

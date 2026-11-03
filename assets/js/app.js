@@ -219,4 +219,69 @@
 	$all('[data-autosubmit]').forEach(function (el) {
 		el.addEventListener('change', function () { el.form.submit(); });
 	});
+
+	/* ---------- Instant Navigation & Hover Prefetcher (LCP Sub-100ms) ---------- */
+	(function initInstantNav() {
+		// Jangan lakukan prefetch jika mode hemat kuota (Data Saver) atau koneksi lambat 2G
+		if (navigator.connection && (navigator.connection.saveData || /2g/.test(navigator.connection.effectiveType))) {
+			return;
+		}
+
+		var prefetchedUrls = new Set();
+		var hoverTimer = null;
+
+		function isSafeLink(a) {
+			if (!a || a.tagName !== 'A') return false;
+			var href = a.getAttribute('href');
+			if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) return false;
+			if (a.hasAttribute('download') || a.hasAttribute('data-no-instant') || a.target === '_blank') return false;
+
+			try {
+				var url = new URL(href, window.location.href);
+				if (url.origin !== window.location.origin) return false;
+				var path = url.pathname.toLowerCase();
+				// Hindari prefetch aksi destruktif atau file binary berat
+				if (/logout|hapus|delete|batal|cetak|download/.test(path)) return false;
+				return url.href;
+			} catch (e) {
+				return false;
+			}
+		}
+
+		function prefetchUrl(url) {
+			if (prefetchedUrls.has(url)) return;
+			prefetchedUrls.add(url);
+
+			var link = document.createElement('link');
+			link.rel = 'prefetch';
+			link.href = url;
+			link.as = 'document';
+			document.head.appendChild(link);
+		}
+
+		// Hover listener dengan jeda 65ms
+		document.addEventListener('mouseover', function (e) {
+			var a = e.target.closest('a');
+			var validUrl = isSafeLink(a);
+			if (!validUrl) return;
+
+			clearTimeout(hoverTimer);
+			hoverTimer = setTimeout(function () {
+				prefetchUrl(validUrl);
+			}, 65);
+		}, { passive: true });
+
+		document.addEventListener('mouseout', function (e) {
+			clearTimeout(hoverTimer);
+		}, { passive: true });
+
+		// Touchstart untuk smartphone / tablet
+		document.addEventListener('touchstart', function (e) {
+			var a = e.target.closest('a');
+			var validUrl = isSafeLink(a);
+			if (validUrl) {
+				prefetchUrl(validUrl);
+			}
+		}, { passive: true });
+	})();
 })();
