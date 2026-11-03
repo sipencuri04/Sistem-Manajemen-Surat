@@ -5,7 +5,8 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?= e($page_title) ?> &middot; <?= e($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') ?></title>
-	<!-- Ultra-Fast LCP Optimization: Preload Bootstrap & Non-blocking Icons -->
+	<!-- Ultra-Fast LCP Optimization: Preload Critical Assets & High-Priority Hero Elements -->
+	<link rel="preload" href="<?= asset_url('assets/img/logo-sekolah.png') ?>" as="image" type="image/png" fetchpriority="high">
 	<link rel="preload" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" as="style">
 	<link rel="stylesheet" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
 	<link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>" media="print" onload="this.media='all'">
@@ -66,7 +67,7 @@
 <header class="py-3 px-4 border-bottom border-white border-opacity-10">
 	<div class="container-fluid d-flex justify-content-between align-items-center">
 		<div class="d-flex align-items-center gap-3">
-			<img src="<?= asset_url('assets/img/logo-sekolah.png') ?>" alt="Logo" class="rounded" style="width: 48px; height: 48px; object-fit: contain;" onerror="this.src='<?= asset_url('assets/img/icon.png') ?>'">
+			<img src="<?= asset_url('assets/img/logo-sekolah.png') ?>" alt="Logo" class="rounded" width="48" height="48" fetchpriority="high" style="width: 48px; height: 48px; object-fit: contain;" onerror="this.src='<?= asset_url('assets/img/icon.png') ?>'">
 			<div>
 				<h5 class="mb-0 fw-bold text-uppercase tracking-wider"><?= e($school['school_name'] ?: 'SMK MUHAMMADIYAH BANDONGAN') ?></h5>
 				<small class="text-white-50">Sistem Antrean Layanan Mandiri Tata Usaha (Kiosk)</small>
