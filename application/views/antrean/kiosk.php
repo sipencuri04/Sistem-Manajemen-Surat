@@ -5,14 +5,16 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?= e($page_title) ?> &middot; <?= e($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') ?></title>
+	<!-- Ultra-Fast LCP Optimization: Preload Bootstrap & Non-blocking Icons -->
+	<link rel="preload" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" as="style">
 	<link rel="stylesheet" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
-	<link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>" media="print" onload="this.media='all'">
+	<noscript><link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>"></noscript>
+
 	<style>
+		/* Native System Font Stack: 0ms Network Delay, Rendertime Instan */
 		body {
-			font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+			font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 			background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1d4ed8 100%);
 			min-height: 100vh;
 			display: flex;

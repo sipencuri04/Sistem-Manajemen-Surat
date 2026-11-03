@@ -5,11 +5,10 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Monitor Antrean &middot; <?= e($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') ?></title>
+	<link rel="preload" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" as="style">
 	<link rel="stylesheet" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
-	<link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>" media="print" onload="this.media='all'">
+	<noscript><link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>"></noscript>
 	<style>
 		:root {
 			--page-bg: #f0f4f9;
@@ -20,7 +19,7 @@
 		}
 		* { box-sizing: border-box; }
 		body {
-			font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 			background-color: var(--page-bg);
 			color: #1e293b;
 			min-height: 100vh;
