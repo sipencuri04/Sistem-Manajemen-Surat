@@ -1,4 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+﻿<?php defined('BASEPATH') OR exit('No direct script access allowed');
 $school_name = trim($school['school_name']) !== '' ? $school['school_name'] : 'Layanan Persuratan Sekolah';
 ?><!DOCTYPE html>
 <html lang="id">
@@ -10,8 +10,12 @@ $school_name = trim($school['school_name']) !== '' ? $school['school_name'] : 'L
 	<meta name="apple-mobile-web-app-status-bar-style" content="default">
 	<meta name="robots" content="noindex, nofollow">
 	<title><?= e($page_title) ?> &middot; <?= e($school_name) ?></title>
+	<!-- High-Speed Preload & Non-blocking Icons -->
+	<link rel="preload" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" as="style">
+	<link rel="preload" href="<?= asset_url('assets/css/app.css') ?>" as="style">
 	<link rel="stylesheet" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
-	<link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>">
+	<link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>" media="print" onload="this.media='all'">
+	<noscript><link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>"></noscript>
 	<link rel="stylesheet" href="<?= asset_url('assets/css/app.css') ?>">
 </head>
 <body class="public-body">

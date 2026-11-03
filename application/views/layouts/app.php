@@ -63,9 +63,16 @@ $menu[] = array('url' => 'akun', 'icon' => 'fa-user-gear', 'label' => 'Pengatura
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="robots" content="noindex, nofollow">
 	<title><?= e($page_title) ?> &middot; Persuratan SMK</title>
+	
+	<!-- High-Speed LCP Preload: Bootstrap & App CSS -->
+	<link rel="preload" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" as="style">
+	<link rel="preload" href="<?= asset_url('assets/css/app.css') ?>" as="style">
 	<link rel="stylesheet" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
-	<link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>">
 	<link rel="stylesheet" href="<?= asset_url('assets/css/app.css') ?>">
+	
+	<!-- Non-Blocking Asynchronous FontAwesome Icons -->
+	<link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>" media="print" onload="this.media='all'">
+	<noscript><link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>"></noscript>
 </head>
 <body>
 <div class="app">
