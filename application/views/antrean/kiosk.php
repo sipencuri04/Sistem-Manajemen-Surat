@@ -5,6 +5,11 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?= e($page_title) ?> &middot; <?= e($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') ?></title>
+	
+	<!-- Favicon -->
+	<link rel="icon" type="image/png" href="<?= base_url('favicon.png') ?>">
+	<link rel="shortcut icon" href="<?= base_url('favicon.ico') ?>">
+
 	<!-- Ultra-Fast LCP Optimization: Preload Critical Assets & High-Priority Hero Elements -->
 	<link rel="preload" href="<?= asset_url('assets/img/logo-sekolah.png') ?>" as="image" type="image/png" fetchpriority="high">
 	<link rel="preload" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" as="style">

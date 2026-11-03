@@ -64,6 +64,10 @@ $menu[] = array('url' => 'akun', 'icon' => 'fa-user-gear', 'label' => 'Pengatura
 	<meta name="robots" content="noindex, nofollow">
 	<title><?= e($page_title) ?> &middot; Persuratan SMK</title>
 	
+	<!-- Favicon -->
+	<link rel="icon" type="image/png" href="<?= base_url('favicon.png') ?>">
+	<link rel="shortcut icon" href="<?= base_url('favicon.ico') ?>">
+	
 	<!-- High-Speed LCP Preload: Bootstrap & App CSS -->
 	<link rel="preload" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" as="style">
 	<link rel="preload" href="<?= asset_url('assets/css/app.css') ?>" as="style">

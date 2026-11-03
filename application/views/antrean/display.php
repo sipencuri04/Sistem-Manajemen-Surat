@@ -5,6 +5,11 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Monitor Antrean &middot; <?= e($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') ?></title>
+	
+	<!-- Favicon -->
+	<link rel="icon" type="image/png" href="<?= base_url('favicon.png') ?>">
+	<link rel="shortcut icon" href="<?= base_url('favicon.ico') ?>">
+
 	<link rel="preload" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" as="style">
 	<link rel="stylesheet" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
 	<link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>" media="print" onload="this.media='all'">
