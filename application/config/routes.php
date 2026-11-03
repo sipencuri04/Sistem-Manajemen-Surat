@@ -131,6 +131,7 @@ $route['antrean/ambil/(:num)']            = 'antrean/ambil_tiket/$1';
 $route['antrean/display']                 = 'antrean/display';
 $route['display-antrean']                 = 'antrean/display';
 $route['antrean/loket']                   = 'antrean/loket';
+$route['antrean/api-loket']               = 'antrean/api_loket_data';
 $route['antrean/api-display']             = 'antrean/api_display_data';
 $route['antrean/panggil-berikutnya']      = 'antrean/api_call_next';
 $route['antrean/panggil-ulang']           = 'antrean/api_recall';

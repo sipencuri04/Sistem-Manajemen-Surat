@@ -424,6 +424,33 @@ class Antrean extends MY_Controller
 	}
 
 	/**
+	 * API Polling Realtime untuk Panel Loket Staf TU (Background Auto-Sync Tanpa Refresh)
+	 */
+	public function api_loket_data()
+	{
+		$service_id = (int) $this->input->get('service_id');
+		$stats = $this->Queue_model->get_stats_today();
+		$today_tickets = $this->Queue_model->get_today_tickets(NULL, 100);
+		$active_ticket = $this->Queue_model->get_active_serving_ticket($service_id);
+
+		// Hitung antrean yang menunggu khusus pada layanan/loket ini
+		$waiting_this = 0;
+		if (isset($stats[$service_id]['waiting']))
+		{
+			$waiting_this = (int) $stats[$service_id]['waiting'];
+		}
+
+		$this->output->set_content_type('application/json')->set_output(json_encode(array(
+			'success'       => TRUE,
+			'active_ticket' => $active_ticket,
+			'stats'         => $stats,
+			'waiting_this'  => $waiting_this,
+			'tickets'       => $today_tickets,
+			'server_time'   => date('H:i:s'),
+		)));
+	}
+
+	/**
 	 * Reset Antrean Hari Ini
 	 */
 	public function reset_today()

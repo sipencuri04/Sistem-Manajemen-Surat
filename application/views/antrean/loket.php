@@ -63,9 +63,9 @@
 				</select>
 			</div>
 			<div class="col-auto ms-auto d-flex gap-3 small text-muted">
-				<div>Total Tiket: <strong class="text-dark"><?= (int) $stats['total'] ?></strong></div>
-				<div>Menunggu: <strong class="text-warning"><?= (int) $stats['waiting'] ?></strong></div>
-				<div>Selesai: <strong class="text-success"><?= (int) $stats['completed'] ?></strong></div>
+				<div>Total Tiket: <strong id="statTotal" class="text-dark"><?= (int) $stats['total'] ?></strong></div>
+				<div>Menunggu: <strong id="statWaiting" class="text-warning"><?= (int) $stats['waiting'] ?></strong></div>
+				<div>Selesai: <strong id="statCompleted" class="text-success"><?= (int) $stats['completed'] ?></strong></div>
 			</div>
 		</form>
 	</div>
@@ -127,8 +127,13 @@
 	<div class="col-lg-7">
 		<div class="card border-0 shadow-sm h-100">
 			<div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-				<h6 class="fw-bold mb-0 text-navy"><i class="fa-solid fa-list-check text-primary me-2"></i>Riwayat &amp; Antrean Hari Ini</h6>
-				<button class="btn btn-light btn-sm" onclick="location.reload()" title="Refresh"><i class="fa-solid fa-arrows-rotate"></i></button>
+				<div class="d-flex align-items-center gap-2">
+					<h6 class="fw-bold mb-0 text-navy"><i class="fa-solid fa-list-check text-primary me-2"></i>Riwayat &amp; Antrean Hari Ini</h6>
+					<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small" style="font-size: 10px;">
+						<i class="fa-solid fa-circle text-success me-1" style="font-size: 7px;"></i> Live Auto-Sync
+					</span>
+				</div>
+				<button class="btn btn-light btn-sm" onclick="syncLoketData(true)" title="Sinkronkan Sekarang"><i class="fa-solid fa-arrows-rotate"></i></button>
 			</div>
 			<div class="card-body p-0">
 				<div class="table-responsive" style="max-height: 380px;">
@@ -181,6 +186,111 @@ const serviceId = <?= (int) $selected_id ?>;
 const csrfName = '<?= $this->security->get_csrf_token_name() ?>';
 const csrfHash = '<?= $this->security->get_csrf_hash() ?>';
 
+// ================================================================
+// LIVE AUTO-SYNC ENGINE (Sinkronisasi Otomatis Setiap 2.5 Detik Tanpa Refresh)
+// ================================================================
+async function syncLoketData(isManual = false) {
+	try {
+		const res = await fetch('<?= site_url("antrean/api-loket") ?>?service_id=' + serviceId, {
+			headers: { 'X-Requested-With': 'XMLHttpRequest' }
+		});
+		if (!res.ok) return;
+		const data = await res.json();
+		if (!data.success) return;
+
+		// 1. Update Statistik Global (Total, Menunggu, Selesai)
+		if (data.stats) {
+			const total = data.stats.total !== undefined ? data.stats.total : 0;
+			const waiting = data.stats.waiting !== undefined ? data.stats.waiting : 0;
+			const completed = data.stats.completed !== undefined ? data.stats.completed : 0;
+			
+			const elTot = document.getElementById('statTotal');
+			const elWait = document.getElementById('statWaiting');
+			const elComp = document.getElementById('statCompleted');
+			if (elTot) elTot.textContent = total;
+			if (elWait) elWait.textContent = waiting;
+			if (elComp) elComp.textContent = completed;
+		}
+
+		// 2. Update Status Tiket yang Sedang Dilayani (Jika berubah dari tab lain)
+		if (data.active_ticket) {
+			currentActiveId = data.active_ticket.id;
+			document.getElementById('servingTicketNumber').textContent = data.active_ticket.ticket_number;
+			document.getElementById('servingStatusBadge').innerHTML = `
+				<span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">
+					<i class="fa-solid fa-volume-high me-1"></i> Sedang Dilayani di Loket
+				</span>
+			`;
+			document.getElementById('btnRecall').disabled = false;
+			document.getElementById('btnSkip').disabled = false;
+			document.getElementById('btnComplete').disabled = false;
+		} else if (!currentActiveId) {
+			document.getElementById('servingTicketNumber').textContent = '---';
+			document.getElementById('servingStatusBadge').innerHTML = `
+				<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill">
+					<i class="fa-solid fa-pause me-1"></i> Loket Sedang Kosong
+				</span>
+			`;
+			document.getElementById('btnRecall').disabled = true;
+			document.getElementById('btnSkip').disabled = true;
+			document.getElementById('btnComplete').disabled = true;
+		}
+
+		// 3. Update Tabel Riwayat & Antrean Hari Ini
+		if (data.tickets) {
+			renderQueueTable(data.tickets);
+		}
+
+		if (isManual) {
+			console.log('[Live-Sync] Data berhasil disinkronkan manual.');
+		}
+	} catch (e) {
+		console.warn('[Live-Sync] Polling error:', e);
+	}
+}
+
+// Render Ulang Tabel Antrean Tanpa Refresh Halaman
+function renderQueueTable(tickets) {
+	const tbody = document.getElementById('queueTableBody');
+	if (!tbody) return;
+
+	if (!tickets || tickets.length === 0) {
+		tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Belum ada tiket antrean yang diambil hari ini.</td></tr>';
+		return;
+	}
+
+	const badgeMap = {
+		'waiting':   '<span class="badge bg-warning-subtle text-warning border border-warning-subtle">Menunggu</span>',
+		'calling':   '<span class="badge bg-primary-subtle text-primary border border-primary-subtle">Dipanggil</span>',
+		'serving':   '<span class="badge bg-info-subtle text-info border border-info-subtle">Dilayani</span>',
+		'completed': '<span class="badge bg-success-subtle text-success border border-success-subtle">Selesai</span>',
+		'skipped':   '<span class="badge bg-danger-subtle text-danger border border-danger-subtle">Dilewati</span>'
+	};
+
+	let html = '';
+	tickets.forEach(t => {
+		const badge = badgeMap[t.status] || `<span class="badge bg-light text-dark">${t.status}</span>`;
+		const timeStr = t.created_at ? t.created_at.substring(11, 16) : '--:--';
+		html += `
+			<tr>
+				<td><strong class="text-primary font-monospace fs-6">${t.ticket_number}</strong></td>
+				<td>${t.service_name || '-'}</td>
+				<td><span class="badge text-bg-light border">Loket ${t.loket_number}</span></td>
+				<td>${timeStr}</td>
+				<td>${badge}</td>
+			</tr>
+		`;
+	});
+
+	tbody.innerHTML = html;
+}
+
+// Jalankan Polling Realtime Setiap 2.5 Detik
+setInterval(syncLoketData, 2500);
+
+// ================================================================
+// AKSI PETUGAS LOKET (Mulus Tanpa Reload / Tanpa Refresh)
+// ================================================================
 function panggilBerikutnya() {
 	fetch('<?= site_url("antrean/api_call_next") ?>', {
 		method: 'POST',
@@ -203,6 +313,7 @@ function panggilBerikutnya() {
 			document.getElementById('btnRecall').disabled = false;
 			document.getElementById('btnSkip').disabled = false;
 			document.getElementById('btnComplete').disabled = false;
+			syncLoketData(); // Sinkronkan tabel seketika
 		} else {
 			alert(data.message || 'Tidak ada antrean berikutnya.');
 		}
@@ -241,7 +352,17 @@ function selesai() {
 	.then(res => res.json())
 	.then(data => {
 		if (data.success) {
-			location.reload();
+			currentActiveId = null;
+			document.getElementById('servingTicketNumber').textContent = '---';
+			document.getElementById('servingStatusBadge').innerHTML = `
+				<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill">
+					<i class="fa-solid fa-check me-1"></i> Pelayanan Selesai
+				</span>
+			`;
+			document.getElementById('btnRecall').disabled = true;
+			document.getElementById('btnSkip').disabled = true;
+			document.getElementById('btnComplete').disabled = true;
+			syncLoketData(); // Update tabel secara realtime tanpa refresh halaman
 		}
 	});
 }
@@ -260,7 +381,17 @@ function lewati() {
 	.then(res => res.json())
 	.then(data => {
 		if (data.success) {
-			location.reload();
+			currentActiveId = null;
+			document.getElementById('servingTicketNumber').textContent = '---';
+			document.getElementById('servingStatusBadge').innerHTML = `
+				<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill">
+					<i class="fa-solid fa-forward me-1"></i> Antrean Dilewati
+				</span>
+			`;
+			document.getElementById('btnRecall').disabled = true;
+			document.getElementById('btnSkip').disabled = true;
+			document.getElementById('btnComplete').disabled = true;
+			syncLoketData(); // Update tabel secara realtime tanpa refresh halaman
 		}
 	});
 }
