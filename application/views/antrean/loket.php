@@ -1,6 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
-$this->load->view('layouts/app', array('page_title' => $page_title));
-?>
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
 <div class="row g-3 mb-4">
 	<div class="col-12 d-flex flex-wrap justify-content-between align-items-center gap-2">
@@ -241,6 +239,4 @@ function lewati() {
 	});
 }
 </script>
-
-<?php $this->load->view('layouts/footer'); ?>
 

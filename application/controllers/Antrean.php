@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Antrean extends CI_Controller
+class Antrean extends MY_Controller
 {
 	public function __construct()
 	{
@@ -142,13 +142,22 @@ class Antrean extends CI_Controller
 	 */
 	public function loket()
 	{
-		if ( ! is_logged_in())
+		$user_id = (int) $this->session->userdata('user_id');
+		if ( ! $user_id)
 		{
+			set_flash('warning', 'Silakan login terlebih dahulu untuk mengakses Panel Loket TU.');
 			redirect('login');
 			return;
 		}
 
-		$current_user = current_user();
+		$this->load->model('User_model');
+		$current_user = $this->User_model->find($user_id);
+		if ( ! $current_user || ! (int) $current_user['is_active'])
+		{
+			redirect('logout');
+			return;
+		}
+		$this->current_user = $current_user;
 		$services = $this->Queue_model->get_services(TRUE);
 
 		// Loket yang sedang dipilih staf TU saat ini
@@ -180,6 +189,7 @@ class Antrean extends CI_Controller
 			}
 		}
 
+		$this->current_user = $current_user;
 		$data = array(
 			'page_title'      => 'Panel Loket Antrean TU',
 			'current_user'    => $current_user,
@@ -192,7 +202,7 @@ class Antrean extends CI_Controller
 			'active_ticket'   => $active_ticket,
 		);
 
-		$this->load->view('antrean/loket', $data);
+		$this->render('antrean/loket', $data);
 	}
 
 	/**
@@ -230,8 +240,8 @@ class Antrean extends CI_Controller
 			return;
 		}
 
-		$u = current_user();
-		$called = $this->Queue_model->call_ticket($next_ticket['id'], $service['loket_number'], $u['id']);
+		$user_id = (int) $this->session->userdata('user_id');
+		$called = $this->Queue_model->call_ticket($next_ticket['id'], $service['loket_number'], $user_id);
 
 		$this->output->set_content_type('application/json')->set_output(json_encode(array(
 			'success' => TRUE,

@@ -469,6 +469,15 @@ if ( ! function_exists('incoming_status_badge'))
 	}
 }
 
+if ( ! function_exists('is_logged_in'))
+{
+	function is_logged_in()
+	{
+		$CI =& get_instance();
+		return !empty($CI->session->userdata('user_id'));
+	}
+}
+
 if ( ! function_exists('current_user'))
 {
 	function current_user()
