@@ -216,7 +216,8 @@ function ambilTiket(serviceId, serviceName) {
 
 function printReceipt() {
 	if (currentTicketId) {
-		const printWin = window.open('<?= site_url("antrean/ambil_tiket") ?>/' + currentTicketId, '_blank', 'width=420,height=600');
+		// Buka popup tiket dengan ?autoprint=1 agar langsung cetak otomatis
+		const printWin = window.open('<?= site_url("antrean/ambil_tiket") ?>/' + currentTicketId + '?autoprint=1', '_blank', 'width=420,height=650');
 		if (printWin) printWin.focus();
 	}
 }

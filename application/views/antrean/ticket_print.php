@@ -182,10 +182,14 @@
 	</div>
 
 	<script>
-		// Auto-print bila URL mengandung ?autoprint=1
-		if (new URLSearchParams(window.location.search).get('autoprint') === '1') {
-			window.addEventListener('load', function() { window.print(); });
-		}
+		// Selalu auto-print otomatis saat halaman tiket dibuka
+		// Delay 400ms memastikan font & layout sudah selesai di-render
+		// sebelum dialog cetak muncul (mencegah cetakan kosong/terpotong)
+		window.addEventListener('load', function() {
+			setTimeout(function() {
+				window.print();
+			}, 400);
+		});
 	</script>
 
 </body>
