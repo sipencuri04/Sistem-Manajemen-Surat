@@ -117,23 +117,23 @@ class Tools extends CI_Controller
 		$req_data = array(
 			'tracking_code'   => $code,
 			'letter_type_id'  => 1, // SKA - Surat Keterangan Siswa Aktif
-			'requester_name'  => 'Muhammad Farhan Al-Fatih',
+			'requester_name'  => 'Noxa Aulia Pratama',
 			'requester_class' => 'XII TKJ 1',
-			'requester_phone' => '082134567890',
-			'requester_email' => 'farhan.tkj@gmail.com',
+			'requester_phone' => '+62 877-4177-7837',
+			'requester_email' => 'noxapremia02@gmail.com',
 			'content_data'    => json_encode(array(
-				'nama'            => 'Muhammad Farhan Al-Fatih',
-				'nis'             => '10842',
-				'nisn'            => '0068492011',
+				'nama'            => 'Noxa Aulia Pratama',
+				'nis'             => '10895',
+				'nisn'            => '0068492088',
 				'tempat_lahir'    => 'Magelang',
-				'tanggal_lahir'   => '2008-05-14',
+				'tanggal_lahir'   => '2008-04-18',
 				'kelas'           => 'XII TKJ 1',
 				'jurusan'         => 'Teknik Komputer dan Jaringan',
-				'nama_orang_tua'  => 'Hendra Wijaya',
+				'nama_orang_tua'  => 'Bambang Premia S.',
 				'keperluan'       => 'Persyaratan Pengajuan Beasiswa Pendidikan Prestasi & Bantuan Kuliah Tahun 2026',
 				'tahun_pelajaran' => '2025/2026',
 			), JSON_UNESCAPED_UNICODE),
-			'requester_note'  => 'Mohon dibantu proses segera Bapak/Ibu TU, berkas beasiswa harus diunggah paling lambat besok lusa. Terima kasih banyak.',
+			'requester_note'  => 'Mohon bantuannya Bapak/Ibu TU untuk diproses surat keterangan aktif ini, berkas beasiswa harus segera saya serahkan. Terima kasih.',
 			'status'          => 'pending',
 			'ip_address'      => '127.0.0.1',
 		);
@@ -141,7 +141,9 @@ class Tools extends CI_Controller
 		echo "[1/2] Data Dummy Permohonan Siswa (Sistem) berhasil dibuat:\n";
 		echo "      - ID: $req_id\n";
 		echo "      - Kode Lacak: $code\n";
-		echo "      - Pemohon: Muhammad Farhan Al-Fatih (XII TKJ 1)\n";
+		echo "      - Pemohon: Noxa Aulia Pratama (XII TKJ 1)\n";
+		echo "      - No. HP/WA: +62 877-4177-7837\n";
+		echo "      - Email: noxapremia02@gmail.com\n";
 		echo "      - Status: pending (Menunggu Diproses TU di menu Permohonan Siswa)\n\n";
 
 		// 2. Data Dummy Surat Masuk dari Instansi
@@ -149,7 +151,7 @@ class Tools extends CI_Controller
 		$tracking = $this->Incoming_letter_model->generate_tracking_code();
 		$inc_data = array(
 			'agenda_number' => $agenda,
-			'letter_number' => '421.3/1084/Disdikbud/2026',
+			'letter_number' => '421.3/1084/Disdikbud.V/2026',
 			'letter_date'   => date('Y-m-d', strtotime('-1 day')),
 			'received_date' => date('Y-m-d'),
 			'sender'        => 'Dinas Pendidikan dan Kebudayaan Cabang Wilayah V Prov. Jawa Tengah',
@@ -159,8 +161,8 @@ class Tools extends CI_Controller
 			'status'        => 'baru',
 			'is_external'   => 1,
 			'tracking_code' => $tracking,
-			'sender_phone'  => '0293-362145',
-			'sender_email'  => 'cabdin5.pdkjateng@gmail.com',
+			'sender_phone'  => '+62 877-4177-7837',
+			'sender_email'  => 'noxapremia02@gmail.com',
 			'created_by'    => 4, // ID staf TU Siti Rahmawati
 		);
 		$inc_id = $this->Incoming_letter_model->insert($inc_data);
