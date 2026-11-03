@@ -30,6 +30,7 @@ class Tools extends CI_Controller
 		echo "  php index.php tools reset_password <username> <password_baru>\n";
 		echo "  php index.php tools test_email <alamat_tujuan@gmail.com>\n";
 		echo "  php index.php tools seed_dummy\n";
+		echo "  php index.php tools seed_test_users\n";
 	}
 
 	public function create_admin($username = '', $password = '', $full_name = 'Administrator')
@@ -169,5 +170,91 @@ class Tools extends CI_Controller
 		echo "      - Pengirim: Dinas Pendidikan dan Kebudayaan Cabang Wilayah V Prov. Jawa Tengah\n";
 		echo "      - Perihal: Undangan Rapat Koordinasi dan Verifikasi TUK UKK SMK 2026\n";
 		echo "      - Status: baru (Menunggu Tindak Lanjut TU di menu Surat Masuk)\n";
+	}
+
+	/**
+	 * Membuat 4 akun pengujian multi-role dengan no WA dan email yang sama
+	 * untuk verifikasi alur persuratan & pengesahan tanda tangan + stempel.
+	 */
+	public function seed_test_users()
+	{
+		$phone = '+62 877-4177-7837';
+		$email = 'noxapremia02@gmail.com';
+		$password = 'testing123';
+		$pass_hash = password_hash($password, PASSWORD_BCRYPT);
+
+		$test_users = array(
+			array(
+				'username'  => 'test_kepsek',
+				'full_name' => 'Drs. H. Mulyadi Pratama, M.Pd',
+				'role'      => 'kepala_sekolah',
+				'position'  => 'Kepala Sekolah',
+				'nip'       => '19720315 199802 1 003',
+			),
+			array(
+				'username'  => 'test_tu',
+				'full_name' => 'Noxa Anindya, S.AP',
+				'role'      => 'tu',
+				'position'  => 'Staf Administrasi & Persuratan TU',
+				'nip'       => '19890520 201403 2 006',
+			),
+			array(
+				'username'  => 'test_pegawai',
+				'full_name' => 'Premia Bagus Saputra, S.Kom',
+				'role'      => 'pegawai',
+				'position'  => 'Guru Produktif / Ka. Bengkel TKJ',
+				'nip'       => '19920810 201902 1 007',
+			),
+			array(
+				'username'  => 'test_admin',
+				'full_name' => 'Administrator Penguji Sistem',
+				'role'      => 'superuser',
+				'position'  => 'Superuser Administrator',
+				'nip'       => '19850101 201001 1 001',
+			),
+		);
+
+		echo "Menyiapkan akun testing (Password default: $password)...\n\n";
+
+		foreach ($test_users as $u)
+		{
+			$existing = $this->db->get_where('users', array('username' => $u['username']))->row_array();
+			if ($existing)
+			{
+				$this->db->where('id', $existing['id'])->update('users', array(
+					'password_hash' => $pass_hash,
+					'full_name'     => $u['full_name'],
+					'nip'           => $u['nip'],
+					'position'      => $u['position'],
+					'phone'         => $phone,
+					'email'         => $email,
+					'role'          => $u['role'],
+					'is_active'     => 1,
+					'failed_attempts' => 0,
+					'locked_until'  => NULL,
+					'updated_at'    => date('Y-m-d H:i:s'),
+				));
+				echo "[UPDATE] Akun '{$u['username']}' diperbarui: {$u['full_name']} ({$u['role']})\n";
+			}
+			else
+			{
+				$this->db->insert('users', array(
+					'username'      => $u['username'],
+					'password_hash' => $pass_hash,
+					'full_name'     => $u['full_name'],
+					'nip'           => $u['nip'],
+					'position'      => $u['position'],
+					'phone'         => $phone,
+					'email'         => $email,
+					'role'          => $u['role'],
+					'is_active'     => 1,
+					'created_at'    => date('Y-m-d H:i:s'),
+				));
+				$new_id = $this->db->insert_id();
+				echo "[BUAT] Akun '{$u['username']}' berhasil dibuat (ID $new_id): {$u['full_name']} ({$u['role']})\n";
+			}
+		}
+
+		echo "\nSemua akun testing siap digunakan dengan password: $password\n";
 	}
 }
