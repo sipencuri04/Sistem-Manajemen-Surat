@@ -6,86 +6,188 @@
 	<title>Tiket Antrean <?= e($ticket['ticket_number']) ?></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style>
-		@page { 
-			margin: 0; 
-			size: 58mm auto; 
+		/* ===================================================
+		 * TIKET ANTREAN - Dioptimasi untuk Printer Thermal
+		 * 58mm (WOYA, POS-58, RPP02, XP-58)
+		 * Area cetak efektif: 48mm = ~162px @ 96dpi
+		 * TIDAK menggunakan letter-spacing, border-radius,
+		 * background-color, atau property yang menyebabkan
+		 * anti-aliasing di driver printer thermal.
+		 * =================================================== */
+		@page {
+			margin: 0;
+			size: 58mm auto;
 		}
 		* {
 			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
 		}
 		body {
 			font-family: Arial, Helvetica, sans-serif;
-			margin: 0 auto;
-			padding: 4px 6px;
-			color: #000000;
-			background: #ffffff;
+			margin: 0;
+			padding: 6px 5px 10px 5px;
+			color: #000;
+			background: #fff;
 			width: 48mm;
-			max-width: 48mm;
 			text-align: center;
 			-webkit-print-color-adjust: exact;
 			print-color-adjust: exact;
+			font-size: 8pt;
+			line-height: 1.3;
 		}
-		.title { font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 2px; line-height: 1.2; word-wrap: break-word; }
-		.sub { font-size: 8.5px; margin-bottom: 4px; font-weight: 600; line-height: 1.2; }
-		.line-solid { border-top: 2px solid #000000; margin: 5px 0; }
-		.line-thin { border-top: 1px solid #000000; margin: 4px 0; }
-		.num-caption { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-		.num { font-size: 34px; font-weight: 900; margin: 2px 0; font-family: Arial, sans-serif; letter-spacing: 1px; line-height: 1.1; }
-		.service { font-size: 11px; font-weight: 800; text-transform: uppercase; margin-top: 2px; line-height: 1.2; }
-		.loket { font-size: 12px; font-weight: 900; margin-top: 3px; letter-spacing: 0.5px; }
-		.meta { font-size: 9.5px; text-align: left; margin: 5px 0; font-weight: 700; }
-		.meta table { width: 100%; border-collapse: collapse; }
-		.meta td { padding: 2px 0; font-size: 9.5px; }
-		.footer { font-size: 8px; margin-top: 5px; font-weight: 600; line-height: 1.3; }
+
+		/* --- Header Sekolah --- */
+		.hdr-nama {
+			font-size: 8.5pt;
+			font-weight: 900;
+			text-transform: uppercase;
+			line-height: 1.25;
+			margin-bottom: 1px;
+		}
+		.hdr-sub {
+			font-size: 6.5pt;
+			font-weight: 700;
+			margin-bottom: 4px;
+		}
+
+		/* --- Garis pemisah: pakai HR bukan border-top (lebih solid di thermal) --- */
+		hr {
+			border: none;
+			border-top: 1.5pt solid #000;
+			margin: 4px 0;
+			display: block;
+			height: 0;
+		}
+		hr.thin {
+			border-top-width: 0.75pt;
+			margin: 3px 0;
+		}
+
+		/* --- Nomor antrean besar --- */
+		.lbl-no {
+			font-size: 6.5pt;
+			font-weight: 900;
+			text-transform: uppercase;
+			margin-top: 2px;
+			margin-bottom: 1px;
+			letter-spacing: 0;
+		}
+		.no-antrean {
+			font-size: 28pt;
+			font-weight: 900;
+			line-height: 1.05;
+			letter-spacing: 0;
+			margin: 2px 0;
+		}
+		.lbl-layanan {
+			font-size: 7.5pt;
+			font-weight: 900;
+			text-transform: uppercase;
+			line-height: 1.2;
+			margin-bottom: 1px;
+		}
+		.lbl-loket {
+			font-size: 8pt;
+			font-weight: 900;
+			margin-bottom: 3px;
+			letter-spacing: 0;
+		}
+
+		/* --- Tabel info --- */
+		.info-tbl {
+			width: 100%;
+			border-collapse: collapse;
+			margin: 3px 0;
+			text-align: left;
+		}
+		.info-tbl td {
+			font-size: 6.5pt;
+			font-weight: 700;
+			padding: 1px 0;
+		}
+		.info-tbl td.val {
+			text-align: right;
+		}
+
+		/* --- Footer --- */
+		.footer {
+			font-size: 5.5pt;
+			font-weight: 700;
+			margin-top: 4px;
+			line-height: 1.35;
+		}
+
+		/* --- Tombol hanya di layar --- */
 		@media print {
 			.no-print { display: none !important; }
-			body { width: 100%; max-width: 48mm; margin: 0; padding: 2px 4px; }
 		}
+		.no-print {
+			margin-top: 16px;
+			display: flex;
+			gap: 8px;
+			justify-content: center;
+		}
+		.no-print button {
+			padding: 8px 18px;
+			font-size: 13px;
+			font-weight: bold;
+			cursor: pointer;
+			border-radius: 6px;
+			border: 1px solid #ccc;
+		}
+		.btn-print { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+		.btn-close  { background: #f1f5f9; color: #333; }
 	</style>
 </head>
 <body>
-	<div class="title"><?= htmlspecialchars($school['school_name'] ?: 'SMK MUHAMMADIYAH BANDONGAN') ?></div>
-	<div class="sub">Layanan Tata Usaha &amp; Administrasi</div>
-	<div class="line-solid"></div>
-	<div class="num-caption">NOMOR ANTREAN ANDA</div>
-	<div class="num"><?= htmlspecialchars($ticket['ticket_number']) ?></div>
-	<div class="service"><?= htmlspecialchars($ticket['service_name']) ?></div>
-	<div class="loket">MENUJU LOKET <?= (int) $ticket['loket_number'] ?></div>
-	<div class="line-solid"></div>
-	<div class="meta">
-		<table>
-			<tr>
-				<td>Tanggal:</td>
-				<td style="text-align: right; font-weight: 800;"><?= date('d/m/Y') ?></td>
-			</tr>
-			<tr>
-				<td>Waktu Ambil:</td>
-				<td style="text-align: right; font-weight: 800;"><?= date('H:i') ?> WIB</td>
-			</tr>
-			<tr>
-				<td>Antrean di Depan:</td>
-				<td style="text-align: right; font-weight: 800;"><?= (int) $ticket['waiting_before'] ?> Orang</td>
-			</tr>
-		</table>
-	</div>
-	<div class="line-thin"></div>
+
+	<div class="hdr-nama"><?= htmlspecialchars($school['school_name'] ?: 'SMK MUHAMMADIYAH BANDONGAN') ?></div>
+	<div class="hdr-sub">Layanan Tata Usaha &amp; Administrasi</div>
+
+	<hr>
+
+	<div class="lbl-no">NOMOR ANTREAN ANDA</div>
+	<div class="no-antrean"><?= htmlspecialchars($ticket['ticket_number']) ?></div>
+	<div class="lbl-layanan"><?= htmlspecialchars($ticket['service_name']) ?></div>
+	<div class="lbl-loket">LOKET <?= (int) $ticket['loket_number'] ?></div>
+
+	<hr>
+
+	<table class="info-tbl">
+		<tr>
+			<td>Tanggal</td>
+			<td class="val"><?= date('d/m/Y') ?></td>
+		</tr>
+		<tr>
+			<td>Waktu Ambil</td>
+			<td class="val"><?= date('H:i') ?> WIB</td>
+		</tr>
+		<tr>
+			<td>Antrian di Depan</td>
+			<td class="val"><?= (int) $ticket['waiting_before'] ?> Orang</td>
+		</tr>
+	</table>
+
+	<hr class="thin">
+
 	<div class="footer">
-		Harap simpan tiket ini dan perhatikan layar monitor TV ruang tunggu.<br>
+		Simpan tiket &amp; perhatikan layar monitor.<br>
 		Terima kasih telah tertib antre.
 	</div>
 
-	<div class="no-print" style="margin-top: 20px;">
-		<button onclick="window.print()" style="padding: 8px 16px; font-weight: bold; cursor: pointer; background: #2563eb; color: #fff; border: none; border-radius: 6px;">Cetak Tiket</button>
-		<button onclick="window.close()" style="padding: 8px 16px; cursor: pointer; border-radius: 6px; border: 1px solid #ccc; background: #f8fafc;">Tutup</button>
+	<div class="no-print">
+		<button class="btn-print" onclick="window.print()">&#x1F5A8; Cetak Tiket</button>
+		<button class="btn-close"  onclick="window.close()">Tutup</button>
 	</div>
 
 	<script>
-		// Hanya auto-print bila parameter autoprint=1 disertakan
-		const urlParams = new URLSearchParams(window.location.search);
-		if (urlParams.get('autoprint') === '1') {
+		// Auto-print bila URL mengandung ?autoprint=1
+		if (new URLSearchParams(window.location.search).get('autoprint') === '1') {
 			window.addEventListener('load', function() { window.print(); });
 		}
 	</script>
+
 </body>
 </html>
 
