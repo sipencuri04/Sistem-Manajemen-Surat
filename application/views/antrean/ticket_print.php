@@ -17,62 +17,66 @@
             print-color-adjust: exact !important;
         }
         body {
-            width: 48mm;
+            /* Dibuat 42mm agar aman di semua jenis roll thermal 58mm tanpa terpotong kanan-kiri */
+            width: 42mm;
+            max-width: 42mm;
             margin: 0 auto;
-            padding: 4px 2px;
+            padding: 2px;
             font-family: Arial, Helvetica, sans-serif;
             color: #000000;
             background: #ffffff;
             text-align: center;
         }
         .header h1 {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 900;
-            line-height: 1.2;
+            line-height: 1.15;
             text-transform: uppercase;
             letter-spacing: 0;
+            word-wrap: break-word;
         }
         .header p {
-            font-size: 9px;
+            font-size: 8px;
             font-weight: bold;
             margin-top: 2px;
-            line-height: 1.2;
+            line-height: 1.15;
         }
         .divider {
-            border-top: 2px solid #000000;
-            margin: 5px 0;
+            border-top: 1.5px solid #000000;
+            margin: 4px 0;
         }
         .queue-label {
-            font-size: 10px;
+            font-size: 8.5px;
             font-weight: 900;
             letter-spacing: 0;
-            margin-top: 2px;
+            margin-top: 1px;
         }
         .queue-number {
-            font-size: 38px;
+            font-size: 32px;
             font-weight: 900;
             letter-spacing: 0;
-            line-height: 1.1;
+            line-height: 1.05;
             margin: 2px 0;
             font-family: Arial, sans-serif;
         }
         .service-name {
-            font-size: 11px;
+            font-size: 9.5px;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0;
-            line-height: 1.2;
+            line-height: 1.15;
+            word-wrap: break-word;
         }
         .counter-name {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 900;
-            margin-top: 2px;
+            margin-top: 1px;
             letter-spacing: 0;
         }
         .meta-table {
             width: 100%;
-            margin: 4px 0;
-            font-size: 9.5px;
+            margin: 3px 0;
+            font-size: 8.5px;
             font-weight: bold;
             border-collapse: collapse;
         }
@@ -82,23 +86,23 @@
         .meta-table .label { text-align: left; }
         .meta-table .val   { text-align: right; }
         .footer {
-            font-size: 8.5px;
+            font-size: 7.5px;
             font-weight: bold;
-            line-height: 1.3;
-            margin-top: 4px;
+            line-height: 1.25;
+            margin-top: 3px;
         }
         @media print {
             .no-print { display: none !important; }
-            body { width: 48mm; margin: 0 auto; padding: 2px; }
+            body { width: 42mm; max-width: 42mm; margin: 0 auto; padding: 1px; }
         }
         .no-print {
-            margin-top: 15px;
+            margin-top: 12px;
             display: flex;
             gap: 6px;
             justify-content: center;
         }
         .no-print button {
-            padding: 6px 14px;
+            padding: 5px 12px;
             font-size: 11px;
             font-weight: bold;
             cursor: pointer;
@@ -154,7 +158,6 @@
     </div>
 
     <script>
-        // Jalankan perintah print segera setelah dimuat
         window.addEventListener('load', function() {
             setTimeout(function() { 
                 window.focus();
