@@ -12,6 +12,7 @@ if ($user_role === 'pegawai')
 	// Menu Pegawai / Guru
 	$menu[] = array('url' => 'disposisi-saya', 'icon' => 'fa-clipboard-check', 'label' => 'Disposisi Saya', 'active' => menu_active(array('disposisi-saya')), 'badge' => isset($my_pending_dispositions) ? (int) $my_pending_dispositions : 0);
 	$menu[] = array('url' => 'arsip', 'icon' => 'fa-box-archive', 'label' => 'Arsip Surat', 'active' => menu_active(array('arsip')));
+	$menu[] = array('url' => 'antrean/display', 'icon' => 'fa-tv', 'label' => 'Monitor Antrean TU', 'active' => menu_active(array('antrean')));
 }
 elseif ($user_role === 'kepala_sekolah')
 {
@@ -21,6 +22,7 @@ elseif ($user_role === 'kepala_sekolah')
 	$menu[] = array('url' => 'persetujuan-surat', 'icon' => 'fa-signature', 'label' => 'Persetujuan Surat', 'active' => menu_active(array('persetujuan-surat')), 'badge' => isset($pending_approvals_count) ? (int) $pending_approvals_count : 0);
 	$menu[] = array('url' => 'surat', 'icon' => 'fa-envelopes-bulk', 'label' => 'Data Surat Keluar', 'active' => menu_active(array('surat'), array('buat')));
 	$menu[] = array('url' => 'arsip', 'icon' => 'fa-box-archive', 'label' => 'Arsip Surat', 'active' => menu_active(array('arsip')));
+	$menu[] = array('url' => 'antrean/display', 'icon' => 'fa-tv', 'label' => 'Monitor Antrean TU', 'active' => menu_active(array('antrean')));
 }
 elseif ($user_role === 'superuser')
 {
@@ -30,7 +32,9 @@ elseif ($user_role === 'superuser')
 	$menu[] = array('url' => 'disposisi', 'icon' => 'fa-share-nodes', 'label' => 'Disposisi Surat', 'active' => menu_active(array('disposisi')));
 	$menu[] = array('url' => 'surat', 'icon' => 'fa-envelopes-bulk', 'label' => 'Data Surat Keluar', 'active' => menu_active(array('surat'), array('buat')));
 	$menu[] = array('url' => 'permohonan-masuk', 'icon' => 'fa-graduation-cap', 'label' => 'Permohonan Siswa', 'active' => menu_active(array('permohonan-masuk')), 'badge' => isset($pending_requests) ? (int) $pending_requests : 0);
+	$menu[] = array('url' => 'antrean/loket', 'icon' => 'fa-users-line', 'label' => 'Antrean Layanan TU', 'active' => menu_active(array('antrean')));
 	$menu[] = array('url' => 'arsip', 'icon' => 'fa-box-archive', 'label' => 'Arsip Surat', 'active' => menu_active(array('arsip')));
+	$menu[] = array('url' => 'antrean/loket', 'icon' => 'fa-users-line', 'label' => 'Antrean Layanan TU', 'active' => menu_active(array('antrean')));
 	$menu[] = array('url' => 'log-aktivitas', 'icon' => 'fa-clock-rotate-left', 'label' => 'Audit Log', 'active' => menu_active(array('log-aktivitas')));
 	$menu[] = array('url' => 'log-sistem', 'icon' => 'fa-triangle-exclamation', 'label' => 'Log Sistem', 'active' => menu_active(array('log-sistem')));
 	$menu[] = array('url' => 'backup', 'icon' => 'fa-database', 'label' => 'Backup Database', 'active' => menu_active(array('backup')));
@@ -45,6 +49,7 @@ else
 	$menu[] = array('url' => 'surat-masuk', 'icon' => 'fa-inbox', 'label' => 'Surat Masuk', 'active' => menu_active(array('surat-masuk')), 'badge' => isset($pending_incoming_count) ? (int) $pending_incoming_count : 0);
 	$menu[] = array('url' => 'disposisi', 'icon' => 'fa-share-nodes', 'label' => 'Disposisi Surat', 'active' => menu_active(array('disposisi')));
 	$menu[] = array('url' => 'permohonan-masuk', 'icon' => 'fa-graduation-cap', 'label' => 'Permohonan Siswa', 'active' => menu_active(array('permohonan-masuk')), 'badge' => isset($pending_requests) ? (int) $pending_requests : 0);
+	$menu[] = array('url' => 'antrean/loket', 'icon' => 'fa-users-line', 'label' => 'Antrean Layanan TU', 'active' => menu_active(array('antrean')));
 	$menu[] = array('url' => 'arsip', 'icon' => 'fa-box-archive', 'label' => 'Arsip Surat', 'active' => menu_active(array('arsip')));
 	$menu[] = array('url' => 'jenis-surat', 'icon' => 'fa-layer-group', 'label' => 'Jenis Surat', 'active' => menu_active(array('jenis-surat')));
 	$menu[] = array('url' => 'pengaturan', 'icon' => 'fa-school', 'label' => 'Pengaturan Sekolah', 'active' => menu_active(array('pengaturan')));

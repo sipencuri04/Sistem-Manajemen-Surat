@@ -16,6 +16,7 @@ class Settings_model extends CI_Model
 		'number_reset', 'number_scope', 'letter_year',
 		'smtp_enabled', 'smtp_host', 'smtp_port', 'smtp_crypto', 'smtp_user', 'smtp_pass',
 		'smtp_from_email', 'smtp_from_name',
+		'queue_running_text', 'queue_video_url',
 	);
 
 	/** Kolom gambar yang dapat diunggah. */

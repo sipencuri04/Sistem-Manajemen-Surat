@@ -491,3 +491,40 @@ INSERT INTO `letter_templates` (`letter_type_id`, `opening_text`, `body_text`, `
      'Demikian surat balasan ini kami sampaikan. Atas perhatian dan kerja samanya, kami ucapkan terima kasih.', NOW()),
 (16, 'Pada hari ini, {hari_tanggal}, pukul {waktu}, bertempat di {tempat}, telah dilaksanakan {nama_kegiatan} dengan uraian sebagai berikut:', '',
      'Demikian berita acara ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana mestinya.', NOW());
+
+-- --------------------------------------------------------
+-- Tabel Sistem Antrean TU & Display TV Monitor (v10)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `queue_services` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` VARCHAR(5) NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  `loket_number` INT NOT NULL DEFAULT 1,
+  `description` VARCHAR(255) NULL DEFAULT NULL,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_queue_code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO `queue_services` (`id`, `code`, `name`, `loket_number`, `description`, `is_active`, `created_at`) VALUES
+(1, 'A', 'Layanan Surat & Legalisir', 1, 'Pengajuan surat keterangan aktif, legalisir ijazah, surat rekomendasi', 1, NOW()),
+(2, 'B', 'Keuangan & Administrasi SPP', 2, 'Pembayaran SPP, cek tunggakan, beasiswa, dan administrasi keuangan', 1, NOW()),
+(3, 'C', 'Layanan Umum & Mutasi Siswa', 3, 'Layanan tamu pimpinan, konsultasi kesiswaan, mutasi peserta didik', 1, NOW());
+
+CREATE TABLE IF NOT EXISTS `queue_tickets` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `service_id` INT UNSIGNED NOT NULL,
+  `ticket_number` VARCHAR(15) NOT NULL,
+  `queue_date` DATE NOT NULL,
+  `sequence` INT NOT NULL,
+  `status` ENUM('waiting', 'calling', 'serving', 'completed', 'skipped') NOT NULL DEFAULT 'waiting',
+  `loket_number` INT NULL DEFAULT NULL,
+  `called_by` INT UNSIGNED NULL DEFAULT NULL,
+  `called_at` DATETIME NULL DEFAULT NULL,
+  `completed_at` DATETIME NULL DEFAULT NULL,
+  `created_at` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_queue_date_status` (`queue_date`, `status`),
+  KEY `idx_queue_service` (`service_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

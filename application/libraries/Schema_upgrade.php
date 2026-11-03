@@ -14,7 +14,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Schema_upgrade
 {
-	const VERSION = 9;
+	const VERSION = 10;
 
 	protected $CI;
 
@@ -353,7 +353,10 @@ class Schema_upgrade
 		// 12. Akun demo untuk kelima role (bila belum ada)
 		$this->seed_demo_roles($db);
 
-		// 13. Injeksi Profil Resmi SMK Muhammadiyah Bandongan
+		// 13. Fitur Sistem Antrean TU & Display TV Monitor (v10)
+		$this->upgrade_queue_tables($db);
+
+		// 14. Injeksi Profil Resmi SMK Muhammadiyah Bandongan
 		$this->seed_school_profile($db);
 
 		$db->db_debug = $debug;
@@ -478,4 +481,64 @@ class Schema_upgrade
 		}
 	}
 
+
+	/** Struktur Tabel Sistem Antrean TU & Layar Display TV */
+	protected function upgrade_queue_tables($db)
+	{
+		if ( ! $db->table_exists('queue_services'))
+		{
+			$db->query("CREATE TABLE IF NOT EXISTS `queue_services` (
+			  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			  `code` VARCHAR(5) NOT NULL,
+			  `name` VARCHAR(100) NOT NULL,
+			  `loket_number` INT NOT NULL DEFAULT 1,
+			  `description` VARCHAR(255) NULL DEFAULT NULL,
+			  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+			  `created_at` DATETIME NOT NULL,
+			  PRIMARY KEY (`id`),
+			  UNIQUE KEY `uq_queue_code` (`code`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+			// Injeksi 3 layanan utama TU SMK Muhammadiyah Bandongan
+			$now = date('Y-m-d H:i:s');
+			$db->query("INSERT IGNORE INTO `queue_services` (`code`, `name`, `loket_number`, `description`, `is_active`, `created_at`) VALUES
+			('A', 'Layanan Surat & Legalisir', 1, 'Pengajuan surat keterangan aktif, legalisir ijazah, surat rekomendasi', 1, '{$now}'),
+			('B', 'Keuangan & Administrasi SPP', 2, 'Pembayaran SPP, cek tunggakan, beasiswa, dan administrasi keuangan', 1, '{$now}'),
+			('C', 'Layanan Umum & Mutasi Siswa', 3, 'Layanan tamu pimpinan, konsultasi kesiswaan, mutasi peserta didik', 1, '{$now}')");
+		}
+
+		if ( ! $db->table_exists('queue_tickets'))
+		{
+			$db->query("CREATE TABLE IF NOT EXISTS `queue_tickets` (
+			  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			  `service_id` INT UNSIGNED NOT NULL,
+			  `ticket_number` VARCHAR(15) NOT NULL,
+			  `queue_date` DATE NOT NULL,
+			  `sequence` INT NOT NULL,
+			  `status` ENUM('waiting', 'calling', 'serving', 'completed', 'skipped') NOT NULL DEFAULT 'waiting',
+			  `loket_number` INT NULL DEFAULT NULL,
+			  `called_by` INT UNSIGNED NULL DEFAULT NULL,
+			  `called_at` DATETIME NULL DEFAULT NULL,
+			  `completed_at` DATETIME NULL DEFAULT NULL,
+			  `created_at` DATETIME NOT NULL,
+			  PRIMARY KEY (`id`),
+			  KEY `idx_queue_date_status` (`queue_date`, `status`),
+			  KEY `idx_queue_service` (`service_id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+		}
+
+		if ($db->table_exists('school_settings'))
+		{
+			if ( ! $db->field_exists('queue_running_text', 'school_settings'))
+			{
+				$db->query("ALTER TABLE `school_settings` ADD COLUMN `queue_running_text` TEXT NULL DEFAULT NULL COMMENT 'Teks berjalan pada layar TV display antrean'");
+				$default_running = 'Selamat Datang di Layanan Tata Usaha SMK Muhammadiyah Bandongan | Silakan ambil nomor antrean dan menunggu hingga nomor Anda dipanggil | Budayakan antre demi kenyamanan dan ketertiban bersama | Jam operasional: Senin - Jumat 07.00 - 15.30 WIB';
+				$db->query("UPDATE `school_settings` SET `queue_running_text` = " . $db->escape($default_running) . " WHERE `id` = 1 AND (`queue_running_text` IS NULL OR `queue_running_text` = '')");
+			}
+			if ( ! $db->field_exists('queue_video_url', 'school_settings'))
+			{
+				$db->query("ALTER TABLE `school_settings` ADD COLUMN `queue_video_url` VARCHAR(255) NULL DEFAULT NULL COMMENT 'URL Video Profil YouTube pada Display TV'");
+			}
+		}
+	}
 }
