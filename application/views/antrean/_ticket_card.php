@@ -39,10 +39,7 @@
 	<!-- Tombol Selesai Utama -->
 	<div class="d-grid gap-2">
 		<button type="button" class="btn btn-success btn-lg fw-bold rounded-pill shadow-sm" data-bs-dismiss="modal">
-			<i class="fa-solid fa-check me-1"></i> Saya Sudah Ingat Nomornya
-		</button>
-		<button type="button" class="btn btn-link text-muted btn-sm text-decoration-none" onclick="printReceipt()">
-			<i class="fa-solid fa-print me-1"></i> Cetak ke Printer Kertas (Opsional)
+			<i class="fa-solid fa-check me-1"></i> Selesai
 		</button>
 	</div>
 </div>

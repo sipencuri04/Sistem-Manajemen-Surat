@@ -274,38 +274,10 @@ function ambilTiket(serviceId, serviceName) {
 // ================================================================
 // PRINT RECEIPT — QZ Tray ESC/POS (utama) + fallback popup browser
 // ================================================================
-async function printReceipt() {
+function printReceipt() {
 	if ( ! currentTicketId) return;
 
-	// --- Coba QZ Tray terlebih dahulu ---
-	const isQZ = await connectQZ();
-
-	if (isQZ) {
-		try {
-			// Ambil ESC/POS data dari server
-			const resp = await fetch('<?= site_url("antrean/escpos") ?>/' + currentTicketId);
-			const json = await resp.json();
-
-			if ( ! json.success) throw new Error(json.message || 'Gagal ambil data ESC/POS');
-
-			// Decode base64 ESC/POS dan kirim langsung ke printer
-			const config = qz.configs.create(PRINTER_NAME);
-			const data = [{
-				type    : 'raw',
-				format  : 'base64',
-				data    : json.escpos_raw,
-			}];
-
-			await qz.print(config, data);
-			console.log('[QZ Tray] Print berhasil: ' + json.ticket_number);
-			return; // Sukses via QZ — tidak perlu fallback
-
-		} catch(e) {
-			console.warn('[QZ Tray] Print gagal, fallback ke popup browser:', e.message);
-		}
-	}
-
-	// --- Fallback: popup browser biasa (jika QZ Tray tidak aktif) ---
+	// Buka langsung jendela cetak tiket tanpa dialog berbelit
 	const printWin = window.open(
 		'<?= site_url("antrean/ambil_tiket") ?>/' + currentTicketId + '?autoprint=1',
 		'_blank',
