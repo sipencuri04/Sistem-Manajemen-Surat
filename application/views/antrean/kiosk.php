@@ -76,6 +76,10 @@
 				<i class="fa-regular fa-clock text-warning"></i>
 				<span id="liveClock" class="fw-bold font-monospace fs-5">00:00:00 WIB</span>
 			</div>
+			<!-- Tombol Pairing Bluetooth Printer POS -->
+			<button type="button" id="btnPairPrinter" onclick="initPosPrinter()" class="btn btn-outline-info btn-sm rounded-pill px-3 shadow-sm">
+				<i class="fa-solid fa-print me-1"></i> <span id="printerStatusText">Sambungkan Printer Bluetooth</span>
+			</button>
 			<a href="<?= site_url('antrean/display') ?>" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3">
 				<i class="fa-solid fa-tv me-1"></i> Monitor TV
 			</a>
@@ -163,7 +167,11 @@
 <iframe id="printFrame" style="position:absolute; width:0px; height:0px; border:none; left:-9999px;"></iframe>
 
 <script src="<?= asset_url('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+<!-- Driver POS Web Serial API Native ESC/POS -->
+<script src="<?= asset_url('assets/js/pos-serial-printer.js') ?>"></script>
 <script>
+const SCHOOL_NAME = <?= json_encode($school['school_name'] ?: 'SMK MUHAMMADIYAH BANDONGAN') ?>;
+
 // Jam Digital Kiosk
 function updateClock() {
 	const now = new Date();
@@ -180,9 +188,47 @@ let isProcessing = false;
 let currentTicketId = null;
 let ticketModal = null;
 
-document.addEventListener('DOMContentLoaded', function() {
+// Cek Auto-Remember Port saat halaman dimuat
+document.addEventListener('DOMContentLoaded', async function() {
 	ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
+
+	if (window.posPrinter && window.posPrinter.isSupported()) {
+		const isRemembered = await window.posPrinter.autoConnect();
+		updatePrinterBadge(isRemembered);
+	} else {
+		const btn = document.getElementById('btnPairPrinter');
+		if (btn) btn.style.display = 'none'; // Sembunyikan jika browser tidak support serial
+	}
 });
+
+// Update status tombol printer
+function updatePrinterBadge(connected) {
+	const btn = document.getElementById('btnPairPrinter');
+	const txt = document.getElementById('printerStatusText');
+	if (!btn || !txt) return;
+
+	if (connected) {
+		btn.className = 'btn btn-success btn-sm rounded-pill px-3 shadow-sm';
+		txt.innerHTML = '<i class="fa-solid fa-check me-1"></i> Bluetooth Printer Siap';
+	} else {
+		btn.className = 'btn btn-outline-info btn-sm rounded-pill px-3 shadow-sm';
+		txt.textContent = 'Sambungkan Printer Bluetooth';
+	}
+}
+
+// Handler klik tombol sambungkan printer (hanya 1x seumur hidup per browser)
+async function initPosPrinter() {
+	if (!window.posPrinter) return;
+	try {
+		const ok = await window.posPrinter.requestPort();
+		updatePrinterBadge(ok);
+		if (ok) {
+			alert('Printer Bluetooth berhasil terhubung!\nSelanjutnya tiket akan dicetak otomatis seketika dengan teks pekat.');
+		}
+	} catch (err) {
+		alert('Gagal menyambungkan port: ' + err.message);
+	}
+}
 
 // Ambil Tiket dengan Proteksi Anti-Spam / Anti-Crash
 function ambilTiket(serviceId, serviceName) {
@@ -207,13 +253,13 @@ function ambilTiket(serviceId, serviceName) {
 		if (!res.ok) throw new Error('Respon server error: ' + res.status);
 		return res.json();
 	})
-	.then(data => {
+	.then(async data => {
 		if (data.success) {
 			currentTicketId = data.ticket.id;
 			modalBody.innerHTML = data.html;
 
-			// Cetak Otomatis via Iframe Tersembunyi (100% Bebas Blokir Pop-up)
-			printTicketSilently(currentTicketId);
+			// Eksekusi Cetak Tiket
+			await executePrint(data.ticket);
 		} else {
 			modalBody.innerHTML = `
 				<div class="alert alert-danger my-3">${data.message || 'Gagal membuat tiket antrean.'}</div>
@@ -240,7 +286,24 @@ function ambilTiket(serviceId, serviceName) {
 	});
 }
 
-// Print Diam-diam Tanpa Membuka Tab Baru
+// Eksekusi Cetak: Prioritas Web Serial ESC/POS murni -> Fallback ke Silent Iframe
+async function executePrint(ticketData) {
+	// 1. Coba cetak kilat via Web Serial API (ESC/POS murni)
+	if (window.posPrinter && window.posPrinter.isConnected) {
+		try {
+			await window.posPrinter.printTicket(ticketData, SCHOOL_NAME);
+			console.log('[POS-Serial] Cetak berhasil via ESC/POS murni!');
+			return; // Selesai!
+		} catch (err) {
+			console.warn('[POS-Serial] Gagal serial, fallback ke iframe:', err);
+		}
+	}
+
+	// 2. Fallback: Iframe HTML print
+	printTicketSilently(ticketData.id);
+}
+
+// Print Diam-diam Tanpa Membuka Tab Baru (Fallback)
 function printTicketSilently(ticketId) {
 	const printFrame = document.getElementById('printFrame');
 	if (!printFrame) return;
