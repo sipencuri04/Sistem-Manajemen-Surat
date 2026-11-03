@@ -18,6 +18,8 @@
 			display: flex;
 			flex-direction: column;
 			color: #fff;
+			user-select: none;
+			-webkit-user-select: none;
 		}
 		.kiosk-card {
 			transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -36,6 +38,10 @@
 		.kiosk-card:active {
 			transform: scale(0.98);
 		}
+		.kiosk-card.disabled {
+			pointer-events: none;
+			opacity: 0.6;
+		}
 		.service-code {
 			width: 65px;
 			height: 65px;
@@ -48,10 +54,8 @@
 		}
 		.clock-badge {
 			background: rgba(255, 255, 255, 0.12);
-			backdrop-filter: blur(8px);
+			backdrop-filter: blur(10px);
 			border: 1px solid rgba(255, 255, 255, 0.2);
-			border-radius: 14px;
-			padding: 8px 18px;
 		}
 	</style>
 </head>
@@ -60,22 +64,20 @@
 <header class="py-3 px-4 border-bottom border-white border-opacity-10">
 	<div class="container-fluid d-flex justify-content-between align-items-center">
 		<div class="d-flex align-items-center gap-3">
-			<div class="bg-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 48px; height: 48px;">
-				<i class="fa-solid fa-school text-primary fs-4"></i>
-			</div>
+			<img src="<?= asset_url('assets/img/logo-sekolah.png') ?>" alt="Logo" class="rounded" style="width: 48px; height: 48px; object-fit: contain;" onerror="this.src='<?= asset_url('assets/img/icon.png') ?>'">
 			<div>
-				<h5 class="fw-bold mb-0 text-white text-uppercase tracking-wide"><?= e($school['school_name'] ?: 'SMK MUHAMMADIYAH BANDONGAN') ?></h5>
-				<small class="text-white-50">Sistem Antrean Pelayanan Tata Usaha Mandiri</small>
+				<h5 class="mb-0 fw-bold text-uppercase tracking-wider"><?= e($school['school_name'] ?: 'SMK MUHAMMADIYAH BANDONGAN') ?></h5>
+				<small class="text-white-50">Sistem Antrean Layanan Mandiri Tata Usaha (Kiosk)</small>
 			</div>
 		</div>
 
 		<div class="d-flex align-items-center gap-3">
-			<div class="clock-badge text-end d-none d-md-block">
-				<div class="fw-bold fs-5 text-white" id="liveClock">--:--:--</div>
-				<small class="text-white-50"><?= tgl_indo(date('Y-m-d')) ?></small>
+			<div class="clock-badge px-4 py-2 rounded-pill d-flex align-items-center gap-2 shadow-sm">
+				<i class="fa-regular fa-clock text-warning"></i>
+				<span id="liveClock" class="fw-bold font-monospace fs-5">00:00:00 WIB</span>
 			</div>
-			<a href="<?= site_url('antrean/display') ?>" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3 shadow-sm" title="Buka Layar Monitor TV">
-				<i class="fa-solid fa-tv me-1"></i> Layar Display TV
+			<a href="<?= site_url('antrean/display') ?>" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3">
+				<i class="fa-solid fa-tv me-1"></i> Monitor TV
 			</a>
 			<a href="<?= site_url('login') ?>" class="btn btn-light btn-sm rounded-pill px-3 shadow-sm">
 				<i class="fa-solid fa-user-lock me-1"></i> Login Staf
@@ -83,11 +85,6 @@
 		</div>
 	</div>
 </header>
-
-<!-- Badge status QZ Tray (muncul di sudut kiri bawah) -->
-<div id="qzStatusBadge" style="position:fixed;bottom:12px;left:12px;z-index:9999;font-size:11px;padding:5px 10px;border-radius:20px;background:#64748b;color:#fff;opacity:0.85;">
-	🖨️ Menghubungkan printer...
-</div>
 
 <main class="flex-grow-1 d-flex align-items-center py-5">
 	<div class="container">
@@ -103,64 +100,58 @@
 			<?php 
 			$card_colors = array(
 				'A' => array('bg' => 'bg-primary text-white', 'btn' => 'btn-primary', 'accent' => '#2563eb', 'icon' => 'fa-file-signature'),
-				'B' => array('bg' => 'bg-success text-white', 'btn' => 'btn-success', 'accent' => '#16a34a', 'icon' => 'fa-wallet'),
-				'C' => array('bg' => 'bg-warning text-dark', 'btn' => 'btn-warning', 'accent' => '#ca8a04', 'icon' => 'fa-users'),
+				'B' => array('bg' => 'bg-success text-white', 'btn' => 'btn-success', 'accent' => '#16a34a', 'icon' => 'fa-money-bill-wave'),
+				'C' => array('bg' => 'bg-warning text-dark',  'btn' => 'btn-warning', 'accent' => '#ca8a04', 'icon' => 'fa-users-gear'),
 			);
-			foreach ($services as $srv): 
-				$color = isset($card_colors[$srv['code']]) ? $card_colors[$srv['code']] : $card_colors['A'];
-				$waiting = isset($lokets[$srv['loket_number']]) ? $lokets[$srv['loket_number']]['waiting_count'] : 0;
+			?>
+
+			<?php foreach ($services as $srv): 
+				$color = isset($card_colors[$srv['code']]) ? $card_colors[$srv['code']] : array('bg' => 'bg-secondary text-white', 'btn' => 'btn-secondary', 'accent' => '#64748b', 'icon' => 'fa-bell');
+				$waiting = isset($stats[$srv['id']]['waiting']) ? $stats[$srv['id']]['waiting'] : 0;
 			?>
 				<div class="col-lg-4 col-md-6">
-					<div class="kiosk-card p-4 h-100 d-flex flex-column justify-content-between" onclick="ambilTiket(<?= (int) $srv['id'] ?>, '<?= e($srv['name']) ?>')">
-						<div>
-							<div class="d-flex justify-content-between align-items-start mb-3">
-								<div class="service-code <?= $color['bg'] ?> shadow-sm">
-									<?= e($srv['code']) ?>
-								</div>
-								<div class="text-end">
-									<span class="badge bg-light text-muted border px-2 py-1">LOKET <?= (int) $srv['loket_number'] ?></span>
-									<div class="small text-muted mt-1"><i class="fa-solid <?= $color['icon'] ?> me-1"></i> Mandiri</div>
-								</div>
+					<div class="card kiosk-card h-100 p-4 service-btn" onclick="ambilTiket(<?= (int)$srv['id'] ?>, '<?= e(addslashes($srv['name'])) ?>')">
+						<div class="d-flex align-items-center gap-3 mb-3">
+							<div class="service-code <?= $color['bg'] ?> shadow-sm">
+								<?= e($srv['code']) ?>
 							</div>
-							<h4 class="fw-bold mb-2 text-dark"><?= e($srv['name']) ?></h4>
-							<p class="text-secondary small mb-4"><?= e($srv['description'] ?: 'Pelayanan cepat dan ramah di Loket ' . $srv['loket_number']) ?></p>
+							<div class="flex-grow-1">
+								<span class="badge bg-light text-muted border px-2 py-1 rounded-pill small">
+									Loket <?= (int) $srv['loket_number'] ?>
+								</span>
+								<h4 class="fw-bold mb-0 text-dark mt-1"><?= e($srv['name']) ?></h4>
+							</div>
 						</div>
 
+						<p class="text-muted small flex-grow-1 mb-4" style="min-height: 40px;">
+							<?= e($srv['description'] ?: 'Pelayanan administrasi dan persuratan di loket TU.') ?>
+						</p>
+
 						<div class="pt-3 border-top d-flex justify-content-between align-items-center">
-							<div class="small text-muted">
-								<i class="fa-solid fa-hourglass-half me-1 text-warning"></i> 
-								Menunggu: <strong class="text-dark"><?= $waiting ?> Orang</strong>
+							<div class="small">
+								<span class="text-muted">Sedang Menunggu:</span>
+								<strong class="text-dark fs-6 ms-1"><?= (int) $waiting ?> Orang</strong>
 							</div>
-							<button type="button" class="btn <?= $color['btn'] ?> fw-bold rounded-pill px-4 shadow-sm">
-								Ambil Tiket &rarr;
+							<button type="button" class="btn <?= $color['btn'] ?> px-4 py-2 rounded-pill fw-bold shadow-sm">
+								<i class="fa-solid fa-ticket me-1"></i> AMBIL TIKET
 							</button>
 						</div>
 					</div>
 				</div>
 			<?php endforeach; ?>
 		</div>
-
-		<!-- Informasi Tata Tertib -->
-		<div class="mt-5 text-center">
-			<div class="d-inline-flex align-items-center gap-3 bg-white bg-opacity-10 border border-white border-opacity-10 rounded-pill px-4 py-2 text-white-50 small">
-				<span><i class="fa-solid fa-circle-info text-info me-1"></i> Setelah mengambil tiket, silakan duduk di ruang tunggu dan dengarkan panggilan suara pada monitor TV.</span>
-			</div>
-		</div>
 	</div>
 </main>
 
-<footer class="py-3 text-center border-top border-white border-opacity-10 text-white-50 small">
-	&copy; <?= date('Y') ?> <?= e($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') ?> &middot; Sistem Manajemen Persuratan &amp; Antrean TU
+<footer class="py-3 text-center text-white-50 small border-top border-white border-opacity-10">
+	&copy; <?= date('Y') ?> <?= e($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') ?> &middot; Sistem Manajemen Persuratan &amp; Antrean Digital
 </footer>
 
-<!-- Modal Tampil Nomor Tiket Digital (Tanpa Perlu Printer) -->
-<div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true" data-bs-backdrop="static">
-	<div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
-		<div class="modal-content rounded-4 border-0 shadow-lg p-3">
-			<div class="modal-header border-0 pb-0 justify-content-end">
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body p-3 pt-0 text-center" id="ticketModalBody">
+<!-- Modal Digital Card Tiket -->
+<div class="modal fade" id="ticketModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+		<div class="modal-content rounded-4 border-0 shadow-lg p-2">
+			<div class="modal-body p-3 text-center" id="ticketModalBody">
 				<div class="spinner-border text-primary my-4" role="status"></div>
 				<p class="text-muted">Sedang mengambil nomor antrean...</p>
 			</div>
@@ -168,59 +159,12 @@
 	</div>
 </div>
 
+<!-- Hidden Iframe untuk Print Otomatis Tanpa Pop-up Blocker -->
+<iframe id="printFrame" style="position:absolute; width:0px; height:0px; border:none; left:-9999px;"></iframe>
+
 <script src="<?= asset_url('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
-<!-- QZ Tray: jembatan browser ↔ printer thermal via ESC/POS langsung -->
-<script src="<?= asset_url('assets/js/qz-tray.js') ?>"></script>
 <script>
-// ================================================================
-// QZ TRAY SETUP
-// ================================================================
-
-// Abaikan error sertifikat untuk penggunaan lokal (localhost)
-qz.security.setCertificatePromise(function(resolve) { resolve(''); });
-qz.security.setSignatureAlgorithm('SHA512');
-qz.security.setSignaturePromise(function(toSign) {
-    return function(resolve) { resolve(''); };
-});
-
-// Nama printer — null = pakai printer default Windows
-// Ganti dengan nama persis printer Anda jika perlu:
-// Contoh: 'RONGTA RPP02 Series Printer' atau 'WOYA 58'
-let PRINTER_NAME = null;
-
-// Status koneksi QZ Tray
-let qzConnected = false;
-
-async function connectQZ() {
-    if (qzConnected) return true;
-    try {
-        await qz.websocket.connect({ retries: 1, delay: 500 });
-        qzConnected = true;
-        console.log('[QZ Tray] Terkoneksi ✅');
-        return true;
-    } catch(e) {
-        qzConnected = false;
-        console.warn('[QZ Tray] Tidak terkoneksi:', e.message);
-        return false;
-    }
-}
-
-// Coba koneksi QZ Tray saat halaman dimuat
-window.addEventListener('load', function() {
-    connectQZ().then(ok => {
-        if (ok) {
-            const badge = document.getElementById('qzStatusBadge');
-            if (badge) {
-                badge.textContent = '🖨️ Printer Siap (QZ Tray)';
-                badge.style.background = '#16a34a';
-            }
-        }
-    });
-});
-
-// ================================================================
-// JAM DIGITAL
-// ================================================================
+// Jam Digital Kiosk
 function updateClock() {
 	const now = new Date();
 	const h = String(now.getHours()).padStart(2, '0');
@@ -232,17 +176,26 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// ================================================================
-// AMBIL TIKET
-// ================================================================
+let isProcessing = false;
 let currentTicketId = null;
-const ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
+let ticketModal = null;
 
+document.addEventListener('DOMContentLoaded', function() {
+	ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
+});
+
+// Ambil Tiket dengan Proteksi Anti-Spam / Anti-Crash
 function ambilTiket(serviceId, serviceName) {
+	if (isProcessing) return; // Mencegah double click
+	isProcessing = true;
+
+	// Kunci semua kartu agar tidak bisa diklik berulang
+	document.querySelectorAll('.kiosk-card').forEach(c => c.classList.add('disabled'));
+
 	const modalBody = document.getElementById('ticketModalBody');
 	modalBody.innerHTML = `
 		<div class="spinner-border text-primary my-4" role="status"></div>
-		<p class="text-muted">Mengambil nomor antrean <strong>${serviceName}</strong>...</p>
+		<p class="text-muted">Membuat nomor antrean <strong>${serviceName}</strong>...</p>
 	`;
 	ticketModal.show();
 
@@ -250,43 +203,52 @@ function ambilTiket(serviceId, serviceName) {
 		method: 'GET',
 		headers: { 'X-Requested-With': 'XMLHttpRequest' }
 	})
-	.then(res => res.json())
+	.then(res => {
+		if (!res.ok) throw new Error('Respon server error: ' + res.status);
+		return res.json();
+	})
 	.then(data => {
 		if (data.success) {
 			currentTicketId = data.ticket.id;
 			modalBody.innerHTML = data.html;
-			// Langsung print via QZ Tray setelah tiket berhasil dibuat
-			printReceipt();
+
+			// Cetak Otomatis via Iframe Tersembunyi (100% Bebas Blokir Pop-up)
+			printTicketSilently(currentTicketId);
 		} else {
-			modalBody.innerHTML = `<div class="alert alert-danger my-3">${data.message || 'Gagal membuat tiket antrean.'}</div>`;
+			modalBody.innerHTML = `
+				<div class="alert alert-danger my-3">${data.message || 'Gagal membuat tiket antrean.'}</div>
+				<button class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+			`;
 		}
 	})
 	.catch(err => {
+		console.error('Kiosk Error:', err);
 		modalBody.innerHTML = `
 			<div class="alert alert-danger my-3">
 				<strong>Gagal menghubungi server.</strong><br>
-				<small>Pastikan koneksi internet stabil dan halaman telah di-refresh.</small>
+				<small>Koneksi terganggu. Silakan coba lagi.</small>
 			</div>
+			<button class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
 		`;
+	})
+	.finally(() => {
+		// Buka kembali kunci klik setelah 2 detik
+		setTimeout(() => {
+			isProcessing = false;
+			document.querySelectorAll('.kiosk-card').forEach(c => c.classList.remove('disabled'));
+		}, 2000);
 	});
 }
 
-// ================================================================
-// PRINT RECEIPT — QZ Tray ESC/POS (utama) + fallback popup browser
-// ================================================================
-function printReceipt() {
-	if ( ! currentTicketId) return;
+// Print Diam-diam Tanpa Membuka Tab Baru
+function printTicketSilently(ticketId) {
+	const printFrame = document.getElementById('printFrame');
+	if (!printFrame) return;
 
-	// Buka langsung jendela cetak tiket tanpa dialog berbelit
-	const printWin = window.open(
-		'<?= site_url("antrean/ambil_tiket") ?>/' + currentTicketId + '?autoprint=1',
-		'_blank',
-		'width=420,height=650'
-	);
-	if (printWin) printWin.focus();
+	// Muat halaman cetak ke dalam iframe tersembunyi
+	printFrame.src = '<?= site_url("antrean/ambil_tiket") ?>/' + ticketId + '?autoprint=1';
 }
 </script>
 
 </body>
 </html>
-

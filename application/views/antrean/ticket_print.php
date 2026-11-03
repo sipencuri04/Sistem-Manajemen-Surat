@@ -154,8 +154,12 @@
     </div>
 
     <script>
+        // Jalankan perintah print segera setelah dimuat
         window.addEventListener('load', function() {
-            setTimeout(function() { window.print(); }, 300);
+            setTimeout(function() { 
+                window.focus();
+                window.print(); 
+            }, 250);
         });
     </script>
 
