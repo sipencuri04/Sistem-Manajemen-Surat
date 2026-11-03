@@ -8,6 +8,65 @@ class Queue_model extends CI_Model
 	public function __construct()
 	{
 		parent::__construct();
+		$this->ensure_tables();
+	}
+
+	/** Pastikan tabel antrean dan 3 layanan utama selalu tersedia otomatis */
+	public function ensure_tables()
+	{
+		if ( ! $this->db->table_exists($this->table_services))
+		{
+			$this->db->query("CREATE TABLE IF NOT EXISTS `queue_services` (
+			  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			  `code` VARCHAR(5) NOT NULL,
+			  `name` VARCHAR(100) NOT NULL,
+			  `loket_number` INT NOT NULL DEFAULT 1,
+			  `description` VARCHAR(255) NULL DEFAULT NULL,
+			  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+			  `created_at` DATETIME NOT NULL,
+			  PRIMARY KEY (`id`),
+			  UNIQUE KEY `uq_queue_code` (`code`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+			$now = date('Y-m-d H:i:s');
+			$this->db->query("INSERT IGNORE INTO `queue_services` (`id`, `code`, `name`, `loket_number`, `description`, `is_active`, `created_at`) VALUES
+			(1, 'A', 'Layanan Surat & Legalisir', 1, 'Pengajuan surat keterangan aktif, legalisir ijazah, surat rekomendasi', 1, '{$now}'),
+			(2, 'B', 'Keuangan & Administrasi SPP', 2, 'Pembayaran SPP, cek tunggakan, beasiswa, dan administrasi keuangan', 1, '{$now}'),
+			(3, 'C', 'Layanan Umum & Mutasi Siswa', 3, 'Layanan tamu pimpinan, konsultasi kesiswaan, mutasi peserta didik', 1, '{$now}');");
+		}
+		else
+		{
+			// Bila tabel ada tapi belum ada baris layanan
+			$count = $this->db->count_all($this->table_services);
+			if ($count === 0)
+			{
+				$now = date('Y-m-d H:i:s');
+				$this->db->query("INSERT IGNORE INTO `queue_services` (`id`, `code`, `name`, `loket_number`, `description`, `is_active`, `created_at`) VALUES
+				(1, 'A', 'Layanan Surat & Legalisir', 1, 'Pengajuan surat keterangan aktif, legalisir ijazah, surat rekomendasi', 1, '{$now}'),
+				(2, 'B', 'Keuangan & Administrasi SPP', 2, 'Pembayaran SPP, cek tunggakan, beasiswa, dan administrasi keuangan', 1, '{$now}'),
+				(3, 'C', 'Layanan Umum & Mutasi Siswa', 3, 'Layanan tamu pimpinan, konsultasi kesiswaan, mutasi peserta didik', 1, '{$now}');");
+			}
+		}
+
+		if ( ! $this->db->table_exists($this->table_tickets))
+		{
+			$this->db->query("CREATE TABLE IF NOT EXISTS `queue_tickets` (
+			  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			  `service_id` INT UNSIGNED NOT NULL,
+			  `ticket_number` VARCHAR(15) NOT NULL,
+			  `queue_date` DATE NOT NULL,
+			  `sequence` INT NOT NULL,
+			  `status` ENUM('waiting', 'calling', 'serving', 'completed', 'skipped') NOT NULL DEFAULT 'waiting',
+			  `loket_number` INT NULL DEFAULT NULL,
+			  `called_by` INT UNSIGNED NULL DEFAULT NULL,
+			  `called_at` DATETIME NULL DEFAULT NULL,
+			  `completed_at` DATETIME NULL DEFAULT NULL,
+			  `created_at` DATETIME NOT NULL,
+			  PRIMARY KEY (`id`),
+			  KEY `idx_queue_date_status` (`queue_date`, `status`),
+			  KEY `idx_queue_service` (`service_id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+		}
 	}
 
 	/** Ambil semua kategori layanan antrean */
@@ -253,3 +312,4 @@ class Queue_model extends CI_Model
 		return $this->db->where('queue_date', $today)->delete($this->table_tickets);
 	}
 }
+

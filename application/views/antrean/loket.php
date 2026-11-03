@@ -154,6 +154,8 @@ $this->load->view('layouts/app', array('page_title' => $page_title));
 <script>
 let currentActiveId = <?= !empty($active_ticket) ? (int) $active_ticket['id'] : 'null' ?>;
 const serviceId = <?= (int) $selected_id ?>;
+const csrfName = '<?= $this->security->get_csrf_token_name() ?>';
+const csrfHash = '<?= $this->security->get_csrf_hash() ?>';
 
 function panggilBerikutnya() {
 	fetch('<?= site_url("antrean/api_call_next") ?>', {
@@ -162,7 +164,7 @@ function panggilBerikutnya() {
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'X-Requested-With': 'XMLHttpRequest' 
 		},
-		body: 'service_id=' + serviceId
+		body: 'service_id=' + serviceId + '&' + csrfName + '=' + encodeURIComponent(csrfHash)
 	})
 	.then(res => res.json())
 	.then(data => {
@@ -191,7 +193,7 @@ function panggilUlang() {
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'X-Requested-With': 'XMLHttpRequest' 
 		},
-		body: 'ticket_id=' + currentActiveId
+		body: 'ticket_id=' + currentActiveId + '&' + csrfName + '=' + encodeURIComponent(csrfHash)
 	})
 	.then(res => res.json())
 	.then(data => {
@@ -210,7 +212,7 @@ function selesai() {
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'X-Requested-With': 'XMLHttpRequest' 
 		},
-		body: 'ticket_id=' + currentActiveId
+		body: 'ticket_id=' + currentActiveId + '&' + csrfName + '=' + encodeURIComponent(csrfHash)
 	})
 	.then(res => res.json())
 	.then(data => {
@@ -229,7 +231,7 @@ function lewati() {
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'X-Requested-With': 'XMLHttpRequest' 
 		},
-		body: 'ticket_id=' + currentActiveId
+		body: 'ticket_id=' + currentActiveId + '&' + csrfName + '=' + encodeURIComponent(csrfHash)
 	})
 	.then(res => res.json())
 	.then(data => {
@@ -241,3 +243,4 @@ function lewati() {
 </script>
 
 <?php $this->load->view('layouts/footer'); ?>
+

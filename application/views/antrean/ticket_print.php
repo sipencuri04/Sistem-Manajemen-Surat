@@ -64,14 +64,17 @@
 	</div>
 
 	<div class="no-print" style="margin-top: 20px;">
-		<button onclick="window.print()" style="padding: 8px 16px; font-weight: bold; cursor: pointer;">Cetak Tiket</button>
-		<button onclick="window.history.back()" style="padding: 8px 16px; cursor: pointer;">Kembali</button>
+		<button onclick="window.print()" style="padding: 8px 16px; font-weight: bold; cursor: pointer; background: #2563eb; color: #fff; border: none; border-radius: 6px;">Cetak Tiket</button>
+		<button onclick="window.close()" style="padding: 8px 16px; cursor: pointer; border-radius: 6px; border: 1px solid #ccc; background: #f8fafc;">Tutup</button>
 	</div>
 
 	<script>
-		window.addEventListener('load', function() {
-			window.print();
-		});
+		// Hanya auto-print bila parameter autoprint=1 disertakan
+		const urlParams = new URLSearchParams(window.location.search);
+		if (urlParams.get('autoprint') === '1') {
+			window.addEventListener('load', function() { window.print(); });
+		}
 	</script>
 </body>
 </html>
+

@@ -148,20 +148,16 @@
 	&copy; <?= date('Y') ?> <?= e($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') ?> &middot; Sistem Manajemen Persuratan &amp; Antrean TU
 </footer>
 
-<!-- Modal Tampil & Cetak Tiket -->
+<!-- Modal Tampil Nomor Tiket Digital (Tanpa Perlu Printer) -->
 <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true" data-bs-backdrop="static">
-	<div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
-		<div class="modal-content rounded-4 border-0 shadow-lg">
+	<div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+		<div class="modal-content rounded-4 border-0 shadow-lg p-3">
 			<div class="modal-header border-0 pb-0 justify-content-end">
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
-			<div class="modal-body p-4 pt-0 text-center" id="ticketModalBody">
+			<div class="modal-body p-3 pt-0 text-center" id="ticketModalBody">
 				<div class="spinner-border text-primary my-4" role="status"></div>
-				<p class="text-muted">Sedang mencetak nomor antrean...</p>
-			</div>
-			<div class="modal-footer border-0 p-3 pt-0 justify-content-center gap-2">
-				<button type="button" class="btn btn-primary fw-bold rounded-pill px-4" onclick="printReceipt()"><i class="fa-solid fa-print me-1"></i> Cetak Struk</button>
-				<button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Selesai</button>
+				<p class="text-muted">Sedang mengambil nomor antrean...</p>
 			</div>
 		</div>
 	</div>
@@ -188,13 +184,16 @@ function ambilTiket(serviceId, serviceName) {
 	const modalBody = document.getElementById('ticketModalBody');
 	modalBody.innerHTML = `
 		<div class="spinner-border text-primary my-4" role="status"></div>
-		<p class="text-muted">Membuat tiket <strong>${serviceName}</strong>...</p>
+		<p class="text-muted">Mengambil nomor antrean <strong>${serviceName}</strong>...</p>
 	`;
 	ticketModal.show();
 
-	fetch('<?= site_url("antrean/ambil_tiket") ?>/' + serviceId, {
-		method: 'POST',
-		headers: { 'X-Requested-With': 'XMLHttpRequest' }
+	// Kirim permintaan via GET atau POST dengan fallback
+	fetch('<?= site_url("antrean/ambil_tiket") ?>/' + serviceId + '?format=json', {
+		method: 'GET',
+		headers: { 
+			'X-Requested-With': 'XMLHttpRequest'
+		}
 	})
 	.then(res => res.json())
 	.then(data => {
@@ -206,13 +205,18 @@ function ambilTiket(serviceId, serviceName) {
 		}
 	})
 	.catch(err => {
-		modalBody.innerHTML = `<div class="alert alert-danger my-3">Terjadi kendala jaringan saat menghubungi server.</div>`;
+		modalBody.innerHTML = `
+			<div class="alert alert-danger my-3">
+				<strong>Gagal menghubungi server.</strong><br>
+				<small>Pastikan koneksi internet stabil dan halaman telah di-refresh.</small>
+			</div>
+		`;
 	});
 }
 
 function printReceipt() {
 	if (currentTicketId) {
-		const printWin = window.open('<?= site_url("antrean/ambil_tiket") ?>/' + currentTicketId, '_blank', 'width=400,height=600');
+		const printWin = window.open('<?= site_url("antrean/ambil_tiket") ?>/' + currentTicketId, '_blank', 'width=420,height=600');
 		if (printWin) printWin.focus();
 	}
 }
@@ -220,3 +224,4 @@ function printReceipt() {
 
 </body>
 </html>
+

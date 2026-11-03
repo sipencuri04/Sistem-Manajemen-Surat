@@ -477,7 +477,7 @@ $config['csrf_token_name'] = 'csrf_token';
 $config['csrf_cookie_name'] = 'smk_csrf';
 $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = FALSE; // FALSE agar aman dipakai di beberapa tab
-$config['csrf_exclude_uris'] = array();
+$config['csrf_exclude_uris'] = array('antrean/.*', 'antrean');
 
 /*
 |--------------------------------------------------------------------------

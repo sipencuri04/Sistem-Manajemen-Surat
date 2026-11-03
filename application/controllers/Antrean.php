@@ -46,9 +46,24 @@ class Antrean extends CI_Controller
 	{
 		$service_id = (int) $service_id;
 		$service = $this->Queue_model->get_service($service_id);
+		if ( ! $service)
+		{
+			$this->Queue_model->ensure_tables();
+			$service = $this->Queue_model->get_service($service_id);
+			if ( ! $service)
+			{
+				$all_srv = $this->Queue_model->get_services(TRUE);
+				if ( ! empty($all_srv))
+				{
+					$service = $all_srv[0];
+					$service_id = (int) $service['id'];
+				}
+			}
+		}
+
 		if ( ! $service || empty($service['is_active']))
 		{
-			if ($this->input->is_ajax_request())
+			if ($this->input->is_ajax_request() || $this->input->get('format') === 'json')
 			{
 				$this->output->set_content_type('application/json')->set_output(json_encode(array(
 					'success' => FALSE,
@@ -64,7 +79,7 @@ class Antrean extends CI_Controller
 		$ticket = $this->Queue_model->create_ticket($service_id);
 		$school = $this->Settings_model->get(TRUE);
 
-		if ($this->input->is_ajax_request())
+		if ($this->input->is_ajax_request() || $this->input->get('format') === 'json')
 		{
 			$this->output->set_content_type('application/json')->set_output(json_encode(array(
 				'success' => TRUE,
@@ -74,7 +89,7 @@ class Antrean extends CI_Controller
 			return;
 		}
 
-		// Jika akses langsung, tampilkan struk cetak tiket
+		// Jika akses langsung dari browser, tampilkan struk cetak tiket
 		$this->load->view('antrean/ticket_print', array(
 			'ticket' => $ticket,
 			'school' => $school,
@@ -313,3 +328,4 @@ class Antrean extends CI_Controller
 		redirect('antrean/loket');
 	}
 }
+
