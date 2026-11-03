@@ -13,124 +13,96 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         body {
             width: 48mm;
             margin: 0 auto;
-            padding: 8px 4px;
+            padding: 4px 2px;
             font-family: Arial, Helvetica, sans-serif;
-            color: #000;
-            background: #fff;
+            color: #000000;
+            background: #ffffff;
             text-align: center;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-        .logo {
-            width: 44px;
-            height: auto;
-            margin: 0 auto 5px auto;
-            display: block;
         }
         .header h1 {
-            font-size: 9.5pt;
+            font-size: 13px;
             font-weight: 900;
             line-height: 1.2;
             text-transform: uppercase;
-            /* TIDAK pakai letter-spacing - menyebabkan pecah di thermal */
-            letter-spacing: 0;
-        }
-        .header h2 {
-            font-size: 9.5pt;
-            font-weight: 900;
-            margin-bottom: 3px;
             letter-spacing: 0;
         }
         .header p {
-            font-size: 7pt;
-            font-weight: 700;
-            margin-bottom: 4px;
+            font-size: 9px;
+            font-weight: bold;
+            margin-top: 2px;
+            line-height: 1.2;
         }
-
-        /* Garis tebal SOLID - jangan pakai dashed/dotted di thermal */
-        .divider-thick {
-            border: none;
-            border-top: 2.5pt solid #000;
+        .divider {
+            border-top: 2px solid #000000;
             margin: 5px 0;
-            display: block;
         }
-        /* Garis tipis SOLID - bukan dashed */
-        .divider-thin {
-            border: none;
-            border-top: 1pt solid #000;
-            margin: 5px 0;
-            display: block;
-        }
-
         .queue-label {
-            font-size: 7pt;
+            font-size: 10px;
             font-weight: 900;
-            /* TIDAK pakai letter-spacing */
             letter-spacing: 0;
-            margin-top: 4px;
-            text-transform: uppercase;
+            margin-top: 2px;
         }
-        /* Nomor antrean: ukuran diturunkan, letter-spacing NOLL */
         .queue-number {
-            font-size: 30pt;
+            font-size: 38px;
             font-weight: 900;
-            letter-spacing: 0;      /* <-- FIX UTAMA: hilangkan celah antar karakter */
-            line-height: 1.05;
-            margin: 4px 0;
+            letter-spacing: 0;
+            line-height: 1.1;
+            margin: 2px 0;
+            font-family: Arial, sans-serif;
         }
         .service-name {
-            font-size: 8pt;
+            font-size: 11px;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0;
             line-height: 1.2;
         }
         .counter-name {
-            font-size: 9pt;
+            font-size: 13px;
             font-weight: 900;
             margin-top: 2px;
             letter-spacing: 0;
         }
-
         .meta-table {
             width: 100%;
             margin: 4px 0;
-            font-size: 7pt;
-            font-weight: 700;
+            font-size: 9.5px;
+            font-weight: bold;
             border-collapse: collapse;
         }
         .meta-table td {
-            padding: 2px 0;
+            padding: 1px 0;
         }
         .meta-table .label { text-align: left; }
         .meta-table .val   { text-align: right; }
-
         .footer {
-            font-size: 6pt;
-            font-weight: 700;
-            line-height: 1.35;
+            font-size: 8.5px;
+            font-weight: bold;
+            line-height: 1.3;
             margin-top: 4px;
         }
-
         @media print {
             .no-print { display: none !important; }
+            body { width: 48mm; margin: 0 auto; padding: 2px; }
         }
         .no-print {
-            margin-top: 18px;
+            margin-top: 15px;
             display: flex;
-            gap: 8px;
+            gap: 6px;
             justify-content: center;
         }
         .no-print button {
-            padding: 7px 16px;
-            font-size: 12px;
+            padding: 6px 14px;
+            font-size: 11px;
             font-weight: bold;
             cursor: pointer;
-            border-radius: 6px;
+            border-radius: 4px;
         }
         .btn-print { background: #1d4ed8; color: #fff; border: none; }
         .btn-close  { background: #f1f5f9; color: #333; border: 1px solid #ccc; }
@@ -139,21 +111,20 @@
 <body>
 
     <div class="header">
-        <img src="<?= base_url('assets/img/logo-sekolah.png') ?>" alt="Logo SMK" class="logo">
-        <h1><?= htmlspecialchars($school['school_name'] ?: 'SMK MUHAMMADIYAH BANDONGAN') ?></h1>
+        <h1>SMK MUHAMMADIYAH BANDONGAN</h1>
         <p>Layanan Tata Usaha &amp; Administrasi</p>
     </div>
 
-    <hr class="divider-thick">
+    <div class="divider"></div>
 
     <div class="queue-section">
         <div class="queue-label">NOMOR ANTREAN ANDA</div>
         <div class="queue-number"><?= htmlspecialchars($ticket['ticket_number']) ?></div>
         <div class="service-name"><?= htmlspecialchars($ticket['service_name']) ?></div>
-        <div class="counter-name">LOKET <?= (int) $ticket['loket_number'] ?></div>
+        <div class="counter-name">MENUJU LOKET <?= (int) $ticket['loket_number'] ?></div>
     </div>
 
-    <hr class="divider-thick">
+    <div class="divider"></div>
 
     <table class="meta-table">
         <tr>
@@ -165,28 +136,26 @@
             <td class="val"><?= date('H:i') ?> WIB</td>
         </tr>
         <tr>
-            <td class="label">Antrian di Depan</td>
+            <td class="label">Antrean di Depan</td>
             <td class="val"><?= (int) $ticket['waiting_before'] ?> Orang</td>
         </tr>
     </table>
 
-    <hr class="divider-thin">
+    <div class="divider"></div>
 
     <div class="footer">
-        Simpan tiket &amp; perhatikan layar monitor.<br>
+        Simpan tiket &amp; perhatikan monitor.<br>
         Terima kasih telah tertib antre.
     </div>
 
-    <!-- Tombol hanya muncul di layar, tidak ikut tercetak -->
     <div class="no-print">
-        <button class="btn-print" onclick="window.print()">&#x1F5A8; Cetak</button>
-        <button class="btn-close"  onclick="window.close()">Tutup</button>
+        <button class="btn-print" onclick="window.print()">Cetak</button>
+        <button class="btn-close" onclick="window.close()">Tutup</button>
     </div>
 
     <script>
-        // Auto-print otomatis saat halaman dibuka (delay 400ms agar render selesai)
         window.addEventListener('load', function() {
-            setTimeout(function() { window.print(); }, 400);
+            setTimeout(function() { window.print(); }, 300);
         });
     </script>
 
