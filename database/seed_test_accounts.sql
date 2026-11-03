@@ -111,3 +111,4 @@ UPDATE `users` SET
   `phone` = '+62 877-4177-7837', 
   `email` = 'noxapremia02@gmail.com'
 WHERE `username` IN ('admin', 'superuser', 'kepsek', 'tu', 'pegawai1', 'pegawai2');
+

@@ -31,6 +31,7 @@ class Tools extends CI_Controller
 		echo "  php index.php tools test_email <alamat_tujuan@gmail.com>\n";
 		echo "  php index.php tools seed_dummy\n";
 		echo "  php index.php tools seed_test_users\n";
+		echo "  php index.php tools reset_and_seed\n";
 	}
 
 	public function create_admin($username = '', $password = '', $full_name = 'Administrator')
@@ -258,5 +259,46 @@ class Tools extends CI_Controller
 		}
 
 		echo "\nSemua akun testing siap digunakan dengan password: $password\n";
+	}
+
+	/**
+	 * Membersihkan data surat lama dan memasukkan 10 data dummy baru
+	 * (5 surat masuk instansi dan 5 permohonan surat siswa).
+	 */
+	public function reset_and_seed()
+	{
+		echo "Membersihkan data surat lama...\n";
+		$this->db->query("SET FOREIGN_KEY_CHECKS = 0");
+		$this->db->query("TRUNCATE TABLE `letter_files`");
+		$this->db->query("TRUNCATE TABLE `disposition_activities`");
+		$this->db->query("TRUNCATE TABLE `disposition_recipients`");
+		$this->db->query("TRUNCATE TABLE `dispositions`");
+		$this->db->query("TRUNCATE TABLE `letter_requests`");
+		$this->db->query("TRUNCATE TABLE `incoming_letters`");
+		$this->db->query("TRUNCATE TABLE `letters`");
+		$this->db->query("DELETE FROM `notifications` WHERE `type` IN ('surat_masuk', 'persetujuan', 'disposisi', 'permohonan')");
+		$this->db->query("SET FOREIGN_KEY_CHECKS = 1");
+		echo "[BERSIH] Semua surat lama, disposisi, dan berkas berhasil direset.\n\n";
+
+		$sql_file = FCPATH.'database/reset_and_seed_10_letters.sql';
+		if (is_file($sql_file))
+		{
+			$sql = file_get_contents($sql_file);
+			// Jalankan query-query insert
+			$queries = explode(';', $sql);
+			foreach ($queries as $q)
+			{
+				$q = trim($q);
+				if ($q !== '' && strpos($q, 'INSERT INTO') !== FALSE)
+				{
+					$this->db->query($q);
+				}
+			}
+			echo "[SUKSES] 10 data dummy (5 instansi + 5 siswa) berhasil dimasukkan!\n";
+		}
+		else
+		{
+			echo "[ERROR] File SQL tidak ditemukan.\n";
+		}
 	}
 }
