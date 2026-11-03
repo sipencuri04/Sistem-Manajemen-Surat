@@ -326,15 +326,25 @@ class Antrean extends MY_Controller
 	 */
 	public function reset_today()
 	{
-		if ( ! is_logged_in() || ! (is_tu() || is_superuser() || is_admin()))
+		$user_id = (int) $this->session->userdata('user_id');
+		if ( ! $user_id)
 		{
-			set_flash('danger', 'Akses ditolak.');
+			set_flash('danger', 'Akses ditolak. Silakan login terlebih dahulu.');
+			redirect('login');
+			return;
+		}
+
+		$this->load->model('User_model');
+		$user = $this->User_model->find($user_id);
+		if ( ! $user || ! in_array($user['role'], array('tu', 'superuser', 'admin'), TRUE))
+		{
+			set_flash('danger', 'Akses ditolak. Anda tidak memiliki izin untuk mereset antrean.');
 			redirect('dashboard');
 			return;
 		}
 
 		$this->Queue_model->reset_today();
-		set_flash('success', 'Seluruh antrean hari ini telah berhasil direset ke nomor awal.');
+		set_flash('success', '<strong>Antrean Berhasil Direset!</strong> Seluruh nomor antrean hari ini telah dikosongkan dan akan dimulai kembali dari nomor 001.');
 		redirect('antrean/loket');
 	}
 }

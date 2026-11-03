@@ -309,7 +309,13 @@ class Queue_model extends CI_Model
 	public function reset_today()
 	{
 		$today = date('Y-m-d');
-		return $this->db->where('queue_date', $today)->delete($this->table_tickets);
+		$this->db->where('queue_date', $today)->delete($this->table_tickets);
+		$cnt = $this->db->count_all($this->table_tickets);
+		if ($cnt === 0)
+		{
+			$this->db->truncate($this->table_tickets);
+		}
+		return TRUE;
 	}
 }
 

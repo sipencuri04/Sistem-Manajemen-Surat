@@ -510,6 +510,16 @@ if ( ! function_exists('is_superuser'))
 	}
 }
 
+if ( ! function_exists('is_admin'))
+{
+	function is_admin()
+	{
+		$user = current_user();
+		if ( ! $user) return FALSE;
+		return in_array($user['role'], array('superuser', 'admin'), TRUE);
+	}
+}
+
 if ( ! function_exists('is_kepala_sekolah'))
 {
 	function is_kepala_sekolah()

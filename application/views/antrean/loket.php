@@ -13,7 +13,7 @@
 			<a href="<?= site_url('antrean/kiosk') ?>" target="_blank" class="btn btn-outline-secondary btn-sm">
 				<i class="fa-solid fa-tablet-screen-button me-1"></i> Mesin Kiosk Tiket
 			</a>
-			<a href="<?= site_url('antrean/reset') ?>" class="btn btn-outline-danger btn-sm" data-confirm="PERINGATAN: Seluruh tiket antrean hari ini akan direset kembali ke nomor awal. Lanjutkan?">
+			<a href="<?= site_url('antrean/reset') ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('PERINGATAN: Seluruh tiket antrean hari ini akan direset kembali ke nomor awal (001). Lanjutkan?');">
 				<i class="fa-solid fa-rotate-left me-1"></i> Reset Hari Ini
 			</a>
 		</div>
