@@ -117,21 +117,17 @@ class Letter_renderer
 			$show_signature = $is_approved && $is_digital_sig;
 		}
 
-		// 2. STEMPEL RESMI: Diputuskan & Dibubuhkan oleh Tata Usaha (TU)
+		// 2. STEMPEL RESMI: Dibubuhkan oleh Tata Usaha (TU) HANYA SETELAH Surat Disetujui Kepala Sekolah
 		$show_stamp = FALSE;
 		if (isset($opts['force_stamp']) && $opts['force_stamp'])
 		{
 			$show_stamp = TRUE;
 		}
-		elseif (empty($opts['blank_signature']) && empty($opts['blank_stamp']))
+		elseif ($is_approved && empty($opts['blank_signature']) && empty($opts['blank_stamp']))
 		{
 			if (isset($letter['stamp_type']))
 			{
 				$show_stamp = ($letter['stamp_type'] === 'digital');
-			}
-			else
-			{
-				$show_stamp = !isset($letter['signature_type']) || $letter['signature_type'] === 'digital';
 			}
 		}
 

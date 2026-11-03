@@ -66,3 +66,4 @@ INSERT INTO `incoming_letters` (
   4,
   NOW()
 );
+

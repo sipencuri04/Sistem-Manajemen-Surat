@@ -606,7 +606,7 @@ class Letters extends Admin_Controller
 			'signer_nip'        => $post('signer_nip'),
 			'notes'             => $post('notes') !== '' ? $post('notes') : NULL,
 			'signature_type'    => in_array($post('signature_type'), array('digital', 'basah'), TRUE) ? $post('signature_type') : 'digital',
-			'stamp_type'        => in_array($post('stamp_type'), array('digital', 'basah', 'belum_stempel'), TRUE) ? $post('stamp_type') : 'digital',
+			'stamp_type'        => ($letter && isset($letter['stamp_type'])) ? $letter['stamp_type'] : (($can_sign && $post('stamp_type') !== '') ? $post('stamp_type') : 'belum_stempel'),
 			'content_data'      => json_encode($data, JSON_UNESCAPED_UNICODE),
 			'data_array'        => $data,
 			'number_mode'       => $mode,
