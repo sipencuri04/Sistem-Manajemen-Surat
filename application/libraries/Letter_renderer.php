@@ -100,7 +100,14 @@ class Letter_renderer
 
 		$S = $this->CI->Settings_model;
 
-		// 1. TANDA TANGAN: Diputuskan oleh Kepala Sekolah
+		// 1. STATUS PENGESAHAN KEPALA SEKOLAH
+		$is_approved = FALSE;
+		if (isset($letter['id']) && (int)$letter['id'] > 0 && isset($letter['approval_status']))
+		{
+			$is_approved = ($letter['approval_status'] === 'disetujui');
+		}
+
+		// TANDA TANGAN: Diputuskan & Disahkan oleh Kepala Sekolah
 		$show_signature = FALSE;
 		if (isset($opts['force_signature']) && $opts['force_signature'])
 		{
@@ -108,11 +115,6 @@ class Letter_renderer
 		}
 		elseif (empty($opts['blank_signature']))
 		{
-			$is_approved = TRUE;
-			if (isset($letter['id']) && (int)$letter['id'] > 0 && isset($letter['approval_status']))
-			{
-				$is_approved = ($letter['approval_status'] === 'disetujui');
-			}
 			$is_digital_sig = !isset($letter['signature_type']) || $letter['signature_type'] === 'digital';
 			$show_signature = $is_approved && $is_digital_sig;
 		}
@@ -125,9 +127,10 @@ class Letter_renderer
 		}
 		elseif ($is_approved && empty($opts['blank_signature']) && empty($opts['blank_stamp']))
 		{
-			if (isset($letter['stamp_type']))
+			// Syarat mutlak: Surat harus sudah disetujui Kepala Sekolah DAN telah distempel digital oleh TU
+			if (isset($letter['stamp_type']) && $letter['stamp_type'] === 'digital' && ! empty($letter['stamped_at']))
 			{
-				$show_stamp = ($letter['stamp_type'] === 'digital');
+				$show_stamp = TRUE;
 			}
 		}
 

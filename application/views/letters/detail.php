@@ -144,8 +144,15 @@ $id = (int) $letter['id'];
 					</dd>
 					<dt>Stempel Resmi (Wewenang TU)</dt>
 					<dd>
-						<?php $st_type = isset($letter['stamp_type']) ? $letter['stamp_type'] : 'digital'; ?>
-						<?php if ($st_type === 'digital'): ?>
+						<?php 
+						$is_approved_letter = isset($letter['approval_status']) && $letter['approval_status'] === 'disetujui';
+						$st_type = isset($letter['stamp_type']) ? $letter['stamp_type'] : 'belum_stempel'; 
+						?>
+						<?php if ( ! $is_approved_letter): ?>
+							<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-semibold">
+								<i class="fa-solid fa-clock me-1"></i> Menunggu TTD Kepala Sekolah (Belum Distempel)
+							</span>
+						<?php elseif ($st_type === 'digital' && ! empty($letter['stamped_at'])): ?>
 							<span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold">
 								<i class="fa-solid fa-stamp me-1"></i> Telah Dibubuhi Stempel Digital TU
 							</span>

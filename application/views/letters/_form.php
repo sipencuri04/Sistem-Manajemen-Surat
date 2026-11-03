@@ -176,37 +176,14 @@ $has_errors = (validation_errors() !== '' || ! empty($f_errors));
 						</div>
 					</div>
 
-					<label class="form-label required fw-bold text-navy">
-						<i class="fa-solid fa-stamp text-danger me-1"></i> Pengaturan Stempel Resmi Sekolah (Wewenang Tata Usaha)
-					</label>
-					<div class="row g-2">
-						<div class="col-md-6">
-							<div class="border rounded-3 p-3 bg-white h-100 shadow-sm">
-								<div class="form-check mb-1">
-									<input class="form-check-input" type="radio" name="stamp_type" id="stamp_digital" value="digital" <?= $v('stamp_type', 'digital') === 'digital' ? 'checked' : '' ?>>
-									<label class="form-check-label fw-bold text-primary" for="stamp_digital">
-										<i class="fa-solid fa-stamp me-1"></i> Stempel Digital TU
-									</label>
-								</div>
-								<div class="small text-muted ps-4">
-									Cap stempel resmi sekolah dibubuhkan secara digital pada dokumen PDF resmi.
-								</div>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="border rounded-3 p-3 bg-white h-100 shadow-sm">
-								<div class="form-check mb-1">
-									<input class="form-check-input" type="radio" name="stamp_type" id="stamp_basah" value="basah" <?= $v('stamp_type') === 'basah' ? 'checked' : '' ?>>
-									<label class="form-check-label fw-bold text-secondary" for="stamp_basah">
-										<i class="fa-solid fa-hand-holding-hand me-1"></i> Wajib Stempel Basah Fisik
-									</label>
-								</div>
-								<div class="small text-muted ps-4">
-									Kolom stempel di PDF dikosongkan untuk dicap basah fisik menggunakan stempel asli di ruang TU.
-								</div>
-							</div>
+					<div class="alert alert-secondary border d-flex align-items-center gap-3 mb-0 py-2 small">
+						<i class="fa-solid fa-stamp text-danger fs-4"></i>
+						<div>
+							<strong class="text-navy">Pengaturan Stempel Resmi Sekolah (Wewenang Tata Usaha):</strong><br>
+							Cap stempel resmi sekolah <strong>baru dibubuhkan oleh staf TU setelah surat disahkan/ditandatangani oleh Kepala Sekolah</strong> melalui halaman detail surat.
 						</div>
 					</div>
+					<input type="hidden" name="stamp_type" value="<?= ($letter && isset($letter['stamp_type'])) ? e($letter['stamp_type']) : 'belum_stempel' ?>">
 				</div>
 
 				<div class="col-12">

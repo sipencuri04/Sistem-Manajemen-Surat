@@ -30,7 +30,7 @@
 					<?php elseif (isset($r['approval_status']) && $r['approval_status'] === 'disetujui'): ?>
 						<span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1" title="Disetujui Kepsek (e-Sign Digital)"><i class="fa-solid fa-signature"></i> e-Sign</span>
 					<?php endif; ?>
-					<?php if (isset($r['stamp_type']) && $r['stamp_type'] === 'digital'): ?>
+					<?php if (isset($r['approval_status']) && $r['approval_status'] === 'disetujui' && isset($r['stamp_type']) && $r['stamp_type'] === 'digital' && ! empty($r['stamped_at'])): ?>
 						<span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-1" title="Stempel Digital TU"><i class="fa-solid fa-stamp"></i> Stempel</span>
 					<?php endif; ?>
 					<?php if ((int) $r['pdf_count'] > 0): ?><i class="fa-solid fa-file-pdf text-danger ms-1" title="PDF arsip tersimpan"></i><?php endif; ?></td>
