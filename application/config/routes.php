@@ -137,3 +137,4 @@ $route['antrean/panggil-ulang']           = 'antrean/api_recall';
 $route['antrean/selesai']                 = 'antrean/api_complete';
 $route['antrean/lewati']                  = 'antrean/api_skip';
 $route['antrean/reset']                   = 'antrean/reset_today';
+$route['antrean/escpos/(:num)']           = 'antrean/escpos_data/$1';

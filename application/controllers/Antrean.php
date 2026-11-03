@@ -97,6 +97,108 @@ class Antrean extends MY_Controller
 	}
 
 	/**
+	 * API endpoint: kembalikan data tiket dalam format JSON untuk QZ Tray ESC/POS
+	 * URL: antrean/escpos_data/<ticket_id>
+	 */
+	public function escpos_data($ticket_id = 0)
+	{
+		$ticket_id = (int) $ticket_id;
+		$ticket = $this->Queue_model->get_ticket($ticket_id);
+		$school = $this->Settings_model->get(TRUE);
+
+		if ( ! $ticket)
+		{
+			$this->output->set_content_type('application/json')
+				->set_output(json_encode(['success' => FALSE, 'message' => 'Tiket tidak ditemukan.']));
+			return;
+		}
+
+		$school_name = strtoupper($school['school_name'] ?: 'SMK MUHAMMADIYAH BANDONGAN');
+		$ticket_number = $ticket['ticket_number'];
+		$service_name  = strtoupper($ticket['service_name']);
+		$loket_number  = (int) $ticket['loket_number'];
+		$waiting       = (int) $ticket['waiting_before'];
+		$tanggal       = date('d/m/Y');
+		$waktu         = date('H:i');
+
+		// ============================================================
+		// Susun perintah ESC/POS sebagai array byte (dikirim ke QZ Tray)
+		// ESC/POS Reference: Epson Technical Reference Guide
+		// ============================================================
+		$ESC = "\x1B";
+		$GS  = "\x1D";
+		$LF  = "\x0A";
+		$INIT          = $ESC . "\x40";           // Initialize printer
+		$CENTER        = $ESC . "\x61\x01";       // Align center
+		$LEFT          = $ESC . "\x61\x00";       // Align left
+		$BOLD_ON       = $ESC . "\x45\x01";       // Bold on
+		$BOLD_OFF      = $ESC . "\x45\x00";       // Bold off
+		$DBLHEIGHT_ON  = $ESC . "\x21\x10";       // Double height text
+		$DBLBOTH_ON    = $ESC . "\x21\x30";       // Double height + width
+		$NORMAL        = $ESC . "\x21\x00";       // Normal text
+		$SIZE_BIG      = $GS  . "\x21\x33";       // 4x width, 4x height
+		$SIZE_MEDIUM   = $GS  . "\x21\x11";       // 2x width, 2x height
+		$SIZE_NORMAL   = $GS  . "\x21\x00";       // Normal size
+		$DIVIDER_THICK = str_repeat("=", 32) . $LF;
+		$DIVIDER_THIN  = str_repeat("-", 32) . $LF;
+		$CUT           = $GS  . "\x56\x41\x03";  // Partial cut with feed
+
+		$lines = [];
+
+		// Init
+		$lines[] = $INIT;
+
+		// Header sekolah
+		$lines[] = $CENTER . $BOLD_ON . $DBLHEIGHT_ON;
+		$lines[] = $school_name . $LF;
+		$lines[] = $NORMAL . $BOLD_OFF;
+		$lines[] = "Layanan Tata Usaha & Administrasi" . $LF;
+
+		// Garis tebal
+		$lines[] = $BOLD_ON . $DIVIDER_THICK . $BOLD_OFF;
+
+		// Label nomor
+		$lines[] = $CENTER . $BOLD_ON . "NOMOR ANTREAN ANDA" . $LF . $BOLD_OFF;
+
+		// Nomor antrean besar
+		$lines[] = $CENTER . $BOLD_ON . $SIZE_BIG;
+		$lines[] = "  " . $ticket_number . "  " . $LF;
+		$lines[] = $SIZE_NORMAL . $BOLD_OFF;
+
+		// Nama layanan + loket
+		$lines[] = $CENTER . $BOLD_ON . $SIZE_MEDIUM;
+		$lines[] = $service_name . $LF;
+		$lines[] = $SIZE_NORMAL . $BOLD_OFF;
+		$lines[] = $CENTER . $BOLD_ON . "LOKET " . $loket_number . $LF . $BOLD_OFF;
+
+		// Garis tebal
+		$lines[] = $BOLD_ON . $DIVIDER_THICK . $BOLD_OFF;
+
+		// Info tanggal, waktu, antrian
+		$lines[] = $LEFT;
+		$col_w = 16;
+		$lines[] = $BOLD_ON . str_pad("Tanggal", $col_w) . ": " . $tanggal . $LF;
+		$lines[] = str_pad("Waktu Ambil", $col_w) . ": " . $waktu . " WIB" . $LF;
+		$lines[] = str_pad("Antrian Depan", $col_w) . ": " . $waiting . " Orang" . $LF . $BOLD_OFF;
+
+		// Garis tipis
+		$lines[] = $DIVIDER_THIN;
+
+		// Footer
+		$lines[] = $CENTER . "Simpan tiket & lihat monitor." . $LF;
+		$lines[] = "Terima kasih telah tertib antre." . $LF . $LF . $LF;
+
+		// Cut
+		$lines[] = $CUT;
+
+		$this->output->set_content_type('application/json')->set_output(json_encode([
+			'success'       => TRUE,
+			'ticket_number' => $ticket_number,
+			'escpos_raw'    => base64_encode(implode('', $lines)),
+		]));
+	}
+
+	/**
 	 * Layar Display Monitor TV Ruang Tunggu Fullscreen
 	 * Diakses langsung dari Smart TV, Android TV, atau PC Display di dinding TU.
 	 */

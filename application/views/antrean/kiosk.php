@@ -84,6 +84,11 @@
 	</div>
 </header>
 
+<!-- Badge status QZ Tray (muncul di sudut kiri bawah) -->
+<div id="qzStatusBadge" style="position:fixed;bottom:12px;left:12px;z-index:9999;font-size:11px;padding:5px 10px;border-radius:20px;background:#64748b;color:#fff;opacity:0.85;">
+	🖨️ Menghubungkan printer...
+</div>
+
 <main class="flex-grow-1 d-flex align-items-center py-5">
 	<div class="container">
 		<div class="text-center mb-5">
@@ -164,8 +169,58 @@
 </div>
 
 <script src="<?= asset_url('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+<!-- QZ Tray: jembatan browser ↔ printer thermal via ESC/POS langsung -->
+<script src="<?= asset_url('assets/js/qz-tray.js') ?>"></script>
 <script>
-// Jam Digital Kiosk
+// ================================================================
+// QZ TRAY SETUP
+// ================================================================
+
+// Abaikan error sertifikat untuk penggunaan lokal (localhost)
+qz.security.setCertificatePromise(function(resolve) { resolve(''); });
+qz.security.setSignatureAlgorithm('SHA512');
+qz.security.setSignaturePromise(function(toSign) {
+    return function(resolve) { resolve(''); };
+});
+
+// Nama printer — null = pakai printer default Windows
+// Ganti dengan nama persis printer Anda jika perlu:
+// Contoh: 'RONGTA RPP02 Series Printer' atau 'WOYA 58'
+let PRINTER_NAME = null;
+
+// Status koneksi QZ Tray
+let qzConnected = false;
+
+async function connectQZ() {
+    if (qzConnected) return true;
+    try {
+        await qz.websocket.connect({ retries: 1, delay: 500 });
+        qzConnected = true;
+        console.log('[QZ Tray] Terkoneksi ✅');
+        return true;
+    } catch(e) {
+        qzConnected = false;
+        console.warn('[QZ Tray] Tidak terkoneksi:', e.message);
+        return false;
+    }
+}
+
+// Coba koneksi QZ Tray saat halaman dimuat
+window.addEventListener('load', function() {
+    connectQZ().then(ok => {
+        if (ok) {
+            const badge = document.getElementById('qzStatusBadge');
+            if (badge) {
+                badge.textContent = '🖨️ Printer Siap (QZ Tray)';
+                badge.style.background = '#16a34a';
+            }
+        }
+    });
+});
+
+// ================================================================
+// JAM DIGITAL
+// ================================================================
 function updateClock() {
 	const now = new Date();
 	const h = String(now.getHours()).padStart(2, '0');
@@ -177,6 +232,9 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
+// ================================================================
+// AMBIL TIKET
+// ================================================================
 let currentTicketId = null;
 const ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
 
@@ -188,18 +246,17 @@ function ambilTiket(serviceId, serviceName) {
 	`;
 	ticketModal.show();
 
-	// Kirim permintaan via GET atau POST dengan fallback
 	fetch('<?= site_url("antrean/ambil_tiket") ?>/' + serviceId + '?format=json', {
 		method: 'GET',
-		headers: { 
-			'X-Requested-With': 'XMLHttpRequest'
-		}
+		headers: { 'X-Requested-With': 'XMLHttpRequest' }
 	})
 	.then(res => res.json())
 	.then(data => {
 		if (data.success) {
 			currentTicketId = data.ticket.id;
 			modalBody.innerHTML = data.html;
+			// Langsung print via QZ Tray setelah tiket berhasil dibuat
+			printReceipt();
 		} else {
 			modalBody.innerHTML = `<div class="alert alert-danger my-3">${data.message || 'Gagal membuat tiket antrean.'}</div>`;
 		}
@@ -214,12 +271,47 @@ function ambilTiket(serviceId, serviceName) {
 	});
 }
 
-function printReceipt() {
-	if (currentTicketId) {
-		// Buka popup tiket dengan ?autoprint=1 agar langsung cetak otomatis
-		const printWin = window.open('<?= site_url("antrean/ambil_tiket") ?>/' + currentTicketId + '?autoprint=1', '_blank', 'width=420,height=650');
-		if (printWin) printWin.focus();
+// ================================================================
+// PRINT RECEIPT — QZ Tray ESC/POS (utama) + fallback popup browser
+// ================================================================
+async function printReceipt() {
+	if ( ! currentTicketId) return;
+
+	// --- Coba QZ Tray terlebih dahulu ---
+	const isQZ = await connectQZ();
+
+	if (isQZ) {
+		try {
+			// Ambil ESC/POS data dari server
+			const resp = await fetch('<?= site_url("antrean/escpos") ?>/' + currentTicketId);
+			const json = await resp.json();
+
+			if ( ! json.success) throw new Error(json.message || 'Gagal ambil data ESC/POS');
+
+			// Decode base64 ESC/POS dan kirim langsung ke printer
+			const config = qz.configs.create(PRINTER_NAME);
+			const data = [{
+				type    : 'raw',
+				format  : 'base64',
+				data    : json.escpos_raw,
+			}];
+
+			await qz.print(config, data);
+			console.log('[QZ Tray] Print berhasil: ' + json.ticket_number);
+			return; // Sukses via QZ — tidak perlu fallback
+
+		} catch(e) {
+			console.warn('[QZ Tray] Print gagal, fallback ke popup browser:', e.message);
+		}
 	}
+
+	// --- Fallback: popup browser biasa (jika QZ Tray tidak aktif) ---
+	const printWin = window.open(
+		'<?= site_url("antrean/ambil_tiket") ?>/' + currentTicketId + '?autoprint=1',
+		'_blank',
+		'width=420,height=650'
+	);
+	if (printWin) printWin.focus();
 }
 </script>
 
