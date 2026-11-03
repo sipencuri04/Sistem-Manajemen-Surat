@@ -76,10 +76,6 @@
 				<i class="fa-regular fa-clock text-warning"></i>
 				<span id="liveClock" class="fw-bold font-monospace fs-5">00:00:00 WIB</span>
 			</div>
-			<!-- Tombol Pairing Bluetooth Printer POS -->
-			<button type="button" id="btnPairPrinter" onclick="initPosPrinter()" class="btn btn-outline-info btn-sm rounded-pill px-3 shadow-sm">
-				<i class="fa-solid fa-print me-1"></i> <span id="printerStatusText">Sambungkan Printer Bluetooth</span>
-			</button>
 			<a href="<?= site_url('antrean/display') ?>" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3">
 				<i class="fa-solid fa-tv me-1"></i> Monitor TV
 			</a>

@@ -20,6 +20,32 @@
 	</div>
 </div>
 
+<!-- Card Pengaturan Printer Thermal Bluetooth (Khusus Admin / Staf TU) -->
+<div class="card border-0 shadow-sm mb-4 bg-light">
+	<div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+		<div class="d-flex align-items-center gap-3">
+			<div class="rounded-circle bg-white p-2 shadow-sm text-primary fs-4 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+				<i class="fa-solid fa-print"></i>
+			</div>
+			<div>
+				<h6 class="mb-0 fw-bold text-navy">Printer Thermal Kiosk (Rongta / POS-58 Bluetooth)</h6>
+				<small class="text-muted">Sambungkan sekali saja di sini agar mesin Kiosk siswa otomatis mencetak tanpa dialog &amp; tidak putus-putus.</small>
+			</div>
+		</div>
+		<div class="d-flex align-items-center gap-2">
+			<span id="loketPrinterStatus" class="badge bg-secondary px-3 py-2 rounded-pill">
+				<i class="fa-solid fa-circle-question me-1"></i> Belum Terhubung
+			</span>
+			<button type="button" id="btnLoketConnectPrinter" onclick="connectPrinterAdmin()" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+				<i class="fa-solid fa-link me-1"></i> Sambungkan Port Bluetooth
+			</button>
+			<button type="button" id="btnLoketTestPrint" onclick="testPrintAdmin()" class="btn btn-outline-success btn-sm rounded-pill px-3" style="display:none;">
+				<i class="fa-solid fa-vial me-1"></i> Tes Print Tiket
+			</button>
+		</div>
+	</div>
+</div>
+
 <!-- Pilih Loket Kerja -->
 <div class="card border-0 shadow-sm mb-4">
 	<div class="card-body p-3">
@@ -237,6 +263,80 @@ function lewati() {
 			location.reload();
 		}
 	});
+}
+</script>
+
+<!-- Driver POS Web Serial API Native ESC/POS untuk Admin -->
+<script src="<?= asset_url('assets/js/pos-serial-printer.js') ?>"></script>
+<script>
+// Auto-detect port printer bluetooth saat halaman Loket dimuat
+document.addEventListener('DOMContentLoaded', async function() {
+	if (window.posPrinter && window.posPrinter.isSupported()) {
+		const isRemembered = await window.posPrinter.autoConnect();
+		updateLoketPrinterUI(isRemembered);
+	} else {
+		const statusBadge = document.getElementById('loketPrinterStatus');
+		if (statusBadge) {
+			statusBadge.className = 'badge bg-warning text-dark px-3 py-2 rounded-pill';
+			statusBadge.textContent = 'Browser tidak mendukung Web Serial';
+		}
+	}
+});
+
+function updateLoketPrinterUI(connected) {
+	const statusBadge = document.getElementById('loketPrinterStatus');
+	const btnConnect  = document.getElementById('btnLoketConnectPrinter');
+	const btnTest     = document.getElementById('btnLoketTestPrint');
+
+	if (!statusBadge) return;
+
+	if (connected) {
+		statusBadge.className = 'badge bg-success px-3 py-2 rounded-pill';
+		statusBadge.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> Terhubung &amp; Siap';
+		if (btnConnect) btnConnect.innerHTML = '<i class="fa-solid fa-arrows-rotate me-1"></i> Ganti Port';
+		if (btnTest) btnTest.style.display = 'inline-block';
+	} else {
+		statusBadge.className = 'badge bg-secondary px-3 py-2 rounded-pill';
+		statusBadge.innerHTML = '<i class="fa-solid fa-circle-xmark me-1"></i> Belum Terhubung';
+		if (btnConnect) btnConnect.innerHTML = '<i class="fa-solid fa-link me-1"></i> Sambungkan Port Bluetooth';
+		if (btnTest) btnTest.style.display = 'none';
+	}
+}
+
+async function connectPrinterAdmin() {
+	if (!window.posPrinter) return;
+	try {
+		const ok = await window.posPrinter.requestPort();
+		updateLoketPrinterUI(ok);
+		if (ok) {
+			alert('Berhasil! Printer Bluetooth telah terhubung ke sistem.\nIzin ini disimpan browser selamanya.');
+		}
+	} catch (err) {
+		alert('Gagal menyambungkan port: ' + err.message);
+	}
+}
+
+async function testPrintAdmin() {
+	if (!window.posPrinter || !window.posPrinter.isConnected) {
+		alert('Silakan sambungkan port printer terlebih dahulu.');
+		return;
+	}
+
+	const dummyTicket = {
+		ticket_number: 'TEST-01',
+		service_name: 'Uji Coba Printer Rongta',
+		loket_number: 1,
+		waiting_before: 0,
+		date_str: '<?= date("d/m/Y") ?>',
+		time_str: '<?= date("H:i") ?>'
+	};
+
+	try {
+		await window.posPrinter.printTicket(dummyTicket, 'SMK MUHAMMADIYAH BANDONGAN');
+		alert('Perintah cetak terkirim ke printer!');
+	} catch (err) {
+		alert('Gagal mencetak: ' + err.message);
+	}
 }
 </script>
 
