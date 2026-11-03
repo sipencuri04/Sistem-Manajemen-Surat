@@ -269,14 +269,21 @@ class Tools extends CI_Controller
 	{
 		echo "Membersihkan data surat lama...\n";
 		$this->db->query("SET FOREIGN_KEY_CHECKS = 0");
-		$this->db->query("TRUNCATE TABLE `letter_files`");
-		$this->db->query("TRUNCATE TABLE `disposition_activities`");
-		$this->db->query("TRUNCATE TABLE `disposition_recipients`");
-		$this->db->query("TRUNCATE TABLE `dispositions`");
-		$this->db->query("TRUNCATE TABLE `letter_requests`");
-		$this->db->query("TRUNCATE TABLE `incoming_letters`");
-		$this->db->query("TRUNCATE TABLE `letters`");
+		$this->db->query("DELETE FROM `letter_files`");
+		$this->db->query("DELETE FROM `disposition_activities`");
+		$this->db->query("DELETE FROM `disposition_recipients`");
+		$this->db->query("DELETE FROM `dispositions`");
+		$this->db->query("DELETE FROM `letter_requests`");
+		$this->db->query("DELETE FROM `incoming_letters`");
+		$this->db->query("DELETE FROM `letters`");
 		$this->db->query("DELETE FROM `notifications` WHERE `type` IN ('surat_masuk', 'persetujuan', 'disposisi', 'permohonan')");
+		$this->db->query("ALTER TABLE `letter_files` AUTO_INCREMENT = 1");
+		$this->db->query("ALTER TABLE `disposition_activities` AUTO_INCREMENT = 1");
+		$this->db->query("ALTER TABLE `disposition_recipients` AUTO_INCREMENT = 1");
+		$this->db->query("ALTER TABLE `dispositions` AUTO_INCREMENT = 1");
+		$this->db->query("ALTER TABLE `letter_requests` AUTO_INCREMENT = 1");
+		$this->db->query("ALTER TABLE `incoming_letters` AUTO_INCREMENT = 1");
+		$this->db->query("ALTER TABLE `letters` AUTO_INCREMENT = 1");
 		$this->db->query("SET FOREIGN_KEY_CHECKS = 1");
 		echo "[BERSIH] Semua surat lama, disposisi, dan berkas berhasil direset.\n\n";
 
