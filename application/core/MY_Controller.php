@@ -133,7 +133,12 @@ class MY_Controller extends CI_Controller
 class Admin_Controller extends MY_Controller
 {
 	/** @var array|null Pengguna yang sedang login. */
-	protected $current_user;
+	public $current_user;
+
+	public function get_current_user()
+	{
+		return $this->current_user;
+	}
 
 	public function __construct()
 	{

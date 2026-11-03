@@ -1,5 +1,9 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 $id = (int) $letter['id'];
+$curr_user = current_user();
+$u_role = $curr_user ? strtolower($curr_user['role']) : (isset($current_user['role']) ? strtolower($current_user['role']) : '');
+$can_tu = in_array($u_role, array('tu', 'superuser', 'admin'), TRUE) || is_tu() || is_superuser() || is_admin();
+$can_kepsek = in_array($u_role, array('kepala_sekolah', 'superuser', 'admin'), TRUE) || is_kepala_sekolah();
 ?>
 <nav aria-label="breadcrumb">
 	<ol class="breadcrumb small mb-2">
@@ -25,7 +29,7 @@ $id = (int) $letter['id'];
 			<?php endif; ?>
 		</div>
 	</div>
-	<?php if (is_kepala_sekolah() && isset($letter['approval_status']) && $letter['approval_status'] === 'menunggu_persetujuan'): ?>
+	<?php if ($can_kepsek && isset($letter['approval_status']) && $letter['approval_status'] === 'menunggu_persetujuan'): ?>
 		<button type="button" class="btn btn-success fw-semibold" data-bs-toggle="modal" data-bs-target="#kepsekApproveModal">
 			<i class="fa-solid fa-signature me-1"></i> Tanda Tangani Surat
 		</button>
@@ -33,7 +37,7 @@ $id = (int) $letter['id'];
 			<i class="fa-solid fa-ban me-1"></i> Tolak / Minta Revisi
 		</button>
 	<?php endif; ?>
-	<?php if (is_tu() || is_superuser() || is_admin()): ?>
+	<?php if ($can_tu): ?>
 		<?php if (isset($letter['approval_status']) && $letter['approval_status'] === 'disetujui'): ?>
 			<button type="button" class="btn btn-danger fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#tuStempelModal">
 				<i class="fa-solid fa-stamp me-1"></i> Beri Stempel TU
@@ -158,7 +162,7 @@ $id = (int) $letter['id'];
 								<i class="fa-solid fa-stamp me-1"></i> Telah Dibubuhi Stempel Digital TU
 							</span>
 							<?php if (!empty($letter['stamped_by_name'])): ?><small class="text-muted d-block">(oleh <?= e($letter['stamped_by_name']) ?>)</small><?php endif; ?>
-							<?php if (is_tu() || is_superuser() || is_admin()): ?>
+							<?php if ($can_tu): ?>
 								<div class="mt-2">
 									<button type="button" class="btn btn-sm btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#tuStempelModal">
 										<i class="fa-solid fa-stamp me-1"></i> Ubah / Cabut Stempel TU
@@ -169,7 +173,7 @@ $id = (int) $letter['id'];
 							<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-semibold d-inline-block mb-1">
 								<i class="fa-solid fa-hand-holding-hand me-1"></i> Mode Stempel Basah Fisik
 							</span>
-							<?php if (is_tu() || is_superuser() || is_admin()): ?>
+							<?php if ($can_tu): ?>
 								<div class="mt-2">
 									<button type="button" class="btn btn-sm btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#tuStempelModal">
 										<i class="fa-solid fa-stamp me-1"></i> Ubah Status Stempel TU
@@ -180,7 +184,7 @@ $id = (int) $letter['id'];
 							<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-semibold d-inline-block mb-1">
 								<i class="fa-solid fa-triangle-exclamation me-1"></i> Belum Distempel oleh TU
 							</span>
-							<?php if (is_tu() || is_superuser() || is_admin()): ?>
+							<?php if ($can_tu): ?>
 								<div class="mt-2">
 									<button type="button" class="btn btn-sm btn-danger fw-bold shadow-sm w-100" data-bs-toggle="modal" data-bs-target="#tuStempelModal">
 										<i class="fa-solid fa-stamp me-1"></i> Beri Stempel TU Sekarang

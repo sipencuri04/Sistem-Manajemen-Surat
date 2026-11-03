@@ -483,7 +483,26 @@ if ( ! function_exists('current_user'))
 	function current_user()
 	{
 		$CI =& get_instance();
-		return isset($CI->current_user) ? $CI->current_user : NULL;
+		if (isset($CI->current_user) && ! empty($CI->current_user))
+		{
+			return $CI->current_user;
+		}
+		if (method_exists($CI, 'get_current_user'))
+		{
+			$u = $CI->get_current_user();
+			if ($u) return $u;
+		}
+		// Fallback session jika dipanggil dari helper di luar lingkup controller langsung
+		if (isset($CI->session) && $CI->session->userdata('user_id'))
+		{
+			$CI->load->model('User_model');
+			$u = $CI->User_model->find((int) $CI->session->userdata('user_id'));
+			if ($u) {
+				$CI->current_user = $u;
+				return $u;
+			}
+		}
+		return NULL;
 	}
 }
 
