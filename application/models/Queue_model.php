@@ -134,6 +134,8 @@ class Queue_model extends CI_Model
 		$this->db->insert($this->table_tickets, $data);
 		$ticket_id = $this->db->insert_id();
 
+		$this->touch_version();
+
 		// Hitung antrean di depan tiket ini
 		$waiting_before = $this->db->from($this->table_tickets)
 			->where('service_id', (int) $service_id)
@@ -176,6 +178,7 @@ class Queue_model extends CI_Model
 			'called_at'    => $now,
 		));
 
+		$this->touch_version();
 		return $this->get_ticket($ticket_id);
 	}
 
@@ -187,6 +190,7 @@ class Queue_model extends CI_Model
 			'called_at' => $now,
 		));
 
+		$this->touch_version();
 		return $this->get_ticket($ticket_id);
 	}
 
@@ -194,20 +198,26 @@ class Queue_model extends CI_Model
 	public function complete_ticket($ticket_id)
 	{
 		$now = date('Y-m-d H:i:s');
-		return $this->db->where('id', (int) $ticket_id)->update($this->table_tickets, array(
+		$res = $this->db->where('id', (int) $ticket_id)->update($this->table_tickets, array(
 			'status'       => 'completed',
 			'completed_at' => $now,
 		));
+
+		$this->touch_version();
+		return $res;
 	}
 
 	/** Lewati tiket (siswa/tamu tidak hadir) */
 	public function skip_ticket($ticket_id)
 	{
 		$now = date('Y-m-d H:i:s');
-		return $this->db->where('id', (int) $ticket_id)->update($this->table_tickets, array(
+		$res = $this->db->where('id', (int) $ticket_id)->update($this->table_tickets, array(
 			'status'       => 'skipped',
 			'completed_at' => $now,
 		));
+
+		$this->touch_version();
+		return $res;
 	}
 
 	/** Ambil tiket terakhir yang baru saja dipanggil hari ini (untuk sorotan display TV) */
@@ -315,7 +325,42 @@ class Queue_model extends CI_Model
 		{
 			$this->db->truncate($this->table_tickets);
 		}
+		$this->touch_version();
 		return TRUE;
+	}
+
+	/**
+	 * Perbarui versi antrean saat ada tiket baru, panggilan, selesai, atau lewati.
+	 * Disimpan dalam file cache ringan untuk mengurangi beban query pooling TV hingga 95%.
+	 */
+	public function touch_version()
+	{
+		$v = (string) microtime(TRUE);
+		$cache_dir = APPPATH . 'cache';
+		if ( ! is_dir($cache_dir))
+		{
+			@mkdir($cache_dir, 0755, TRUE);
+		}
+		@file_put_contents($cache_dir . '/queue_version.txt', $v);
+		return $v;
+	}
+
+	/**
+	 * Dapatkan versi antrean saat ini (menggunakan cache file super cepat)
+	 */
+	public function get_version()
+	{
+		$cache_file = APPPATH . 'cache/queue_version.txt';
+		if (file_exists($cache_file))
+		{
+			$v = trim((string) @file_get_contents($cache_file));
+			if ($v !== '')
+			{
+				return $v;
+			}
+		}
+
+		return $this->touch_version();
 	}
 }
 

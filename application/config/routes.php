@@ -122,6 +122,8 @@ $route['log-sistem']                      = 'logs/system';
 $route['log-sistem/bersihkan']            = 'logs/clean_logs';
 $route['backup']                          = 'logs/backup';
 $route['backup/buat']                     = 'logs/create_backup';
+$route['backup/buat-surat']               = 'logs/create_letters_backup';
+$route['backup/cron']                     = 'logs/cron_weekly_backup';
 $route['backup/unduh/(:any)']             = 'logs/download_backup/$1';
 
 // Sistem Antrean TU & Display TV Monitor

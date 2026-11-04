@@ -143,6 +143,13 @@ class Admin_Controller extends MY_Controller
 	public function __construct()
 	{
 		parent::__construct();
+
+		// Izinkan cron job via CLI atau endpoint cron ber-token rahasia
+		if (is_cli() || ($this->uri->segment(1) === 'backup' && $this->uri->segment(2) === 'cron' && $this->input->get('token') === 'smk_weekly_backup_secret'))
+		{
+			return;
+		}
+
 		$this->load->model('User_model');
 
 		$user_id = (int) $this->session->userdata('user_id');

@@ -136,6 +136,153 @@ class Logs extends Admin_Controller
 		redirect('backup');
 	}
 
+	/**
+	 * Backup Khusus Data Surat & Persuratan (SQL Mingguan)
+	 */
+	public function create_letters_backup()
+	{
+		$this->require_post();
+		$this->load->dbutil();
+
+		$letter_tables = array(
+			'letters',
+			'letter_files',
+			'letter_templates',
+			'letter_types',
+			'letter_counters',
+			'letter_requests',
+			'incoming_letters',
+			'dispositions',
+			'disposition_recipients',
+			'disposition_activities'
+		);
+
+		$existing = array();
+		foreach ($letter_tables as $t)
+		{
+			if ($this->db->table_exists($t))
+			{
+				$existing[] = $t;
+			}
+		}
+
+		$prefs = array(
+			'tables'     => $existing,
+			'format'     => 'txt',
+			'filename'   => 'backup_surat_smk.sql',
+			'add_drop'   => TRUE,
+			'add_insert' => TRUE,
+			'newline'    => "\n",
+		);
+
+		try {
+			$backup = $this->dbutil->backup($prefs);
+			$filename = 'backup_surat_'.date('Ymd_His').'.sql';
+			$path = storage_path('backups/'.$filename);
+
+			file_put_contents($path, $backup);
+			audit_log('DATABASE_BACKUP', 'system', NULL, 'Membuat backup khusus data surat: '.$filename);
+			set_flash('success', 'Backup khusus data persuratan <strong>'.$filename.'</strong> berhasil dibuat ('.count($existing).' tabel tersimpan).');
+		} catch (Exception $e) {
+			set_flash('danger', 'Gagal membuat backup data surat: '.$e->getMessage());
+		}
+		redirect('backup');
+	}
+
+	/**
+	 * Endpoint Cron Job Otomatis Mingguan (Jalankan via cPanel Cron Job atau CLI)
+	 */
+	public function cron_weekly_backup()
+	{
+		$is_cli = is_cli();
+		$token  = (string) $this->input->get('token');
+		$secret = 'smk_weekly_backup_secret';
+
+		if ( ! $is_cli && $token !== $secret)
+		{
+			$user_id = (int) $this->session->userdata('user_id');
+			if ( ! $user_id)
+			{
+				show_error('Akses ditolak: Token cron tidak valid.', 403, 'Akses Ditolak');
+				return;
+			}
+		}
+
+		$this->load->dbutil();
+		$letter_tables = array(
+			'letters',
+			'letter_files',
+			'letter_templates',
+			'letter_types',
+			'letter_counters',
+			'letter_requests',
+			'incoming_letters',
+			'dispositions',
+			'disposition_recipients',
+			'disposition_activities'
+		);
+
+		$existing = array();
+		foreach ($letter_tables as $t)
+		{
+			if ($this->db->table_exists($t))
+			{
+				$existing[] = $t;
+			}
+		}
+
+		$prefs = array(
+			'tables'     => $existing,
+			'format'     => 'txt',
+			'filename'   => 'backup_surat_smk.sql',
+			'add_drop'   => TRUE,
+			'add_insert' => TRUE,
+			'newline'    => "\n",
+		);
+
+		$backup_dir = storage_path('backups');
+		if ( ! is_dir($backup_dir)) @mkdir($backup_dir, 0755, TRUE);
+
+		$filename = 'backup_surat_mingguan_'.date('Ymd_His').'.sql';
+		$path = storage_path('backups/'.$filename);
+
+		$backup = $this->dbutil->backup($prefs);
+		file_put_contents($path, $backup);
+
+		// Rotasi otomatis: Hapus backup surat mingguan yang lebih lama dari 60 hari
+		$now = time();
+		foreach (scandir($backup_dir) as $f)
+		{
+			if (strpos($f, 'backup_surat_mingguan_') === 0 && preg_match('/\.sql$/i', $f))
+			{
+				$f_path = $backup_dir . DIRECTORY_SEPARATOR . $f;
+				if ($now - filemtime($f_path) > 60 * 86400)
+				{
+					@unlink($f_path);
+				}
+			}
+		}
+
+		$this->load->helper('number');
+		$msg = 'OK: Backup surat mingguan berhasil dibuat: ' . $filename . ' (' . count($existing) . ' tabel, ' . byte_format(filesize($path)) . ')';
+		log_message('info', '[CRON] ' . $msg);
+
+		if ($is_cli)
+		{
+			echo $msg . PHP_EOL;
+		}
+		else
+		{
+			$this->output->set_content_type('application/json')->set_output(json_encode(array(
+				'success'  => TRUE,
+				'message'  => $msg,
+				'filename' => $filename,
+				'size'     => byte_format(filesize($path)),
+				'time'     => date('Y-m-d H:i:s'),
+			)));
+		}
+	}
+
 	public function download_backup($filename = '')
 	{
 		$filename = safe_filename($filename);

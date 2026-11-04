@@ -4,9 +4,14 @@
 		<h1 class="h4 fw-bold text-navy mb-1"><i class="fa-solid fa-database me-2 text-primary"></i>Backup Database &amp; Pemeliharaan</h1>
 		<p class="text-muted small mb-0">Cadangan basis data aplikasi untuk pencegahan kehilangan data dan pemeliharaan server.</p>
 	</div>
-	<?= form_open('backup/buat', array('data-confirm' => 'Mulai proses backup seluruh database saat ini?')) ?>
-		<button type="submit" class="btn btn-primary"><i class="fa-solid fa-download me-1"></i> Buat Cadangan Database Baru</button>
-	<?= form_close() ?>
+	<div class="d-flex flex-wrap gap-2">
+		<?= form_open('backup/buat-surat', array('data-confirm' => 'Mulai proses backup khusus data surat & persuratan (SQL)?')) ?>
+			<button type="submit" class="btn btn-success fw-semibold"><i class="fa-solid fa-envelope-open-text me-1"></i> Backup Khusus Surat (SQL)</button>
+		<?= form_close() ?>
+		<?= form_open('backup/buat', array('data-confirm' => 'Mulai proses backup seluruh database saat ini?')) ?>
+			<button type="submit" class="btn btn-primary"><i class="fa-solid fa-database me-1"></i> Backup Seluruh Database</button>
+		<?= form_close() ?>
+	</div>
 </div>
 
 <div class="row g-3">
@@ -51,6 +56,23 @@
 	</div>
 
 	<div class="col-lg-4">
+		<div class="card mb-3 border-success-subtle bg-light">
+			<div class="card-header bg-white py-3">
+				<h2 class="h6 card-title mb-0 text-success"><i class="fa-solid fa-calendar-check me-2"></i>Jadwal Backup Surat Mingguan (cPanel)</h2>
+			</div>
+			<div class="card-body small text-muted">
+				<p class="mb-2">Sistem dapat mencadangkan tabel surat secara otomatis setiap minggu via menu <strong>Cron Jobs</strong> di cPanel hosting:</p>
+				<div class="mb-2">
+					<label class="form-label fw-bold small text-navy mb-1">Perintah Cron cPanel (Minggu pk 02:00):</label>
+					<div class="input-group input-group-sm">
+						<input type="text" class="form-control font-monospace small bg-white" id="cronCmd" value="curl -s &quot;<?= site_url('backup/cron?token=smk_weekly_backup_secret') ?>&quot; > /dev/null 2>&1" readonly>
+						<button class="btn btn-outline-success" type="button" onclick="navigator.clipboard.writeText(document.getElementById('cronCmd').value); this.innerText = 'Tersalin!'; setTimeout(() => this.innerText = 'Salin', 2000);">Salin</button>
+					</div>
+				</div>
+				<small class="text-muted d-block"><i class="fa-solid fa-circle-info me-1"></i> Jadwal: <code>0 2 * * 0</code>. Berkas tersimpan di folder <code>storage/backups/</code> dan dirotasi otomatis.</small>
+			</div>
+		</div>
+
 		<div class="card mb-3">
 			<div class="card-header bg-white py-3">
 				<h2 class="h6 card-title mb-0 text-navy"><i class="fa-solid fa-hard-drive text-primary me-2"></i>Kapasitas Penyimpanan</h2>

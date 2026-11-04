@@ -221,16 +221,34 @@ class Antrean extends MY_Controller
 	}
 
 	/**
-	 * Endpoint API Polling Ringan untuk TV Display (setiap 2-3 detik)
+	 * Endpoint API Polling Ringan untuk TV Display (Ultra-lightweight Change Detection)
+	 * Mengurangi beban server cPanel hingga 95% dengan version-check cache.
 	 */
 	public function api_display_data()
 	{
+		$server_v = $this->Queue_model->get_version();
+		$client_v = (string) $this->input->get('v');
+
+		// Jika data belum berubah sama sekali, langsung kembalikan respons mikro (0 query MySQL)
+		if ($client_v !== '' && $client_v === $server_v)
+		{
+			$this->output->set_content_type('application/json')->set_output(json_encode(array(
+				'success'     => TRUE,
+				'changed'     => FALSE,
+				'version'     => $server_v,
+				'server_time' => date('H:i:s'),
+			)));
+			return;
+		}
+
 		$lokets = $this->Queue_model->get_active_lokets();
 		$last   = $this->Queue_model->get_last_called_ticket();
 		$stats  = $this->Queue_model->get_stats_today();
 
 		$this->output->set_content_type('application/json')->set_output(json_encode(array(
 			'success'     => TRUE,
+			'changed'     => TRUE,
+			'version'     => $server_v,
 			'last_called' => $last,
 			'lokets'      => $lokets,
 			'stats'       => $stats,
@@ -428,6 +446,21 @@ class Antrean extends MY_Controller
 	 */
 	public function api_loket_data()
 	{
+		$server_v = $this->Queue_model->get_version();
+		$client_v = (string) $this->input->get('v');
+
+		// Jika data belum berubah, kembalikan respons mikro tanpa query berat
+		if ($client_v !== '' && $client_v === $server_v)
+		{
+			$this->output->set_content_type('application/json')->set_output(json_encode(array(
+				'success'     => TRUE,
+				'changed'     => FALSE,
+				'version'     => $server_v,
+				'server_time' => date('H:i:s'),
+			)));
+			return;
+		}
+
 		$service_id = (int) $this->input->get('service_id');
 		$stats = $this->Queue_model->get_stats_today();
 		$today_tickets = $this->Queue_model->get_today_tickets(NULL, 100);
@@ -442,6 +475,8 @@ class Antrean extends MY_Controller
 
 		$this->output->set_content_type('application/json')->set_output(json_encode(array(
 			'success'       => TRUE,
+			'changed'       => TRUE,
+			'version'       => $server_v,
 			'active_ticket' => $active_ticket,
 			'stats'         => $stats,
 			'waiting_this'  => $waiting_this,

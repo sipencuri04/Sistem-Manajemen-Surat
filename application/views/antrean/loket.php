@@ -187,16 +187,42 @@ const csrfName = '<?= $this->security->get_csrf_token_name() ?>';
 const csrfHash = '<?= $this->security->get_csrf_hash() ?>';
 
 // ================================================================
-// LIVE AUTO-SYNC ENGINE (Sinkronisasi Otomatis Setiap 2.5 Detik Tanpa Refresh)
 // ================================================================
+// LIVE AUTO-SYNC ENGINE (Smart Version-Cached Polling)
+// ================================================================
+let currentLoketVersion = '';
+
+function broadcastQueueAction(action, data = null) {
+	if (window.BroadcastChannel) {
+		try {
+			const bc = new BroadcastChannel('tu_queue_sync');
+			bc.postMessage({ action: action, data: data, time: Date.now() });
+			bc.close();
+		} catch(e) {}
+	}
+	try {
+		localStorage.setItem('tu_queue_action', JSON.stringify({ action: action, time: Date.now() }));
+	} catch(e) {}
+}
+
 async function syncLoketData(isManual = false) {
 	try {
-		const res = await fetch('<?= site_url("antrean/api-loket") ?>?service_id=' + serviceId, {
+		const url = '<?= site_url("antrean/api-loket") ?>?service_id=' + serviceId + (isManual ? '' : '&v=' + encodeURIComponent(currentLoketVersion));
+		const res = await fetch(url, {
 			headers: { 'X-Requested-With': 'XMLHttpRequest' }
 		});
 		if (!res.ok) return;
 		const data = await res.json();
 		if (!data.success) return;
+
+		// Jika data belum berubah di server, hemat resource browser
+		if (data.changed === false) {
+			return;
+		}
+
+		if (data.version) {
+			currentLoketVersion = data.version;
+		}
 
 		// 1. Update Statistik Global (Total, Menunggu, Selesai)
 		if (data.stats) {
@@ -313,7 +339,8 @@ function panggilBerikutnya() {
 			document.getElementById('btnRecall').disabled = false;
 			document.getElementById('btnSkip').disabled = false;
 			document.getElementById('btnComplete').disabled = false;
-			syncLoketData(); // Sinkronkan tabel seketika
+			broadcastQueueAction('CALL', data.ticket);
+			syncLoketData(true); // Sinkronkan tabel seketika
 		} else {
 			alert(data.message || 'Tidak ada antrean berikutnya.');
 		}
@@ -335,6 +362,7 @@ function panggilUlang() {
 		if (data.success) {
 			const badge = document.getElementById('servingStatusBadge');
 			badge.innerHTML = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 rounded-pill"><i class="fa-solid fa-rotate-right me-1"></i> Panggilan Ulang Terkirim ke Layar TV</span>`;
+			broadcastQueueAction('RECALL', data.ticket);
 		}
 	});
 }
@@ -362,7 +390,8 @@ function selesai() {
 			document.getElementById('btnRecall').disabled = true;
 			document.getElementById('btnSkip').disabled = true;
 			document.getElementById('btnComplete').disabled = true;
-			syncLoketData(); // Update tabel secara realtime tanpa refresh halaman
+			broadcastQueueAction('COMPLETE');
+			syncLoketData(true); // Update tabel secara realtime tanpa refresh halaman
 		}
 	});
 }
@@ -391,7 +420,8 @@ function lewati() {
 			document.getElementById('btnRecall').disabled = true;
 			document.getElementById('btnSkip').disabled = true;
 			document.getElementById('btnComplete').disabled = true;
-			syncLoketData(); // Update tabel secara realtime tanpa refresh halaman
+			broadcastQueueAction('SKIP');
+			syncLoketData(true); // Update tabel secara realtime tanpa refresh halaman
 		}
 	});
 }
