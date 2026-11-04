@@ -20,6 +20,7 @@ elseif ($user_role === 'kepala_sekolah')
 	$menu[] = array('url' => 'surat-masuk', 'icon' => 'fa-inbox', 'label' => 'Surat Masuk', 'active' => menu_active(array('surat-masuk')), 'badge' => isset($pending_incoming_count) ? (int) $pending_incoming_count : 0);
 	$menu[] = array('url' => 'disposisi', 'icon' => 'fa-share-nodes', 'label' => 'Disposisi Surat', 'active' => menu_active(array('disposisi')));
 	$menu[] = array('url' => 'persetujuan-surat', 'icon' => 'fa-signature', 'label' => 'Persetujuan Surat', 'active' => menu_active(array('persetujuan-surat')), 'badge' => isset($pending_approvals_count) ? (int) $pending_approvals_count : 0);
+	$menu[] = array('url' => 'surat/buat', 'icon' => 'fa-file-circle-plus', 'label' => 'Buat Surat', 'active' => menu_active(array('surat/buat')));
 	$menu[] = array('url' => 'surat', 'icon' => 'fa-envelopes-bulk', 'label' => 'Data Surat Keluar', 'active' => menu_active(array('surat'), array('buat')));
 	$menu[] = array('url' => 'arsip', 'icon' => 'fa-box-archive', 'label' => 'Arsip Surat', 'active' => menu_active(array('arsip')));
 	$menu[] = array('url' => 'antrean/display', 'icon' => 'fa-tv', 'label' => 'Monitor Antrean TU', 'active' => menu_active(array('antrean')));
@@ -134,7 +135,7 @@ $menu[] = array('url' => 'akun', 'icon' => 'fa-user-gear', 'label' => 'Pengatura
 			<button class="btn btn-light d-lg-none me-2" type="button" data-sidebar-toggle aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
 			<h1 class="h5 mb-0 fw-semibold text-navy text-truncate"><?= e($page_title) ?></h1>
 			<div class="ms-auto d-flex align-items-center gap-2">
-				<?php if (in_array($user_role, array('tu', 'superuser', 'admin'), TRUE)): ?>
+				<?php if (in_array($user_role, array('tu', 'kepala_sekolah', 'superuser', 'admin'), TRUE)): ?>
 					<a href="<?= site_url('surat/buat') ?>" class="btn btn-primary btn-sm d-none d-sm-inline-flex align-items-center"><i class="fa-solid fa-plus me-1"></i> Surat Baru</a>
 				<?php endif; ?>
 

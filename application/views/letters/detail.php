@@ -48,7 +48,17 @@ $can_kepsek = in_array($u_role, array('kepala_sekolah', 'superuser', 'admin'), T
 			</button>
 		<?php endif; ?>
 	<?php endif; ?>
-	<a href="<?= site_url('surat/edit/'.$id) ?>" class="btn btn-outline-primary"><i class="fa-solid fa-pen me-1"></i> Edit</a>
+	<?php if ( ! is_pegawai() && ($can_tu || $can_kepsek)): ?>
+		<a href="<?= site_url('surat/edit/'.$id) ?>" class="btn btn-outline-primary"><i class="fa-solid fa-pen me-1"></i> Edit</a>
+	<?php endif; ?>
+	<?php 
+	$is_ready_to_share = (isset($letter['approval_status']) && $letter['approval_status'] === 'disetujui') || $letter['status'] === 'final';
+	?>
+	<?php if ($is_ready_to_share && ! is_pegawai()): ?>
+		<button type="button" class="btn btn-success fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#shareLetterModal">
+			<i class="fa-brands fa-whatsapp me-1"></i> Kirim ke Guru / TU
+		</button>
+	<?php endif; ?>
 	<div class="btn-group">
 		<a href="<?= site_url('surat/pdf/'.$id.'/lihat') ?>" target="_blank" rel="noopener" class="btn btn-outline-secondary">
 			<i class="fa-solid fa-print me-1"></i> Cetak Surat
@@ -380,3 +390,128 @@ $can_kepsek = in_array($u_role, array('kepala_sekolah', 'superuser', 'admin'), T
 		</div>
 	</div>
 </div>
+
+<!-- Modal Kirim & Bagikan Surat ke Guru / TU (WhatsApp) -->
+<?php if ($is_ready_to_share): 
+	$verify_hash = substr(md5($letter['letter_number'] . 'PERSURATAN_SMK_' . $id), 0, 8);
+	$verify_url  = site_url('verifikasi/' . $id . '/' . $verify_hash);
+	$wa_broadcast_msg = "Assalamu'alaikum Wr. Wb.\n\n*PEMBERITAHUAN SURAT RESMI SEKOLAH*\n" . $school['school_name'] . "\n\n"
+		. "- *No. Surat:* " . $letter['letter_number'] . "\n"
+		. "- *Jenis:* " . $letter['type_name'] . "\n"
+		. "- *Tanggal:* " . tgl_indo($letter['letter_date']) . "\n"
+		. "- *Perihal:* " . $letter['subject'] . "\n"
+		. (!empty($letter['recipient']) ? "- *Ditujukan:* " . $letter['recipient'] . "\n" : "")
+		. "\nDokumen surat resmi bertanda tangan digital & berstempel dapat diakses/diunduh pada tautan berikut:\n" . $verify_url . "\n\n"
+		. "Demikian disampaikan. Terima kasih.\nWassalamu'alaikum Wr. Wb.";
+?>
+<div class="modal fade" id="shareLetterModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+		<div class="modal-content shadow border-0">
+			<div class="modal-header bg-success text-white">
+				<h5 class="modal-title h6 fw-bold mb-0">
+					<i class="fa-brands fa-whatsapp me-2"></i>Kirim &amp; Bagikan Surat Resmi ke Guru / TU
+				</h5>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+			</div>
+			<div class="modal-body p-4">
+				<!-- Ringkasan Teks Siap Kirim ke Grup WA Guru & Karyawan -->
+				<div class="card mb-4 border-success-subtle bg-light">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-center mb-2">
+							<span class="fw-bold text-success"><i class="fa-solid fa-users-line me-1"></i> Format Pesan untuk Grup WhatsApp Guru / Staf SMK</span>
+							<button type="button" class="btn btn-xs btn-success" id="btnCopyBroadcast">
+								<i class="fa-solid fa-copy me-1"></i> <span id="copyBtnText">Salin Teks Pesan</span>
+							</button>
+						</div>
+						<textarea class="form-control font-monospace small bg-white text-dark" id="txtBroadcastMsg" rows="6" readonly><?= e($wa_broadcast_msg) ?></textarea>
+						<small class="text-muted mt-1 d-block"><i class="fa-solid fa-circle-info me-1"></i> Klik <strong>Salin Teks Pesan</strong> lalu tempelkan (paste) langsung ke grup WhatsApp Guru &amp; Karyawan SMK.</small>
+					</div>
+				</div>
+
+				<!-- Pengiriman Personal Langsung ke WhatsApp Masing-masing Guru / TU -->
+				<h6 class="fw-bold text-navy mb-2"><i class="fa-solid fa-paper-plane text-primary me-2"></i>Kirim Personal ke WhatsApp Guru / Pegawai / TU</h6>
+				<p class="small text-muted mb-3">Klik tombol <strong>Kirim WA</strong> di samping nama pegawai untuk mengirimkan link surat ini langsung ke nomor WhatsApp pribadinya:</p>
+
+				<div class="table-responsive border rounded bg-white" style="max-height: 280px; overflow-y: auto;">
+					<table class="table table-hover align-middle mb-0 small">
+						<thead class="table-light sticky-top">
+							<tr>
+								<th>Nama Pegawai / Guru</th>
+								<th>Jabatan / Role</th>
+								<th>No. WhatsApp</th>
+								<th class="text-end" style="width: 120px;">Aksi</th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php if (empty($employees)): ?>
+							<tr>
+								<td colspan="4" class="text-center text-muted py-3">Belum ada akun pegawai aktif.</td>
+							</tr>
+						<?php else: foreach ($employees as $emp): 
+							$emp_phone = trim($emp['phone'] ?: '');
+							$emp_name  = $emp['full_name'];
+							$emp_personal_msg = "Assalamu'alaikum Bpk/Ibu *" . $emp_name . "*,\n\nBerikut Surat Resmi dari Kepala Sekolah " . $school['school_name'] . ":\n"
+								. "- *No. Surat:* " . $letter['letter_number'] . "\n"
+								. "- *Perihal:* " . $letter['subject'] . "\n"
+								. "- *Tanggal:* " . tgl_indo($letter['letter_date']) . "\n\n"
+								. "Dokumen surat resmi bertanda tangan digital & stempel dapat diakses / diunduh pada tautan berikut:\n" . $verify_url . "\n\n"
+								. "Terima kasih.\nWassalamu'alaikum Wr. Wb.";
+							$emp_wa_link = !empty($emp_phone) ? build_wa_link($emp_phone, $emp_personal_msg) : '#';
+						?>
+							<tr>
+								<td>
+									<strong><?= e($emp_name) ?></strong>
+									<?php if (!empty($letter['recipient']) && stripos($letter['recipient'], $emp_name) !== FALSE): ?>
+										<span class="badge bg-warning-subtle text-dark border border-warning-subtle ms-1">Penerima Surat</span>
+									<?php endif; ?>
+								</td>
+								<td>
+									<?= role_badge($emp['role']) ?>
+									<span class="text-muted ms-1"><?= e($emp['position'] ?: '-') ?></span>
+								</td>
+								<td>
+									<?= !empty($emp_phone) ? e($emp_phone) : '<span class="text-muted fst-italic">Belum diisi</span>' ?>
+								</td>
+								<td class="text-end">
+									<?php if (!empty($emp_phone)): ?>
+										<a href="<?= $emp_wa_link ?>" target="_blank" rel="noopener" class="btn btn-xs btn-outline-success">
+											<i class="fa-brands fa-whatsapp me-1"></i> Kirim WA
+										</a>
+									<?php else: ?>
+										<button type="button" class="btn btn-xs btn-outline-secondary" disabled title="Nomor WhatsApp pegawai belum diisi di profil">
+											<i class="fa-brands fa-whatsapp me-1"></i> No WA Kosong
+										</button>
+									<?php endif; ?>
+								</td>
+							</tr>
+						<?php endforeach; endif; ?>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="modal-footer border-top bg-light">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	var copyBtn = document.getElementById('btnCopyBroadcast');
+	var txtMsg = document.getElementById('txtBroadcastMsg');
+	var copyText = document.getElementById('copyBtnText');
+	if (copyBtn && txtMsg) {
+		copyBtn.addEventListener('click', function() {
+			txtMsg.select();
+			navigator.clipboard.writeText(txtMsg.value).then(function() {
+				if (copyText) {
+					copyText.textContent = 'Berhasil Disalin!';
+					setTimeout(function() { copyText.textContent = 'Salin Teks Pesan'; }, 2500);
+				}
+			});
+		});
+	}
+});
+</script>
+<?php endif; ?>

@@ -12,9 +12,9 @@ class Letters extends Admin_Controller
 	{
 		parent::__construct();
 		$this->require_schema();
-		$this->load->model(array('Letter_model', 'Letter_type_model', 'Letter_file_model'));
+		$this->load->model(array('Letter_model', 'Letter_type_model', 'Letter_file_model', 'User_model'));
 		$this->load->library(array('Template_registry', 'Letter_numbering', 'Letter_renderer', 'pagination'));
-		$this->require_role(array('tu', 'kepala_sekolah', 'superuser', 'admin'));
+		$this->require_role(array('tu', 'kepala_sekolah', 'superuser', 'admin', 'pegawai'));
 	}
 
 	/* =====================================================================
@@ -22,6 +22,12 @@ class Letters extends Admin_Controller
 	 * ===================================================================== */
 	public function index()
 	{
+		if ($this->is_pegawai())
+		{
+			redirect('arsip');
+			return;
+		}
+
 		$filters = array(
 			'q'      => substr(trim((string) $this->input->get('q', TRUE)), 0, 100),
 			'type'   => (int) $this->input->get('type'),
@@ -51,6 +57,8 @@ class Letters extends Admin_Controller
 	/** Langkah 1: pilih jenis surat. */
 	public function select_type()
 	{
+		$this->require_role(array('tu', 'kepala_sekolah', 'superuser', 'admin'));
+
 		$this->render('letters/select_type', array(
 			'page_title' => 'Buat Surat',
 			'types'      => $this->Letter_type_model->all(TRUE),
@@ -61,6 +69,8 @@ class Letters extends Admin_Controller
 	/** Langkah 2-3: formulir sesuai jenis surat. */
 	public function create($type_id = 0)
 	{
+		$this->require_role(array('tu', 'kepala_sekolah', 'superuser', 'admin'));
+
 		list($type, $tpl) = $this->load_type($type_id, TRUE);
 
 		$defaults = array(
@@ -131,6 +141,7 @@ class Letters extends Admin_Controller
 	/** Langkah 6: simpan surat baru. */
 	public function store($type_id = 0)
 	{
+		$this->require_role(array('tu', 'kepala_sekolah', 'superuser', 'admin'));
 		$this->require_post();
 		list($type, $tpl) = $this->load_type($type_id, TRUE);
 		$this->pending_request((int) $this->input->post('request_id'), $type);
@@ -261,6 +272,7 @@ class Letters extends Admin_Controller
 	/** Langkah 5: pratinjau sebelum disimpan (dibuka di tab baru). */
 	public function preview()
 	{
+		$this->require_role(array('tu', 'kepala_sekolah', 'superuser', 'admin'));
 		$this->require_post();
 		$type_id = (int) $this->input->post('letter_type_id');
 		$letter_id = (int) $this->input->post('letter_id');
@@ -293,6 +305,7 @@ class Letters extends Admin_Controller
 	/** AJAX: perkiraan nomor berikutnya untuk tanggal tertentu. */
 	public function next_number($type_id = 0)
 	{
+		$this->require_role(array('tu', 'kepala_sekolah', 'superuser', 'admin'));
 		list($type) = $this->load_type($type_id, FALSE);
 		$date = (string) $this->input->get('date');
 		if ( ! valid_date_string($date))
@@ -309,7 +322,18 @@ class Letters extends Admin_Controller
 	public function detail($id = 0)
 	{
 		$letter = $this->load_letter($id);
+		if ($this->is_pegawai() && $letter['status'] !== 'final' && ( ! isset($letter['approval_status']) || $letter['approval_status'] !== 'disetujui'))
+		{
+			$this->forbidden('Surat ini belum berstatus final atau disetujui Kepala Sekolah.');
+		}
+
 		list($type, $tpl) = $this->load_type($letter['letter_type_id'], FALSE);
+
+		$employees = array();
+		if ($this->db->table_exists('users'))
+		{
+			$employees = $this->User_model->get_active_employees();
+		}
 
 		$this->render('letters/detail', array(
 			'page_title' => 'Detail Surat',
@@ -318,11 +342,13 @@ class Letters extends Admin_Controller
 			'tpl'        => $tpl,
 			'values'     => $this->template_registry->formatted_values($tpl, $letter['data']),
 			'files'      => $this->Letter_file_model->by_letter($letter['id']),
+			'employees'  => $employees,
 		));
 	}
 
 	public function edit($id = 0)
 	{
+		$this->require_role(array('tu', 'kepala_sekolah', 'superuser', 'admin'));
 		$letter = $this->load_letter($id);
 		list($type, $tpl) = $this->load_type($letter['letter_type_id'], FALSE);
 		$values = $letter;
@@ -332,6 +358,7 @@ class Letters extends Admin_Controller
 
 	public function update($id = 0)
 	{
+		$this->require_role(array('tu', 'kepala_sekolah', 'superuser', 'admin'));
 		$this->require_post();
 		$letter = $this->load_letter($id);
 		list($type, $tpl) = $this->load_type($letter['letter_type_id'], FALSE);
@@ -417,6 +444,7 @@ class Letters extends Admin_Controller
 
 	public function delete($id = 0)
 	{
+		$this->require_role(array('tu', 'kepala_sekolah', 'superuser', 'admin'));
 		$this->require_post();
 		$letter = $this->load_letter($id);
 
@@ -447,6 +475,10 @@ class Letters extends Admin_Controller
 	public function pdf($id = 0, $mode = 'unduh')
 	{
 		$letter = $this->load_letter($id);
+		if ($this->is_pegawai() && $letter['status'] !== 'final' && ( ! isset($letter['approval_status']) || $letter['approval_status'] !== 'disetujui'))
+		{
+			$this->forbidden('Surat ini belum berstatus final atau disetujui Kepala Sekolah.');
+		}
 		list($type) = $this->load_type($letter['letter_type_id'], FALSE);
 		try
 		{
@@ -468,6 +500,7 @@ class Letters extends Admin_Controller
 	/** Buat ulang & simpan PDF arsip ke storage. */
 	public function regenerate($id = 0)
 	{
+		$this->require_role(array('tu', 'kepala_sekolah', 'superuser', 'admin'));
 		$this->require_post();
 		$letter = $this->load_letter($id);
 		if ($this->archive_pdf($letter))

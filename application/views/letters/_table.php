@@ -36,12 +36,16 @@
 					<?php if ((int) $r['pdf_count'] > 0): ?><i class="fa-solid fa-file-pdf text-danger ms-1" title="PDF arsip tersimpan"></i><?php endif; ?></td>
 				<td class="text-end text-nowrap">
 					<a class="btn btn-sm btn-light" href="<?= site_url('surat/detail/'.(int) $r['id']) ?>" title="Detail"><i class="fa-solid fa-eye"></i></a>
-					<a class="btn btn-sm btn-light" href="<?= site_url('surat/edit/'.(int) $r['id']) ?>" title="Edit"><i class="fa-solid fa-pen"></i></a>
+					<?php if ( ! is_pegawai()): ?>
+						<a class="btn btn-sm btn-light" href="<?= site_url('surat/edit/'.(int) $r['id']) ?>" title="Edit"><i class="fa-solid fa-pen"></i></a>
+					<?php endif; ?>
 					<a class="btn btn-sm btn-light" href="<?= site_url('surat/pdf/'.(int) $r['id']) ?>" title="Unduh PDF"><i class="fa-solid fa-download"></i></a>
-					<?= form_open('surat/hapus/'.(int) $r['id'], array('class' => 'd-inline', 'data-confirm' => 'Hapus surat nomor '.$r['letter_number'].'? Data dan file PDF arsipnya akan dihapus permanen.')) ?>
-						<input type="hidden" name="back" value="<?= e($back) ?>">
-						<button type="submit" class="btn btn-sm btn-light text-danger" title="Hapus"><i class="fa-solid fa-trash"></i></button>
-					<?= form_close() ?>
+					<?php if ( ! is_pegawai()): ?>
+						<?= form_open('surat/hapus/'.(int) $r['id'], array('class' => 'd-inline', 'data-confirm' => 'Hapus surat nomor '.$r['letter_number'].'? Data dan file PDF arsipnya akan dihapus permanen.')) ?>
+							<input type="hidden" name="back" value="<?= e($back) ?>">
+							<button type="submit" class="btn btn-sm btn-light text-danger" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+						<?= form_close() ?>
+					<?php endif; ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>
