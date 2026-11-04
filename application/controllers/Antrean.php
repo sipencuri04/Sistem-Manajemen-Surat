@@ -463,14 +463,18 @@ class Antrean extends MY_Controller
 
 		$service_id = (int) $this->input->get('service_id');
 		$stats = $this->Queue_model->get_stats_today();
-		$today_tickets = $this->Queue_model->get_today_tickets(NULL, 100);
-		$active_ticket = $this->Queue_model->get_active_serving_ticket($service_id);
+		$today_tickets = $this->Queue_model->get_today_tickets_list($service_id ?: NULL, 50);
+		$active_ticket = $this->Queue_model->get_active_serving_ticket($service_id ?: NULL);
 
 		// Hitung antrean yang menunggu khusus pada layanan/loket ini
 		$waiting_this = 0;
-		if (isset($stats[$service_id]['waiting']))
+		if ($service_id)
 		{
-			$waiting_this = (int) $stats[$service_id]['waiting'];
+			$waiting_this = $this->db->from('queue_tickets')
+				->where('queue_date', date('Y-m-d'))
+				->where('service_id', (int) $service_id)
+				->where('status', 'waiting')
+				->count_all_results();
 		}
 
 		$this->output->set_content_type('application/json')->set_output(json_encode(array(

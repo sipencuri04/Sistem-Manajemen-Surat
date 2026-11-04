@@ -315,6 +315,30 @@ class Queue_model extends CI_Model
 		return $this->db->order_by('t.id', 'DESC')->limit($limit)->get()->result_array();
 	}
 
+	/** Alias untuk get_today_tickets_list */
+	public function get_today_tickets($service_id = NULL, $limit = 50)
+	{
+		return $this->get_today_tickets_list($service_id, $limit);
+	}
+
+	/** Ambil tiket yang sedang aktif dipanggil / dilayani pada layanan atau loket tertentu */
+	public function get_active_serving_ticket($service_id = NULL)
+	{
+		$today = date('Y-m-d');
+		$this->db->select('t.*, s.name AS service_name, s.code AS service_code')
+			->from($this->table_tickets.' t')
+			->join($this->table_services.' s', 's.id = t.service_id', 'left')
+			->where('t.queue_date', $today)
+			->where_in('t.status', array('calling', 'serving'));
+
+		if ($service_id)
+		{
+			$this->db->where('t.service_id', (int) $service_id);
+		}
+
+		return $this->db->order_by('t.called_at', 'DESC')->limit(1)->get()->row_array();
+	}
+
 	/** Reset antrean hari ini */
 	public function reset_today()
 	{
