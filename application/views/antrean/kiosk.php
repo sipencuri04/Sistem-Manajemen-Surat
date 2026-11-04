@@ -262,6 +262,18 @@ function ambilTiket(serviceId, serviceName) {
 			currentTicketId = data.ticket.id;
 			modalBody.innerHTML = data.html;
 
+			// Broadcast sinyal instan ke Layar Loket TU & Display TV (0.00 detik)
+			if (window.BroadcastChannel) {
+				try {
+					const bc = new BroadcastChannel('tu_queue_sync');
+					bc.postMessage({ action: 'NEW_TICKET', ticket: data.ticket, time: Date.now() });
+					bc.close();
+				} catch(e) {}
+			}
+			try {
+				localStorage.setItem('tu_queue_action', JSON.stringify({ action: 'NEW_TICKET', ticket: data.ticket, time: Date.now() }));
+			} catch(e) {}
+
 			// Eksekusi Cetak Tiket
 			await executePrint(data.ticket);
 		} else {

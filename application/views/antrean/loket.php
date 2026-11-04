@@ -205,6 +205,23 @@ function broadcastQueueAction(action, data = null) {
 	} catch(e) {}
 }
 
+// Listener Sinkronisasi Instan Antar-Layar (Kiosk -> Loket TU -> Display TV)
+if (window.BroadcastChannel) {
+	try {
+		const queueChannel = new BroadcastChannel('tu_queue_sync');
+		queueChannel.onmessage = function(e) {
+			// Saat ada tiket baru dari Kiosk atau aksi dari loket lain, sinkronkan seketika (0.00 detik)
+			syncLoketData(true);
+		};
+	} catch(e) {}
+}
+
+window.addEventListener('storage', function(e) {
+	if (e.key === 'tu_queue_action') {
+		syncLoketData(true);
+	}
+});
+
 async function syncLoketData(isManual = false) {
 	try {
 		const url = '<?= site_url("antrean/api-loket") ?>?service_id=' + serviceId + (isManual ? '' : '&v=' + encodeURIComponent(currentLoketVersion));
