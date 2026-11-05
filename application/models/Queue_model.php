@@ -234,6 +234,21 @@ class Queue_model extends CI_Model
 			->get()->row_array();
 	}
 
+	/** Ambil riwayat tiket yang baru saja dipanggil hari ini (misal 3 atau 5 tiket terakhir) */
+	public function get_recent_called_tickets($limit = 3)
+	{
+		$today = date('Y-m-d');
+		return $this->db->select('t.*, s.name AS service_name, s.code AS service_code')
+			->from($this->table_tickets.' t')
+			->join($this->table_services.' s', 's.id = t.service_id', 'left')
+			->where('t.queue_date', $today)
+			->where('t.called_at IS NOT NULL')
+			->where_in('t.status', array('calling', 'serving', 'completed'))
+			->order_by('t.called_at', 'DESC')
+			->limit($limit)
+			->get()->result_array();
+	}
+
 	/** Dapatkan status tiket yang sedang aktif di masing-masing loket */
 	public function get_active_lokets()
 	{

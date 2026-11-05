@@ -207,14 +207,16 @@ class Antrean extends MY_Controller
 		$school   = $this->Settings_model->get(TRUE);
 		$services = $this->Queue_model->get_services(TRUE);
 		$lokets   = $this->Queue_model->get_active_lokets();
-		$last     = $this->Queue_model->get_last_called_ticket();
+		$last          = $this->Queue_model->get_last_called_ticket();
+		$recent_called = $this->Queue_model->get_recent_called_tickets(3);
 
 		$data = array(
-			'page_title'  => 'Layar Monitor Antrean TU',
-			'school'      => $school,
-			'services'    => $services,
-			'lokets'      => $lokets,
-			'last_called' => $last,
+			'page_title'    => 'Layar Monitor Antrean TU',
+			'school'        => $school,
+			'services'      => $services,
+			'lokets'        => $lokets,
+			'last_called'   => $last,
+			'recent_called' => $recent_called,
 		);
 
 		$this->load->view('antrean/display', $data);
@@ -241,18 +243,20 @@ class Antrean extends MY_Controller
 			return;
 		}
 
-		$lokets = $this->Queue_model->get_active_lokets();
-		$last   = $this->Queue_model->get_last_called_ticket();
-		$stats  = $this->Queue_model->get_stats_today();
+		$lokets        = $this->Queue_model->get_active_lokets();
+		$last          = $this->Queue_model->get_last_called_ticket();
+		$recent_called = $this->Queue_model->get_recent_called_tickets(3);
+		$stats         = $this->Queue_model->get_stats_today();
 
 		$this->output->set_content_type('application/json')->set_output(json_encode(array(
-			'success'     => TRUE,
-			'changed'     => TRUE,
-			'version'     => $server_v,
-			'last_called' => $last,
-			'lokets'      => $lokets,
-			'stats'       => $stats,
-			'server_time' => date('H:i:s'),
+			'success'       => TRUE,
+			'changed'       => TRUE,
+			'version'       => $server_v,
+			'last_called'   => $last,
+			'recent_called' => $recent_called,
+			'lokets'        => $lokets,
+			'stats'         => $stats,
+			'server_time'   => date('H:i:s'),
 		)));
 	}
 
