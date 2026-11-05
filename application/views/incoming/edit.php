@@ -54,7 +54,7 @@
 					</div>
 
 					<div class="col-12">
-						<label class="form-label" for="letter_file">Ganti Berkas Scan (Kosongkan jika tidak diubah, Maksimal 5 MB)</label>
+						<label class="form-label" for="letter_file">Ganti Berkas Scan (Kosongkan jika tidak diubah, Maksimal 2 MB)</label>
 						<?php if ($letter['file_path']): ?>
 							<div class="mb-2 small text-muted"><i class="fa-solid fa-file me-1"></i> File saat ini: <?= e($letter['file_name']) ?></div>
 						<?php endif; ?>

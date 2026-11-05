@@ -132,7 +132,7 @@
 						<textarea name="progress_notes" class="form-control" rows="3" placeholder="Tuliskan uraian hasil pelaksanaan tugas..." required><?= e($d['progress_notes']) ?></textarea>
 					</div>
 					<div class="mb-3">
-						<label class="form-label">Unggah Bukti Hasil (PDF/Foto/Dokumen, maks 5 MB)</label>
+						<label class="form-label">Unggah Bukti Hasil (PDF/Foto/Dokumen, maks 2 MB)</label>
 						<?php if ($d['evidence_file']): ?>
 							<div class="small text-muted mb-1">File saat ini: <?= e($d['evidence_name']) ?></div>
 						<?php endif; ?>

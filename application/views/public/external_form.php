@@ -113,7 +113,7 @@ $inv = function ($k) use ($custom_errors) {
 						<input type="file" class="form-control rounded-3<?= $inv('letter_file') ?>" id="letter_file" name="letter_file" accept=".pdf,.jpg,.jpeg,.png" required>
 						<?= $err('letter_file') ?>
 						<div class="form-text small mt-2">
-							<i class="fa-solid fa-circle-info text-primary me-1"></i> Format yang didukung: <strong>PDF, JPG, PNG</strong>. Maksimal ukuran file <strong>5 MB</strong>. Pastikan surat telah ditandatangani dan dibubuhi stempel resmi instansi pengirim.
+							<i class="fa-solid fa-circle-info text-primary me-1"></i> Format yang didukung: <strong>PDF, JPG, PNG</strong>. Maksimal ukuran file <strong>2 MB</strong>. Pastikan surat telah ditandatangani dan dibubuhi stempel resmi instansi pengirim.
 						</div>
 					</div>
 				</div>

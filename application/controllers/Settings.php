@@ -159,7 +159,7 @@ class Settings extends Admin_Controller
 	}
 
 	/**
-	 * Unggah satu gambar (PNG/JPG, maks 5 MB) ke storage/uploads.
+	 * Unggah satu gambar (PNG/JPG, maks 2 MB) ke storage/uploads.
 	 * @return string|array path relatif atau ['error' => pesan]
 	 */
 	protected function handle_upload($field)
@@ -171,7 +171,7 @@ class Settings extends Admin_Controller
 		$this->upload->initialize(array(
 			'upload_path'      => $dir,
 			'allowed_types'    => 'png|jpg|jpeg',
-			'max_size'         => 5120,
+			'max_size'         => 2048,
 			'max_width'        => 4000,
 			'max_height'       => 4000,
 			'encrypt_name'     => TRUE,       // nama file acak & aman

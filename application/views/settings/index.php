@@ -218,7 +218,7 @@ $text = function ($k, $label, $opts = array()) use ($val, $inv, $fb) {
 		<div class="form-section">
 			<div class="form-section-title"><i class="fa-solid fa-image"></i> Logo, Tanda Tangan &amp; Stempel</div>
 			<div class="form-section-body">
-				<p class="small text-muted">Format PNG/JPG, maksimal 5 MB. Gunakan hanya gambar resmi dari pihak sekolah. Jika tanda tangan/stempel tidak diunggah, PDF menyediakan ruang kosong untuk ditandatangani basah.</p>
+				<p class="small text-muted">Format PNG/JPG, maksimal 2 MB. Gunakan hanya gambar resmi dari pihak sekolah. Jika tanda tangan/stempel tidak diunggah, PDF menyediakan ruang kosong untuk ditandatangani basah.</p>
 				<?php foreach ($images as $field => $meta): ?>
 					<div class="border rounded-3 p-3 mb-3">
 						<label class="form-label" for="<?= e($field) ?>"><?= e($meta[0]) ?></label>

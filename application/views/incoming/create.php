@@ -55,9 +55,9 @@
 					</div>
 
 					<div class="col-12">
-						<label class="form-label" for="letter_file">Unggah Berkas Scan / PDF Surat Masuk (Maksimal 5 MB)</label>
+						<label class="form-label" for="letter_file">Unggah Berkas Scan / PDF Surat Masuk (Maksimal 2 MB)</label>
 						<input type="file" class="form-control" id="letter_file" name="letter_file" accept="application/pdf,image/png,image/jpeg">
-						<small class="text-muted">Format file yang diperbolehkan: PDF, JPG, PNG (maksimal 5 MB). File tersimpan terlindungi dari akses publik.</small>
+						<small class="text-muted">Format file yang diperbolehkan: PDF, JPG, PNG (maksimal 2 MB). File tersimpan terlindungi dari akses publik.</small>
 					</div>
 				</div>
 

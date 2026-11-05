@@ -196,7 +196,7 @@ class Kirim_surat extends MY_Controller
 		$this->upload->initialize(array(
 			'upload_path'      => $dir,
 			'allowed_types'    => 'pdf|png|jpg|jpeg',
-			'max_size'         => 5120, // 5 MB
+			'max_size'         => 2048, // 2 MB
 			'encrypt_name'     => TRUE,
 			'file_ext_tolower' => TRUE,
 		), TRUE);

@@ -220,7 +220,7 @@ class Dispositions extends Admin_Controller
 			'progress_notes'   => $notes,
 		);
 
-		// Unggah bukti tindak lanjut jika ada (PDF/JPG/PNG max 5 MB)
+		// Unggah bukti tindak lanjut jika ada (PDF/JPG/PNG max 2 MB)
 		if ( ! empty($_FILES['evidence_file']['name']))
 		{
 			$upload = $this->handle_upload('evidence_file');
@@ -352,7 +352,7 @@ class Dispositions extends Admin_Controller
 		$this->upload->initialize(array(
 			'upload_path'      => $dir,
 			'allowed_types'    => 'pdf|png|jpg|jpeg|docx|xlsx',
-			'max_size'         => 5120, // 5 MB
+			'max_size'         => 2048, // 2 MB
 			'encrypt_name'     => TRUE,
 			'file_ext_tolower' => TRUE,
 		), TRUE);

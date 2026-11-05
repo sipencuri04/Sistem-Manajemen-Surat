@@ -167,7 +167,7 @@ $is_overdue = $disp['deadline_date'] && strtotime($disp['deadline_date']) < time
 												<textarea name="progress_notes" class="form-control" rows="3" placeholder="Tuliskan uraian hasil pelaksanaan tugas atau kendala..." required><?= e($r['progress_notes']) ?></textarea>
 											</div>
 											<div class="mb-3">
-												<label class="form-label">Unggah Bukti Hasil (PDF/Foto/Dokumen, maks 5 MB)</label>
+												<label class="form-label">Unggah Bukti Hasil (PDF/Foto/Dokumen, maks 2 MB)</label>
 												<?php if ($r['evidence_file']): ?>
 													<div class="small text-muted mb-1">File saat ini: <?= e($r['evidence_name']) ?></div>
 												<?php endif; ?>
