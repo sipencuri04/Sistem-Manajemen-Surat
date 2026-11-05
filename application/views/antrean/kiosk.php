@@ -10,7 +10,7 @@
 	<link rel="icon" type="image/png" href="<?= base_url('favicon.png') ?>">
 	<link rel="shortcut icon" href="<?= base_url('favicon.ico') ?>">
 
-	<!-- Ultra-Fast LCP Optimization: Preload Critical Assets & High-Priority Hero Elements -->
+	<!-- Preload Assets -->
 	<link rel="preload" href="<?= asset_url('assets/img/logo-sekolah.png') ?>" as="image" type="image/png" fetchpriority="high">
 	<link rel="preload" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" as="style">
 	<link rel="stylesheet" href="<?= asset_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>">
@@ -18,132 +18,502 @@
 	<noscript><link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>"></noscript>
 
 	<style>
-		/* Native System Font Stack: 0ms Network Delay, Rendertime Instan */
+		:root {
+			--page-bg: #f0f4f9;
+			--navy-dark: #0f172a;
+			--brand-blue: #0d5ecc;
+			--brand-cyan: #38bdf8;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
 		body {
 			font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-			background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1d4ed8 100%);
+			background-color: var(--page-bg);
 			min-height: 100vh;
 			display: flex;
 			flex-direction: column;
-			color: #fff;
+			color: #1e293b;
 			user-select: none;
 			-webkit-user-select: none;
+			overflow-x: hidden;
+			margin: 0;
+			padding: 0;
+		}
+
+		/* 1. Header */
+		.kiosk-header {
+			background: #ffffff;
+			border-bottom: 1px solid #e2e8f0;
+			padding: 12px 32px;
+			position: relative;
+			z-index: 20;
+		}
+		.school-logo {
+			width: 48px;
+			height: 48px;
+			object-fit: contain;
+			filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
+		}
+		.school-title {
+			color: #0f2444;
+			font-size: 16.5px;
+			letter-spacing: -0.2px;
+			line-height: 1.25;
+		}
+		.school-sub {
+			color: #64748b;
+			font-size: 12px;
+			font-weight: 500;
+		}
+		.kiosk-clock-pill {
+			background: #edf4fe;
+			border: 1px solid #d8e6fa;
+			border-radius: 50px;
+			padding: 6px 16px;
+			color: #0b326f;
+			font-size: 13.5px;
+		}
+		.btn-navy-pill {
+			background: #172b4d;
+			color: #ffffff;
+			border-radius: 50px;
+			padding: 7px 18px;
+			font-size: 13.5px;
+			font-weight: 600;
+			border: none;
+			transition: all 0.2s ease;
+		}
+		.btn-navy-pill:hover {
+			background: #0f1d34;
+			color: #ffffff;
+			transform: translateY(-1px);
+		}
+		.btn-primary-pill {
+			background: #0d6efd;
+			color: #ffffff;
+			border-radius: 50px;
+			padding: 7px 20px;
+			font-size: 13.5px;
+			font-weight: 600;
+			border: none;
+			transition: all 0.2s ease;
+		}
+		.btn-primary-pill:hover {
+			background: #0b5ed7;
+			color: #ffffff;
+			transform: translateY(-1px);
+			box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+		}
+
+		/* 2. Hero Section */
+		.kiosk-hero {
+			background: linear-gradient(110deg, #0947b4 0%, #0d5ecc 42%, #1977f3 78%, #2563eb 100%);
+			position: relative;
+			padding: 38px 32px 85px 32px;
+			overflow: hidden;
+		}
+		.kiosk-hero-welcome {
+			font-size: 17px;
+			font-weight: 500;
+			color: #e0f2fe;
+			letter-spacing: 0.2px;
+		}
+		.kiosk-hero-title {
+			font-size: 38px;
+			font-weight: 900;
+			letter-spacing: -0.5px;
+			line-height: 1.15;
+			color: #ffffff;
+		}
+		.text-cyan {
+			color: #38bdf8 !important;
+		}
+		.kiosk-hero-sub {
+			font-size: 15px;
+			color: rgba(255, 255, 255, 0.9);
+			font-weight: 400;
+			max-width: 480px;
+		}
+		.cyan-accent-line {
+			width: 46px;
+			height: 5px;
+			background: #38bdf8;
+			border-radius: 10px;
+		}
+		.kiosk-building-wrapper {
+			position: absolute;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			width: 48%;
+			max-width: 520px;
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			pointer-events: none;
+			overflow: hidden;
+			z-index: 1;
+		}
+		.kiosk-building-img {
+			height: 100%;
+			width: 100%;
+			object-fit: cover;
+			object-position: right center;
+			opacity: 0.96;
+		}
+
+		/* 3. Main Container & Cards Grid */
+		.kiosk-content-wrapper {
+			position: relative;
+			z-index: 10;
+			margin-top: -60px;
+			flex: 1;
 		}
 		.kiosk-card {
+			background: #ffffff;
+			border-radius: 22px;
+			border: 1px solid #eef2f6;
+			box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.07), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
+			padding: 24px;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			position: relative;
+			overflow: hidden;
 			transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 			cursor: pointer;
-			border: 2px solid rgba(255, 255, 255, 0.15);
-			background: rgba(255, 255, 255, 0.95);
-			color: #0f172a;
-			border-radius: 20px;
-			box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 		}
 		.kiosk-card:hover {
-			transform: translateY(-8px) scale(1.02);
-			border-color: #60a5fa;
-			box-shadow: 0 20px 35px rgba(37, 99, 235, 0.4);
+			transform: translateY(-6px);
+			box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.12);
 		}
 		.kiosk-card:active {
-			transform: scale(0.98);
+			transform: translateY(-2px) scale(0.99);
 		}
 		.kiosk-card.disabled {
 			pointer-events: none;
 			opacity: 0.6;
 		}
-		.service-code {
-			width: 65px;
-			height: 65px;
-			border-radius: 16px;
+
+		/* Radial Corner Accents per Theme */
+		.card-radial-accent {
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 140px;
+			height: 140px;
+			pointer-events: none;
+			border-radius: 0 22px 0 0;
+		}
+		.theme-blue .card-radial-accent {
+			background: radial-gradient(circle at top right, rgba(14, 165, 233, 0.16) 0%, transparent 68%);
+		}
+		.theme-green .card-radial-accent {
+			background: radial-gradient(circle at top right, rgba(22, 163, 74, 0.16) 0%, transparent 68%);
+		}
+		.theme-purple .card-radial-accent {
+			background: radial-gradient(circle at top right, rgba(124, 58, 237, 0.16) 0%, transparent 68%);
+		}
+
+		/* Service Icon Box */
+		.service-icon-box {
+			width: 64px;
+			height: 64px;
+			border-radius: 18px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			font-size: 28px;
-			font-weight: 900;
+			flex-shrink: 0;
 		}
-		.clock-badge {
-			background: rgba(255, 255, 255, 0.12);
-			backdrop-filter: blur(10px);
-			border: 1px solid rgba(255, 255, 255, 0.2);
+		.theme-blue .service-icon-box {
+			background: #e0f2fe;
+			color: #0284c7;
+		}
+		.theme-green .service-icon-box {
+			background: #dcfce7;
+			color: #16a34a;
+		}
+		.theme-purple .service-icon-box {
+			background: #f3e8ff;
+			color: #7c3aed;
+		}
+
+		.service-title {
+			color: #0f172a;
+			font-size: 19px;
+			font-weight: 800;
+			letter-spacing: -0.2px;
+			line-height: 1.3;
+		}
+		.service-desc {
+			color: #64748b;
+			font-size: 13px;
+			line-height: 1.5;
+			min-height: 38px;
+		}
+
+		/* Waiting Box */
+		.waiting-box {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+		.waiting-icon {
+			font-size: 20px;
+		}
+		.theme-blue .waiting-icon { color: #0284c7; }
+		.theme-green .waiting-icon { color: #16a34a; }
+		.theme-purple .waiting-icon { color: #7c3aed; }
+
+		.waiting-label {
+			font-size: 11.5px;
+			color: #64748b;
+			font-weight: 600;
+			text-transform: capitalize;
+			line-height: 1.2;
+		}
+		.waiting-count {
+			font-size: 17.5px;
+			font-weight: 800;
+			color: #0f172a;
+			line-height: 1.2;
+		}
+
+		/* Full-width Action Buttons */
+		.btn-kiosk-action {
+			border-radius: 50px;
+			padding: 12px 24px;
+			font-weight: 700;
+			font-size: 14.5px;
+			color: #ffffff;
+			border: none;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			transition: all 0.2s ease;
+			box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+		}
+		.theme-blue .btn-kiosk-action {
+			background: #0d6efd;
+		}
+		.theme-blue .btn-kiosk-action:hover {
+			background: #0b5ed7;
+			box-shadow: 0 8px 20px rgba(13, 110, 253, 0.35);
+		}
+		.theme-green .btn-kiosk-action {
+			background: #16a34a;
+		}
+		.theme-green .btn-kiosk-action:hover {
+			background: #15803d;
+			box-shadow: 0 8px 20px rgba(22, 163, 74, 0.35);
+		}
+		.theme-purple .btn-kiosk-action {
+			background: #7c3aed;
+		}
+		.theme-purple .btn-kiosk-action:hover {
+			background: #6d28d9;
+			box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+		}
+
+		/* 4. Bottom Information Bar */
+		.kiosk-info-pill {
+			background: #ffffff;
+			border-radius: 50px;
+			border: 1px solid #e2e8f0;
+			padding: 12px 28px;
+			display: flex;
+			align-items: center;
+			gap: 16px;
+			box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+		}
+		.info-tag {
+			font-size: 14.5px;
+			color: #0d5ecc;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		.info-divider {
+			width: 1px;
+			height: 20px;
+			background: #cbd5e1;
+		}
+		.info-text {
+			font-size: 13.5px;
+			color: #475569;
+			font-weight: 500;
+		}
+
+		@media (max-width: 991px) {
+			.kiosk-hero {
+				padding: 28px 20px 75px 20px;
+			}
+			.kiosk-hero-title {
+				font-size: 30px;
+			}
+			.kiosk-building-wrapper {
+				opacity: 0.3;
+				width: 60%;
+			}
+			.kiosk-content-wrapper {
+				margin-top: -50px;
+			}
+		}
+
+		@media (max-width: 767px) {
+			.kiosk-header {
+				padding: 10px 16px;
+			}
+			.school-title {
+				font-size: 14px;
+			}
+			.kiosk-clock-pill {
+				display: none !important;
+			}
+			.kiosk-building-wrapper {
+				display: none;
+			}
+			.kiosk-hero {
+				padding: 24px 16px 65px 16px;
+			}
+			.kiosk-hero-title {
+				font-size: 26px;
+			}
+			.kiosk-content-wrapper {
+				margin-top: -45px;
+			}
+			.kiosk-info-pill {
+				border-radius: 16px;
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 8px;
+				padding: 14px 18px;
+			}
+			.info-divider {
+				display: none;
+			}
 		}
 	</style>
 </head>
 <body>
 
-<header class="py-3 px-4 border-bottom border-white border-opacity-10">
+<!-- 1. HEADER ATAS -->
+<header class="kiosk-header">
 	<div class="container-fluid d-flex justify-content-between align-items-center">
+		<!-- Brand & Identitas Sekolah -->
 		<div class="d-flex align-items-center gap-3">
-			<img src="<?= asset_url('assets/img/logo-sekolah.png') ?>" alt="Logo" class="rounded" width="48" height="48" fetchpriority="high" style="width: 48px; height: 48px; object-fit: contain;" onerror="this.src='<?= asset_url('assets/img/icon.png') ?>'">
+			<img src="<?= asset_url('assets/img/logo-sekolah.png') ?>" alt="Logo" class="school-logo" onerror="this.src='<?= asset_url('assets/img/icon.png') ?>'">
 			<div>
-				<h5 class="mb-0 fw-bold text-uppercase tracking-wider"><?= e($school['school_name'] ?: 'SMK MUHAMMADIYAH BANDONGAN') ?></h5>
-				<small class="text-white-50">Sistem Antrean Layanan Mandiri Tata Usaha (Kiosk)</small>
+				<h1 class="h6 mb-0 fw-bold school-title"><?= e($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') ?></h1>
+				<div class="school-sub">Sistem Antrean Layanan Mandiri Tata Usaha (Kiosk)</div>
 			</div>
 		</div>
 
-		<div class="d-flex align-items-center gap-3">
-			<div class="clock-badge px-4 py-2 rounded-pill d-flex align-items-center gap-2 shadow-sm">
-				<i class="fa-regular fa-clock text-warning"></i>
-				<span id="liveClock" class="fw-bold font-monospace fs-5">00:00:00 WIB</span>
+		<!-- Tombol & Jam Kiosk -->
+		<div class="d-flex align-items-center gap-2 gap-sm-3">
+			<div class="kiosk-clock-pill d-flex align-items-center gap-2">
+				<i class="fa-regular fa-clock text-primary"></i>
+				<span id="liveClock" class="fw-bold font-monospace">00:00:00 WIB</span>
 			</div>
-			<a href="<?= site_url('antrean/display') ?>" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3">
+			<a href="<?= site_url('antrean/display') ?>" target="_blank" class="btn btn-navy-pill d-inline-flex align-items-center">
 				<i class="fa-solid fa-tv me-1"></i> Monitor TV
 			</a>
-			<a href="<?= site_url('login') ?>" class="btn btn-light btn-sm rounded-pill px-3 shadow-sm">
-				<i class="fa-solid fa-user-lock me-1"></i> Login Staf
+			<a href="<?= site_url('login') ?>" class="btn btn-primary-pill d-inline-flex align-items-center shadow-sm">
+				<i class="fa-solid fa-user me-1"></i> Login Staf
 			</a>
 		</div>
 	</div>
 </header>
 
-<main class="flex-grow-1 d-flex align-items-center py-5">
-	<div class="container">
-		<div class="text-center mb-5">
-			<span class="badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill fs-6 mb-2 border border-white border-opacity-25">
-				<i class="fa-solid fa-hand-pointer me-1"></i> Sentuh Layar untuk Mengambil Tiket
-			</span>
-			<h1 class="display-6 fw-black text-white text-uppercase mb-2">PILIH JENIS LAYANAN ANDA</h1>
-			<p class="text-white-50 fs-5 mb-0">Silakan pilih loket pelayanan di bawah ini untuk mendapatkan nomor antrean</p>
+<!-- 2. HERO BANNER BIRU DENGAN GRAFIK GEDUNG SEKOLAH -->
+<section class="kiosk-hero">
+	<div class="container-fluid px-3 px-lg-4 position-relative" style="z-index: 2;">
+		<div class="row align-items-center">
+			<div class="col-lg-7 col-md-8">
+				<div class="kiosk-hero-welcome mb-1">Selamat Datang di</div>
+				<h2 class="kiosk-hero-title mb-2">
+					Layanan <span class="text-cyan">Tata Usaha</span>
+				</h2>
+				<p class="kiosk-hero-sub mb-3">
+					Silakan pilih jenis layanan di bawah ini untuk mengambil nomor antrean.
+				</p>
+				<div class="cyan-accent-line"></div>
+			</div>
 		</div>
+	</div>
 
+	<!-- Foto Gedung SMK Muhammadiyah Bandongan di sebelah kanan -->
+	<div class="kiosk-building-wrapper">
+		<img src="<?= asset_url('assets/img/kiosk_school_banner_faded.png') ?>" alt="Gedung SMK Muhammadiyah Bandongan" class="kiosk-building-img" onerror="this.style.display='none'">
+	</div>
+</section>
+
+<!-- 3. KARTU LAYANAN ANTREAN (GRID) -->
+<main class="kiosk-content-wrapper px-3 px-lg-4 pb-3">
+	<div class="container-fluid">
 		<div class="row g-4 justify-content-center">
 			<?php 
-			$card_colors = array(
-				'A' => array('bg' => 'bg-primary text-white', 'btn' => 'btn-primary', 'accent' => '#2563eb', 'icon' => 'fa-file-signature'),
-				'B' => array('bg' => 'bg-success text-white', 'btn' => 'btn-success', 'accent' => '#16a34a', 'icon' => 'fa-money-bill-wave'),
-				'C' => array('bg' => 'bg-warning text-dark',  'btn' => 'btn-warning', 'accent' => '#ca8a04', 'icon' => 'fa-users-gear'),
+			// Pemetaan tema warna & ikon persis seperti mockup gambar
+			$theme_presets = array(
+				'A' => array('class' => 'theme-blue',   'icon' => 'fa-file-signature', 'btn_text' => 'Ambil Tiket'),
+				'B' => array('class' => 'theme-green',  'icon' => 'fa-coins',          'btn_text' => 'Ambil Tiket'),
+				'C' => array('class' => 'theme-purple', 'icon' => 'fa-graduation-cap', 'btn_text' => 'Ambil Tiket'),
 			);
-			?>
 
-			<?php foreach ($services as $srv): 
-				$color = isset($card_colors[$srv['code']]) ? $card_colors[$srv['code']] : array('bg' => 'bg-secondary text-white', 'btn' => 'btn-secondary', 'accent' => '#64748b', 'icon' => 'fa-bell');
+			$i = 0;
+			$fallback_themes = array('theme-blue', 'theme-green', 'theme-purple');
+
+			foreach ($services as $srv): 
+				$code = strtoupper(trim($srv['code']));
+				if (isset($theme_presets[$code])) {
+					$theme = $theme_presets[$code];
+				} else {
+					$theme_class = $fallback_themes[$i % count($fallback_themes)];
+					$theme = array('class' => $theme_class, 'icon' => 'fa-ticket', 'btn_text' => 'Ambil Tiket');
+				}
 				$waiting = isset($stats[$srv['id']]['waiting']) ? $stats[$srv['id']]['waiting'] : 0;
+				$i++;
 			?>
 				<div class="col-lg-4 col-md-6">
-					<div class="card kiosk-card h-100 p-4 service-btn" onclick="ambilTiket(<?= (int)$srv['id'] ?>, '<?= e(addslashes($srv['name'])) ?>')">
-						<div class="d-flex align-items-center gap-3 mb-3">
-							<div class="service-code <?= $color['bg'] ?> shadow-sm">
-								<?= e($srv['code']) ?>
+					<div class="kiosk-card h-100 <?= $theme['class'] ?> service-btn" onclick="ambilTiket(<?= (int)$srv['id'] ?>, '<?= e(addslashes($srv['name'])) ?>')">
+						<!-- Aksen kurva radial pojok kanan atas -->
+						<div class="card-radial-accent"></div>
+
+						<!-- Header Kartu: Ikon & Judul Layanan -->
+						<div class="d-flex align-items-start gap-3 mb-3">
+							<div class="service-icon-box shadow-sm">
+								<i class="fa-solid <?= $theme['icon'] ?> fa-xl"></i>
 							</div>
 							<div class="flex-grow-1">
-								<span class="badge bg-light text-muted border px-2 py-1 rounded-pill small">
-									Loket <?= (int) $srv['loket_number'] ?>
-								</span>
-								<h4 class="fw-bold mb-0 text-dark mt-1"><?= e($srv['name']) ?></h4>
+								<h3 class="service-title mb-1"><?= e($srv['name']) ?></h3>
+								<p class="service-desc mb-0">
+									<?= e($srv['description'] ?: 'Pelayanan administrasi dan persuratan di loket TU.') ?>
+								</p>
 							</div>
 						</div>
 
-						<p class="text-muted small flex-grow-1 mb-4" style="min-height: 40px;">
-							<?= e($srv['description'] ?: 'Pelayanan administrasi dan persuratan di loket TU.') ?>
-						</p>
-
-						<div class="pt-3 border-top d-flex justify-content-between align-items-center">
-							<div class="small">
-								<span class="text-muted">Sedang Menunggu:</span>
-								<strong class="text-dark fs-6 ms-1"><?= (int) $waiting ?> Orang</strong>
+						<!-- Status Jumlah Antrean yang Sedang Menunggu -->
+						<div class="waiting-box my-3 pt-2">
+							<div class="waiting-icon">
+								<i class="fa-solid fa-users"></i>
 							</div>
-							<button type="button" class="btn <?= $color['btn'] ?> px-4 py-2 rounded-pill fw-bold shadow-sm">
-								<i class="fa-solid fa-ticket me-1"></i> AMBIL TIKET
-							</button>
+							<div>
+								<div class="waiting-label">Sedang Menunggu</div>
+								<div class="waiting-count"><?= (int) $waiting ?> Orang</div>
+							</div>
 						</div>
+
+						<!-- Tombol Aksi Pill Penuh -->
+						<button type="button" class="btn btn-kiosk-action w-100">
+							<span class="d-flex align-items-center">
+								<i class="fa-solid fa-ticket-simple me-2"></i>
+								<?= $theme['btn_text'] ?>
+							</span>
+							<i class="fa-solid fa-chevron-right"></i>
+						</button>
 					</div>
 				</div>
 			<?php endforeach; ?>
@@ -151,8 +521,20 @@
 	</div>
 </main>
 
-<footer class="py-3 text-center text-white-50 small border-top border-white border-opacity-10">
-	&copy; <?= date('Y') ?> <?= e($school['school_name'] ?: 'SMK Muhammadiyah Bandongan') ?> &middot; Sistem Manajemen Persuratan &amp; Antrean Digital
+<!-- 4. FOOTER / INFORMASI ANTREAN (PILL BAR) -->
+<footer class="px-3 px-lg-4 pb-4">
+	<div class="container-fluid">
+		<div class="kiosk-info-pill shadow-sm">
+			<div class="info-tag fw-bold text-nowrap">
+				<i class="fa-solid fa-circle-info fs-5"></i>
+				<span>Informasi</span>
+			</div>
+			<div class="info-divider"></div>
+			<div class="info-text">
+				Ambil nomor antrean sesuai dengan kebutuhan layanan Anda. Nomor akan dipanggil pada monitor TV.
+			</div>
+		</div>
+	</div>
 </footer>
 
 <!-- Modal Digital Card Tiket -->
@@ -197,44 +579,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 	ticketModal = new bootstrap.Modal(document.getElementById('ticketModal'));
 
 	if (window.posPrinter && window.posPrinter.isSupported()) {
-		const isRemembered = await window.posPrinter.autoConnect();
-		updatePrinterBadge(isRemembered);
-	} else {
-		const btn = document.getElementById('btnPairPrinter');
-		if (btn) btn.style.display = 'none'; // Sembunyikan jika browser tidak support serial
+		await window.posPrinter.autoConnect();
 	}
 });
 
-// Update status tombol printer
-function updatePrinterBadge(connected) {
-	const btn = document.getElementById('btnPairPrinter');
-	const txt = document.getElementById('printerStatusText');
-	if (!btn || !txt) return;
-
-	if (connected) {
-		btn.className = 'btn btn-success btn-sm rounded-pill px-3 shadow-sm';
-		txt.innerHTML = '<i class="fa-solid fa-check me-1"></i> Bluetooth Printer Siap';
-	} else {
-		btn.className = 'btn btn-outline-info btn-sm rounded-pill px-3 shadow-sm';
-		txt.textContent = 'Sambungkan Printer Bluetooth';
-	}
-}
-
-// Handler klik tombol sambungkan printer (hanya 1x seumur hidup per browser)
-async function initPosPrinter() {
-	if (!window.posPrinter) return;
-	try {
-		const ok = await window.posPrinter.requestPort();
-		updatePrinterBadge(ok);
-		if (ok) {
-			alert('Printer Bluetooth berhasil terhubung!\nSelanjutnya tiket akan dicetak otomatis seketika dengan teks pekat.');
-		}
-	} catch (err) {
-		alert('Gagal menyambungkan port: ' + err.message);
-	}
-}
-
-// Ambil Tiket dengan Proteksi Anti-Spam / Anti-Crash
+// Ambil Tiket dengan Proteksi Anti-Spam / Anti-Crash & Broadcast Instan 0.00s
 function ambilTiket(serviceId, serviceName) {
 	if (isProcessing) return; // Mencegah double click
 	isProcessing = true;
