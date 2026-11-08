@@ -5,13 +5,34 @@
 	function $(sel, ctx) { return (ctx || document).querySelector(sel); }
 	function $all(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
 
-	/* ---------- Sidebar mobile ---------- */
+	/* ---------- Sidebar mobile & Responsivitas ---------- */
 	$all('[data-sidebar-toggle]').forEach(function (btn) {
 		btn.addEventListener('click', function () { $('#sidebar').classList.toggle('show'); });
 	});
 	$all('[data-sidebar-close]').forEach(function (el) {
 		el.addEventListener('click', function () { $('#sidebar').classList.remove('show'); });
 	});
+	// Tutup sidebar saat klik nav-link di perangkat mobile
+	$all('.sidebar-nav .nav-link').forEach(function (link) {
+		link.addEventListener('click', function () {
+			if (window.innerWidth < 992) {
+				var sb = $('#sidebar');
+				if (sb) sb.classList.remove('show');
+			}
+		});
+	});
+	// Tutup sidebar jika tekan tombol Escape
+	document.addEventListener('keydown', function (e) {
+		if (e.key === 'Escape') {
+			var sb = $('#sidebar');
+			if (sb && sb.classList.contains('show')) sb.classList.remove('show');
+		}
+	});
+
+	// Deteksi formulir dengan sticky-actions agar navigasi bawah mobile tidak bentrok
+	if ($('.sticky-actions')) {
+		document.body.classList.add('has-sticky-actions');
+	}
 
 	/* ---------- Tampilkan/sembunyikan password ---------- */
 	$all('[data-toggle-password]').forEach(function (btn) {

@@ -43,14 +43,14 @@
 		</div>
 		<p class="text-muted mb-0 small"><?= e($current_user['position'] ?: role_title($current_user['role'])) ?> &middot; <?= tgl_indo(date('Y-m-d'), TRUE) ?></p>
 	</div>
-	<div class="d-flex gap-2">
+	<div class="d-flex flex-wrap gap-2 w-100 w-sm-auto">
 		<?php if ($role === 'pegawai'): ?>
-			<a href="<?= site_url('disposisi-saya') ?>" class="btn btn-primary"><i class="fa-solid fa-clipboard-check me-1"></i> Buka Disposisi Saya</a>
+			<a href="<?= site_url('disposisi-saya') ?>" class="btn btn-primary flex-fill flex-sm-grow-0"><i class="fa-solid fa-clipboard-check me-1"></i> Buka Disposisi Saya</a>
 		<?php elseif ($role === 'kepala_sekolah'): ?>
-			<a href="<?= site_url('disposisi/buat') ?>" class="btn btn-warning"><i class="fa-solid fa-share-nodes me-1"></i> Buat Disposisi</a>
+			<a href="<?= site_url('disposisi/buat') ?>" class="btn btn-warning flex-fill flex-sm-grow-0"><i class="fa-solid fa-share-nodes me-1"></i> Buat Disposisi</a>
 		<?php elseif (in_array($role, array('tu', 'superuser', 'admin'), TRUE)): ?>
-			<a href="<?= site_url('surat/buat') ?>" class="btn btn-primary"><i class="fa-solid fa-file-circle-plus me-1"></i> Buat Surat Baru</a>
-			<a href="<?= site_url('surat-masuk/catat') ?>" class="btn btn-outline-primary"><i class="fa-solid fa-inbox me-1"></i> Catat Surat Masuk</a>
+			<a href="<?= site_url('surat/buat') ?>" class="btn btn-primary flex-fill flex-sm-grow-0"><i class="fa-solid fa-file-circle-plus me-1"></i> Buat Surat Baru</a>
+			<a href="<?= site_url('surat-masuk/catat') ?>" class="btn btn-outline-primary flex-fill flex-sm-grow-0"><i class="fa-solid fa-inbox me-1"></i> Catat Surat Masuk</a>
 		<?php endif; ?>
 	</div>
 </div>
@@ -234,7 +234,7 @@
 				<a href="<?= site_url('surat/buat') ?>" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> Buat surat pertama</a>
 			</div>
 		<?php else: ?>
-			<div class="table-responsive">
+			<div class="table-responsive d-none d-md-block">
 				<table class="table table-hover align-middle mb-0">
 					<thead class="table-light"><tr><th>Nomor Surat</th><th>Jenis</th><th>Tanggal</th><th>Perihal</th><th>Status</th><th style="width:80px" class="text-end">Aksi</th></tr></thead>
 					<tbody>
@@ -250,6 +250,30 @@
 					<?php endforeach; ?>
 					</tbody>
 				</table>
+			</div>
+
+			<!-- Tampilan Ringkas Mobile (< 768px) -->
+			<div class="list-mobile d-md-none">
+				<?php foreach ($recent as $r): ?>
+					<div class="list-mobile-item p-3">
+						<div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+							<div class="min-w-0">
+								<span class="letter-number fw-bold text-navy text-truncate"><?= e($r['letter_number']) ?></span>
+								<div class="small text-muted"><?= e($r['type_name']) ?></div>
+							</div>
+							<div class="text-end flex-shrink-0">
+								<?= status_badge($r['status']) ?>
+							</div>
+						</div>
+						<div class="fw-semibold text-dark small mb-2"><?= e($r['subject']) ?></div>
+						<div class="d-flex justify-content-between align-items-center small text-muted pt-1 border-top">
+							<span><i class="fa-regular fa-calendar me-1"></i><?= e(tgl_indo($r['letter_date'])) ?></span>
+							<a class="btn btn-sm btn-outline-primary py-1 px-3" href="<?= site_url('surat/detail/'.(int) $r['id']) ?>">
+								<i class="fa-solid fa-eye me-1"></i> Detail
+							</a>
+						</div>
+					</div>
+				<?php endforeach; ?>
 			</div>
 		<?php endif; ?>
 	</div>

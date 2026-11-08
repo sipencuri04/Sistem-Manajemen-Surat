@@ -10,7 +10,7 @@
 </div>
 
 <div class="row g-2 mb-3">
-	<div class="col-sm-6 col-md-3">
+	<div class="col-6 col-md-3">
 		<div class="stat-card">
 			<div class="stat-icon bg-primary-subtle text-primary"><i class="fa-solid fa-inbox"></i></div>
 			<div>
@@ -19,16 +19,16 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-sm-6 col-md-3">
+	<div class="col-6 col-md-3">
 		<div class="stat-card">
 			<div class="stat-icon bg-warning-subtle text-warning"><i class="fa-solid fa-envelope"></i></div>
 			<div>
-				<div class="stat-label">Baru / Diteruskan</div>
+				<div class="stat-label">Baru / Terusan</div>
 				<div class="stat-value"><?= number_format($counts['baru'] + $counts['diteruskan']) ?></div>
 			</div>
 		</div>
 	</div>
-	<div class="col-sm-6 col-md-3">
+	<div class="col-6 col-md-3">
 		<div class="stat-card">
 			<div class="stat-icon bg-info-subtle text-info"><i class="fa-solid fa-share-nodes"></i></div>
 			<div>
@@ -37,7 +37,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-sm-6 col-md-3">
+	<div class="col-6 col-md-3">
 		<div class="stat-card">
 			<div class="stat-icon bg-success-subtle text-success"><i class="fa-solid fa-check-double"></i></div>
 			<div>
@@ -84,7 +84,7 @@
 
 <div class="card">
 	<div class="card-body p-0">
-		<div class="table-responsive">
+		<div class="table-responsive d-none d-md-block">
 			<table class="table table-hover align-middle mb-0">
 				<thead class="table-light">
 					<tr>
@@ -164,6 +164,63 @@
 				<?php endforeach; endif; ?>
 				</tbody>
 			</table>
+		</div>
+
+		<!-- Tampilan Kartu Responsif Khusus Mobile (< 768px) -->
+		<div class="list-mobile d-md-none">
+		<?php if (empty($letters)): ?>
+			<div class="text-center py-4 text-muted">
+				<i class="fa-solid fa-inbox fa-3x mb-3 text-secondary opacity-50 d-block"></i>
+				Belum ada surat masuk yang cocok dengan filter pencarian.
+			</div>
+		<?php else: foreach ($letters as $idx => $l): ?>
+			<div class="list-mobile-item p-3">
+				<div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+					<div class="min-w-0">
+						<div class="fw-bold letter-number text-navy text-truncate"><?= e($l['agenda_number']) ?></div>
+						<small class="text-muted">Asal: <?= e($l['letter_number']) ?></small>
+					</div>
+					<div class="text-end flex-shrink-0">
+						<?= incoming_status_badge($l['status']) ?>
+					</div>
+				</div>
+
+				<div class="fw-semibold text-dark mb-1"><?= e($l['subject']) ?></div>
+
+				<div class="small text-muted mb-2">
+					<i class="fa-solid fa-building me-1"></i> Asal: <strong class="text-dark"><?= e($l['sender']) ?></strong>
+					<?php if ( ! empty($l['is_external'])): ?>
+						<span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1" style="font-size:0.68rem;">
+							<i class="fa-solid fa-globe me-1"></i>Online
+						</span>
+					<?php endif; ?>
+				</div>
+
+				<div class="d-flex flex-wrap gap-2 text-muted small mb-3">
+					<div><i class="fa-regular fa-calendar-check me-1"></i>Terima: <?= e(tgl_indo($l['received_date'])) ?></div>
+					<div>&middot; <i class="fa-regular fa-calendar me-1"></i>Surat: <?= e(tgl_indo($l['letter_date'])) ?></div>
+					<?php if ($l['disposition_count'] > 0): ?>
+						<div>&middot; <span class="badge text-bg-info text-white"><i class="fa-solid fa-share-nodes me-1"></i><?= (int) $l['disposition_count'] ?> Disposisi</span></div>
+					<?php endif; ?>
+				</div>
+
+				<div class="d-flex align-items-center gap-2 pt-2 border-top">
+					<a href="<?= site_url('surat-masuk/detail/'.$l['id']) ?>" class="btn btn-sm btn-outline-primary flex-fill">
+						<i class="fa-solid fa-eye me-1"></i> Detail
+					</a>
+					<?php if ($l['file_path']): ?>
+						<a href="<?= site_url('surat-masuk/berkas/'.$l['id']) ?>" target="_blank" class="btn btn-sm btn-outline-danger" title="Buka Scan PDF">
+							<i class="fa-solid fa-file-pdf me-1"></i> PDF
+						</a>
+					<?php endif; ?>
+					<?php if (is_kepala_sekolah()): ?>
+						<a href="<?= site_url('disposisi/buat/'.$l['id']) ?>" class="btn btn-sm btn-warning" title="Buat Lembar Disposisi">
+							<i class="fa-solid fa-share-nodes me-1"></i> Disposisi
+						</a>
+					<?php endif; ?>
+				</div>
+			</div>
+		<?php endforeach; endif; ?>
 		</div>
 	</div>
 	<?php if ($pagination): ?>

@@ -136,7 +136,7 @@ $menu[] = array('url' => 'akun', 'icon' => 'fa-user-gear', 'label' => 'Pengatura
 			<h1 class="h5 mb-0 fw-semibold text-navy text-truncate"><?= e($page_title) ?></h1>
 			<div class="ms-auto d-flex align-items-center gap-2">
 				<?php if (in_array($user_role, array('tu', 'kepala_sekolah', 'superuser', 'admin'), TRUE)): ?>
-					<a href="<?= site_url('surat/buat') ?>" class="btn btn-primary btn-sm d-none d-sm-inline-flex align-items-center"><i class="fa-solid fa-plus me-1"></i> Surat Baru</a>
+					<a href="<?= site_url('surat/buat') ?>" class="btn btn-primary btn-sm d-inline-flex align-items-center" title="Buat Surat Baru"><i class="fa-solid fa-plus"></i><span class="d-none d-sm-inline ms-1"> Surat Baru</span></a>
 				<?php endif; ?>
 
 				<!-- Dropdown Notifikasi Internal -->
@@ -217,6 +217,72 @@ $menu[] = array('url' => 'akun', 'icon' => 'fa-user-gear', 'label' => 'Pengatura
 		</footer>
 	</div>
 </div>
+
+<!-- Admin Mobile Bottom Navigation Dock (Layar ponsel / tablet < 992px) -->
+<nav class="admin-bottom-nav d-lg-none" aria-label="Navigasi Cepat Mobile">
+	<div class="admin-bottom-nav-inner">
+		<a href="<?= site_url('dashboard') ?>" class="admin-bottom-nav-item <?= menu_active(array('dashboard')) ?>">
+			<i class="fa-solid fa-gauge-high"></i>
+			<span>Beranda</span>
+		</a>
+		<?php if ($user_role === 'pegawai'): ?>
+			<a href="<?= site_url('disposisi-saya') ?>" class="admin-bottom-nav-item <?= menu_active(array('disposisi-saya')) ?>">
+				<i class="fa-solid fa-clipboard-check"></i>
+				<span>Disposisi</span>
+				<?php if ( ! empty($my_pending_dispositions)): ?>
+					<span class="admin-bottom-nav-badge"><?= (int) $my_pending_dispositions ?></span>
+				<?php endif; ?>
+			</a>
+			<a href="<?= site_url('arsip') ?>" class="admin-bottom-nav-item <?= menu_active(array('arsip')) ?>">
+				<i class="fa-solid fa-box-archive"></i>
+				<span>Arsip</span>
+			</a>
+			<a href="<?= site_url('antrean/display') ?>" class="admin-bottom-nav-item <?= menu_active(array('antrean')) ?>">
+				<i class="fa-solid fa-tv"></i>
+				<span>Antrean</span>
+			</a>
+		<?php elseif ($user_role === 'kepala_sekolah'): ?>
+			<a href="<?= site_url('persetujuan-surat') ?>" class="admin-bottom-nav-item <?= menu_active(array('persetujuan-surat')) ?>">
+				<i class="fa-solid fa-signature"></i>
+				<span>Persetujuan</span>
+				<?php if ( ! empty($pending_approvals_count)): ?>
+					<span class="admin-bottom-nav-badge"><?= (int) $pending_approvals_count ?></span>
+				<?php endif; ?>
+			</a>
+			<a href="<?= site_url('disposisi') ?>" class="admin-bottom-nav-item <?= menu_active(array('disposisi')) ?>">
+				<i class="fa-solid fa-share-nodes"></i>
+				<span>Disposisi</span>
+			</a>
+			<a href="<?= site_url('surat-masuk') ?>" class="admin-bottom-nav-item <?= menu_active(array('surat-masuk')) ?>">
+				<i class="fa-solid fa-inbox"></i>
+				<span>Surat Masuk</span>
+				<?php if ( ! empty($pending_incoming_count)): ?>
+					<span class="admin-bottom-nav-badge"><?= (int) $pending_incoming_count ?></span>
+				<?php endif; ?>
+			</a>
+		<?php else: /* TU / Admin / Superuser */ ?>
+			<a href="<?= site_url('surat') ?>" class="admin-bottom-nav-item <?= menu_active(array('surat'), array('buat')) ?>">
+				<i class="fa-solid fa-envelopes-bulk"></i>
+				<span>Surat Keluar</span>
+			</a>
+			<a href="<?= site_url('surat-masuk') ?>" class="admin-bottom-nav-item <?= menu_active(array('surat-masuk')) ?>">
+				<i class="fa-solid fa-inbox"></i>
+				<span>Surat Masuk</span>
+				<?php if ( ! empty($pending_incoming_count)): ?>
+					<span class="admin-bottom-nav-badge"><?= (int) $pending_incoming_count ?></span>
+				<?php endif; ?>
+			</a>
+			<a href="<?= site_url('antrean/loket') ?>" class="admin-bottom-nav-item <?= menu_active(array('antrean')) ?>">
+				<i class="fa-solid fa-users-line"></i>
+				<span>Antrean TU</span>
+			</a>
+		<?php endif; ?>
+		<button type="button" class="admin-bottom-nav-item border-0 bg-transparent" data-sidebar-toggle aria-label="Buka Menu Lengkap">
+			<i class="fa-solid fa-bars"></i>
+			<span>Menu</span>
+		</button>
+	</div>
+</nav>
 
 <!-- Modal konfirmasi (dipakai oleh form ber-atribut data-confirm) -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">

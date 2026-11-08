@@ -50,7 +50,7 @@
 
 <div class="card">
 	<div class="card-body p-0">
-		<div class="table-responsive">
+		<div class="table-responsive d-none d-md-block">
 			<table class="table table-hover align-middle mb-0">
 				<thead class="table-light">
 					<tr>
@@ -121,6 +121,64 @@
 				<?php endforeach; endif; ?>
 				</tbody>
 			</table>
+		</div>
+
+		<!-- Tampilan Kartu Responsif Khusus Mobile (< 768px) -->
+		<div class="list-mobile d-md-none">
+		<?php if (empty($dispositions)): ?>
+			<div class="text-center py-4 text-muted">
+				<i class="fa-solid fa-clipboard-list fa-3x mb-3 text-secondary opacity-50 d-block"></i>
+				Belum ada lembar disposisi yang sesuai.
+			</div>
+		<?php else: foreach ($dispositions as $idx => $d):
+			$is_overdue = $d['deadline_date'] && strtotime($d['deadline_date']) < time() && $d['status'] !== 'selesai';
+		?>
+			<div class="list-mobile-item p-3">
+				<div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+					<div class="min-w-0">
+						<div class="fw-bold letter-number text-navy text-truncate"><?= e($d['disposition_number']) ?></div>
+						<small class="text-muted"><?= e(tgl_indo($d['disposition_date'])) ?></small>
+					</div>
+					<div class="text-end flex-shrink-0">
+						<?= disposition_status_badge($d['status'], $is_overdue) ?>
+						<div class="mt-1"><?= disposition_priority_badge($d['priority']) ?></div>
+					</div>
+				</div>
+
+				<div class="fw-semibold text-dark mb-1">
+					<i class="fa-solid fa-comment-dots text-warning me-1"></i> <?= e($d['instruction']) ?>
+				</div>
+
+				<?php if ($d['incoming_letter_id']): ?>
+					<div class="small text-muted mb-2">
+						<i class="fa-solid fa-link text-primary me-1"></i> Rujukan: <?= e($d['incoming_subject']) ?>
+						<div class="text-muted ms-3">Agenda: <?= e($d['agenda_number']) ?> &middot; <?= e($d['incoming_sender']) ?></div>
+					</div>
+				<?php endif; ?>
+
+				<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 text-muted small mb-3">
+					<div>
+						<?php if ($d['deadline_date']): ?>
+							<span class="<?= $is_overdue ? 'text-danger fw-bold' : '' ?>">
+								<i class="fa-regular fa-clock me-1"></i> Tenggat: <?= e(tgl_indo($d['deadline_date'])) ?>
+							</span>
+							<?php if ($is_overdue): ?>
+								<span class="badge text-bg-danger ms-1">Terlambat</span>
+							<?php endif; ?>
+						<?php endif; ?>
+					</div>
+					<div>
+						<span class="badge text-bg-light border"><?= (int) $d['completed_recipients'] ?>/<?= (int) $d['total_recipients'] ?> Selesai</span>
+					</div>
+				</div>
+
+				<div class="pt-2 border-top">
+					<a href="<?= site_url('disposisi/detail/'.$d['id']) ?>" class="btn btn-sm btn-outline-primary w-100">
+						<i class="fa-solid fa-eye me-1"></i> Buka Detail Disposisi
+					</a>
+				</div>
+			</div>
+		<?php endforeach; endif; ?>
 		</div>
 	</div>
 	<?php if ($pagination): ?>

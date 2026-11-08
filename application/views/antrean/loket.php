@@ -6,15 +6,15 @@
 			<h2 class="h4 fw-bold text-navy mb-1"><i class="fa-solid fa-users-line text-primary me-2"></i>Panel Pemanggil Antrean Tata Usaha</h2>
 			<p class="text-muted small mb-0">Kelola dan panggil nomor antrean siswa/tamu menuju loket pelayanan TU.</p>
 		</div>
-		<div class="d-flex align-items-center gap-2">
-			<a href="<?= site_url('antrean/display') ?>" target="_blank" class="btn btn-outline-primary btn-sm fw-bold">
-				<i class="fa-solid fa-tv me-1"></i> Buka Layar Display TV
+		<div class="d-flex flex-wrap align-items-center gap-2 w-100 w-sm-auto">
+			<a href="<?= site_url('antrean/display') ?>" target="_blank" class="btn btn-outline-primary btn-sm fw-bold flex-fill flex-sm-grow-0">
+				<i class="fa-solid fa-tv me-1"></i> <span class="d-none d-sm-inline">Buka Layar </span>Display TV
 			</a>
-			<a href="<?= site_url('antrean/kiosk') ?>" target="_blank" class="btn btn-outline-secondary btn-sm">
-				<i class="fa-solid fa-tablet-screen-button me-1"></i> Mesin Kiosk Tiket
+			<a href="<?= site_url('antrean/kiosk') ?>" target="_blank" class="btn btn-outline-secondary btn-sm flex-fill flex-sm-grow-0">
+				<i class="fa-solid fa-tablet-screen-button me-1"></i> <span class="d-none d-sm-inline">Mesin </span>Kiosk
 			</a>
-			<a href="<?= site_url('antrean/reset') ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('PERINGATAN: Seluruh tiket antrean hari ini akan direset kembali ke nomor awal (001). Lanjutkan?');">
-				<i class="fa-solid fa-rotate-left me-1"></i> Reset Hari Ini
+			<a href="<?= site_url('antrean/reset') ?>" class="btn btn-outline-danger btn-sm flex-fill flex-sm-grow-0" onclick="return confirm('PERINGATAN: Seluruh tiket antrean hari ini akan direset kembali ke nomor awal (001). Lanjutkan?');">
+				<i class="fa-solid fa-rotate-left me-1"></i> Reset
 			</a>
 		</div>
 	</div>
@@ -24,22 +24,22 @@
 <div class="card border-0 shadow-sm mb-4 bg-light">
 	<div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
 		<div class="d-flex align-items-center gap-3">
-			<div class="rounded-circle bg-white p-2 shadow-sm text-primary fs-4 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+			<div class="rounded-circle bg-white p-2 shadow-sm text-primary fs-4 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 45px; height: 45px;">
 				<i class="fa-solid fa-print"></i>
 			</div>
 			<div>
 				<h6 class="mb-0 fw-bold text-navy">Printer Thermal Kiosk (Rongta / POS-58 Bluetooth)</h6>
-				<small class="text-muted">Sambungkan sekali saja di sini agar mesin Kiosk siswa otomatis mencetak tanpa dialog &amp; tidak putus-putus.</small>
+				<small class="text-muted d-block">Sambungkan port bluetooth untuk cetak otomatis di Kiosk.</small>
 			</div>
 		</div>
-		<div class="d-flex align-items-center gap-2">
-			<span id="loketPrinterStatus" class="badge bg-secondary px-3 py-2 rounded-pill">
+		<div class="d-flex flex-wrap align-items-center gap-2 w-100 w-md-auto">
+			<span id="loketPrinterStatus" class="badge bg-secondary px-3 py-2 rounded-pill flex-fill flex-sm-grow-0 text-center">
 				<i class="fa-solid fa-circle-question me-1"></i> Belum Terhubung
 			</span>
-			<button type="button" id="btnLoketConnectPrinter" onclick="connectPrinterAdmin()" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+			<button type="button" id="btnLoketConnectPrinter" onclick="connectPrinterAdmin()" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm flex-fill flex-sm-grow-0">
 				<i class="fa-solid fa-link me-1"></i> Sambungkan Port Bluetooth
 			</button>
-			<button type="button" id="btnLoketTestPrint" onclick="testPrintAdmin()" class="btn btn-outline-success btn-sm rounded-pill px-3" style="display:none;">
+			<button type="button" id="btnLoketTestPrint" onclick="testPrintAdmin()" class="btn btn-outline-success btn-sm rounded-pill px-3 flex-fill flex-sm-grow-0" style="display:none;">
 				<i class="fa-solid fa-vial me-1"></i> Tes Print Tiket
 			</button>
 		</div>
@@ -50,10 +50,10 @@
 <div class="card border-0 shadow-sm mb-4">
 	<div class="card-body p-3">
 		<form method="GET" action="<?= site_url('antrean/loket') ?>" class="row g-2 align-items-center">
-			<div class="col-auto">
-				<label class="col-form-label fw-bold text-navy small"><i class="fa-solid fa-desktop me-1"></i> Loket Kerja Anda:</label>
+			<div class="col-12 col-md-auto">
+				<label class="col-form-label fw-bold text-navy small mb-0"><i class="fa-solid fa-desktop me-1"></i> Loket Kerja Anda:</label>
 			</div>
-			<div class="col-md-4 col-sm-6">
+			<div class="col-12 col-sm-6 col-md-4">
 				<select name="service_id" class="form-select form-select-sm fw-semibold" onchange="this.form.submit()">
 					<?php foreach ($services as $srv): ?>
 						<option value="<?= (int) $srv['id'] ?>" <?= $selected_id === (int) $srv['id'] ? 'selected' : '' ?>>
@@ -62,10 +62,10 @@
 					<?php endforeach; ?>
 				</select>
 			</div>
-			<div class="col-auto ms-auto d-flex gap-3 small text-muted">
-				<div>Total Tiket: <strong id="statTotal" class="text-dark"><?= (int) $stats['total'] ?></strong></div>
-				<div>Menunggu: <strong id="statWaiting" class="text-warning"><?= (int) $stats['waiting'] ?></strong></div>
-				<div>Selesai: <strong id="statCompleted" class="text-success"><?= (int) $stats['completed'] ?></strong></div>
+			<div class="col-12 col-sm-auto ms-sm-auto d-flex flex-wrap gap-2 gap-sm-3 small text-muted pt-1 pt-sm-0">
+				<span class="badge bg-light text-dark border">Total: <strong id="statTotal"><?= (int) $stats['total'] ?></strong></span>
+				<span class="badge bg-warning-subtle text-warning border border-warning-subtle">Menunggu: <strong id="statWaiting"><?= (int) $stats['waiting'] ?></strong></span>
+				<span class="badge bg-success-subtle text-success border border-success-subtle">Selesai: <strong id="statCompleted"><?= (int) $stats['completed'] ?></strong></span>
 			</div>
 		</form>
 	</div>
