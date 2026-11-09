@@ -61,16 +61,6 @@ $statuses = array(
 ?>
 <div class="row justify-content-center">
 	<div class="col-lg-8 col-xl-7">
-		<!-- Top Action Bar -->
-		<div class="d-flex align-items-center justify-content-between mb-3">
-			<a href="<?= site_url('permohonan') ?>" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-muted text-decoration-none">
-				<i class="fa-solid fa-arrow-left me-1"></i> Beranda
-			</a>
-			<span class="badge bg-secondary-subtle text-secondary border rounded-pill px-3 py-1">
-				<i class="fa-solid fa-magnifying-glass me-1"></i> Pelacakan Surat Masuk
-			</span>
-		</div>
-
 		<?php if ($is_new && $letter): ?>
 			<!-- Success Box (Saat baru berhasil mengirim) -->
 			<div class="card border-0 shadow-sm rounded-4 mb-3 text-center overflow-hidden" style="background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);">

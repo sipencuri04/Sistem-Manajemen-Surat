@@ -56,16 +56,6 @@ $badges = array(
 ?>
 <div class="row justify-content-center">
 	<div class="col-lg-8 col-xl-7">
-		<!-- Top Action Bar -->
-		<div class="d-flex align-items-center justify-content-between mb-3">
-			<a href="<?= site_url('permohonan') ?>" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-muted text-decoration-none">
-				<i class="fa-solid fa-arrow-left me-1"></i> Beranda
-			</a>
-			<span class="badge bg-secondary-subtle text-secondary border rounded-pill px-3 py-1">
-				<i class="fa-solid fa-magnifying-glass me-1"></i> Pelacakan Surat
-			</span>
-		</div>
-
 		<?php if ($is_new && $request): ?>
 			<!-- Success Alert Box (First Submission) -->
 			<div class="card border-0 shadow-sm rounded-4 mb-3 text-center overflow-hidden" style="background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%);">
