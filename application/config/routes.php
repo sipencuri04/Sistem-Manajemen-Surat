@@ -83,7 +83,7 @@ $route['surat-masuk/detail/(:num)']       = 'incoming_letters/detail/$1';
 $route['surat-masuk/edit/(:num)']         = 'incoming_letters/edit/$1';
 $route['surat-masuk/update/(:num)']       = 'incoming_letters/update/$1';
 $route['surat-masuk/hapus/(:num)']        = 'incoming_letters/delete/$1';
-$route['surat-masuk/teruskan/(:num)']     = 'incoming_letters/forward_to_kepsek/$1';
+$route['surat-masuk/teruskan/(:num)']     = 'incoming_letters/forward/$1';
 $route['surat-masuk/berkas/(:num)']       = 'incoming_letters/file/$1';
 
 // Disposisi & Delegasi

@@ -169,6 +169,11 @@ class Incoming_letters extends Admin_Controller
 		redirect('surat-masuk/detail/'.$letter['id']);
 	}
 
+	public function forward_to_kepsek($id = 0)
+	{
+		return $this->forward($id);
+	}
+
 	public function edit($id = 0)
 	{
 		$this->require_role(array('tu', 'superuser', 'admin'));
