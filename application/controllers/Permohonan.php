@@ -147,11 +147,11 @@ class Permohonan extends MY_Controller
 	/** Cek status permohonan dengan kode lacak. */
 	public function cek()
 	{
-		$code = (string) $this->input->get('kode', TRUE);
+		$code = trim((string) $this->input->get('kode', TRUE));
 		$request = $code !== '' ? $this->Letter_request_model->find_by_code($code) : NULL;
 		$this->public_view('public/status', array(
 			'page_title' => 'Cek Status Permohonan',
-			'code'       => strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $code), 0, 10)),
+			'code'       => strtoupper(substr(preg_replace('/[^A-Za-z0-9\-]/', '', $code), 0, 15)),
 			'request'    => $request,
 			'searched'   => $code !== '',
 			'is_new'     => $this->session->flashdata('new_request') === ($request ? $request['tracking_code'] : '#'),
@@ -164,7 +164,7 @@ class Permohonan extends MY_Controller
 	 */
 	public function dokumen($code = '', $mode = 'cetak')
 	{
-		$code = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string) $code));
+		$code = trim((string) $code);
 		$request = $this->Letter_request_model->find_by_code($code);
 		if ( ! $request OR ! in_array($request['status'], array('approved', 'taken'), TRUE) OR empty($request['letter_id']))
 		{

@@ -68,17 +68,28 @@ class Letter_request_model extends CI_Model
 
 	public function find_by_code($code)
 	{
-		$code = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string) $code));
-		if (strlen($code) !== 10)
+		$raw = strtoupper(trim((string) $code));
+		if ($raw === '')
 		{
 			return NULL;
 		}
+
+		$clean = preg_replace('/[^A-Za-z0-9]/', '', $raw);
+		if (strlen($clean) < 4 || strlen($clean) > 20)
+		{
+			return NULL;
+		}
+
 		return $this->db->select('r.id, r.tracking_code, r.requester_name, r.requester_email, r.status, r.admin_note, r.created_at,
 				r.processed_at, r.letter_id, t.name AS type_name, l.letter_number, l.signature_type, l.approval_status, l.stamp_type')
 			->from($this->table.' r')
 			->join('letter_types t', 't.id = r.letter_type_id', 'inner')
 			->join('letters l', 'l.id = r.letter_id', 'left')
-			->where('r.tracking_code', $code)
+			->group_start()
+				->where('r.tracking_code', $raw)
+				->or_where('r.tracking_code', $clean)
+				->or_where("REPLACE(r.tracking_code, '-', '') =", $clean)
+			->group_end()
 			->get()->row_array() ?: NULL;
 	}
 
