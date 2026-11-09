@@ -25,7 +25,7 @@
 			</div>
 			<div class="col-md-2 d-flex gap-2">
 				<button class="btn btn-navy flex-fill" type="submit">Cari</button>
-				<a class="btn btn-light" href="<?= site_url('surat') ?>" title="Reset"><i class="fa-solid fa-rotate-left"></i></a>
+				<a class="btn btn-light border" href="<?= site_url('surat') ?>" title="Reset"><i class="fa-solid fa-rotate-left"></i></a>
 			</div>
 		</form>
 	</div>

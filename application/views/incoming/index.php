@@ -9,9 +9,9 @@
 	<?php endif; ?>
 </div>
 
-<div class="row g-2 mb-3">
+<div class="row g-3 mb-3">
 	<div class="col-6 col-md-3">
-		<div class="stat-card">
+		<div class="card stat-card shadow-sm h-100">
 			<div class="stat-icon bg-primary-subtle text-primary"><i class="fa-solid fa-inbox"></i></div>
 			<div>
 				<div class="stat-label">Total Surat Masuk</div>
@@ -20,7 +20,7 @@
 		</div>
 	</div>
 	<div class="col-6 col-md-3">
-		<div class="stat-card">
+		<div class="card stat-card shadow-sm h-100">
 			<div class="stat-icon bg-warning-subtle text-warning"><i class="fa-solid fa-envelope"></i></div>
 			<div>
 				<div class="stat-label">Baru / Terusan</div>
@@ -29,7 +29,7 @@
 		</div>
 	</div>
 	<div class="col-6 col-md-3">
-		<div class="stat-card">
+		<div class="card stat-card shadow-sm h-100">
 			<div class="stat-icon bg-info-subtle text-info"><i class="fa-solid fa-share-nodes"></i></div>
 			<div>
 				<div class="stat-label">Sudah Didisposisi</div>
@@ -38,7 +38,7 @@
 		</div>
 	</div>
 	<div class="col-6 col-md-3">
-		<div class="stat-card">
+		<div class="card stat-card shadow-sm h-100">
 			<div class="stat-icon bg-success-subtle text-success"><i class="fa-solid fa-check-double"></i></div>
 			<div>
 				<div class="stat-label">Selesai Tindak Lanjut</div>
@@ -196,11 +196,11 @@
 					<?php endif; ?>
 				</div>
 
-				<div class="d-flex flex-wrap gap-2 text-muted small mb-3">
-					<div><i class="fa-regular fa-calendar-check me-1"></i>Terima: <?= e(tgl_indo($l['received_date'])) ?></div>
-					<div>&middot; <i class="fa-regular fa-calendar me-1"></i>Surat: <?= e(tgl_indo($l['letter_date'])) ?></div>
+				<div class="d-flex flex-wrap align-items-center column-gap-3 row-gap-1 text-muted small mb-3">
+					<span class="d-inline-flex align-items-center"><i class="fa-regular fa-calendar-check me-1"></i>Terima: <?= e(tgl_indo($l['received_date'])) ?></span>
+					<span class="d-inline-flex align-items-center"><i class="fa-regular fa-calendar me-1"></i>Surat: <?= e(tgl_indo($l['letter_date'])) ?></span>
 					<?php if ($l['disposition_count'] > 0): ?>
-						<div>&middot; <span class="badge text-bg-info text-white"><i class="fa-solid fa-share-nodes me-1"></i><?= (int) $l['disposition_count'] ?> Disposisi</span></div>
+						<span class="badge text-bg-info text-white"><i class="fa-solid fa-share-nodes me-1"></i><?= (int) $l['disposition_count'] ?> Disposisi</span>
 					<?php endif; ?>
 				</div>
 

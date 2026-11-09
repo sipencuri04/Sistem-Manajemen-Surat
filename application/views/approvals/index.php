@@ -16,7 +16,7 @@
 		</h2>
 	</div>
 	<div class="card-body p-0">
-		<div class="table-responsive">
+		<div class="table-responsive d-none d-md-block">
 			<table class="table table-hover align-middle mb-0">
 				<thead class="table-light">
 					<tr>
@@ -135,6 +135,54 @@
 				</tbody>
 			</table>
 		</div>
+
+		<!-- Tampilan Kartu Responsif Khusus Mobile (< 768px) -->
+		<div class="list-mobile d-md-none">
+		<?php if (empty($letters)): ?>
+			<div class="text-center py-4 text-muted">
+				<i class="fa-solid fa-circle-check fa-3x text-success opacity-50 mb-2 d-block"></i>
+				Tidak ada surat yang sedang menunggu persetujuan.
+			</div>
+		<?php else: foreach ($letters as $l): ?>
+			<div class="list-mobile-item p-3">
+				<div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+					<div class="min-w-0">
+						<div class="fw-bold letter-number text-navy text-truncate"><?= e($l['letter_number']) ?></div>
+						<small class="text-muted"><?= e($l['type_name']) ?></small>
+					</div>
+					<div class="text-end flex-shrink-0">
+						<?php if (isset($l['signature_type']) && $l['signature_type'] === 'basah'): ?>
+							<span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:0.68rem;" title="TTD Basah"><i class="fa-solid fa-pen-nib me-1"></i>TTD Basah</span>
+						<?php else: ?>
+							<span class="badge bg-info-subtle text-info border border-info-subtle" style="font-size:0.68rem;" title="TTD Digital"><i class="fa-solid fa-qrcode me-1"></i>TTD Digital</span>
+						<?php endif; ?>
+					</div>
+				</div>
+
+				<div class="fw-semibold text-dark mb-2"><?= e($l['subject']) ?></div>
+
+				<div class="d-flex flex-wrap align-items-center column-gap-3 row-gap-1 text-muted small mb-3">
+					<span class="d-inline-flex align-items-center"><i class="fa-regular fa-calendar me-1"></i><?= e(tgl_indo($l['letter_date'])) ?></span>
+					<?php if ($l['recipient']): ?>
+						<span class="d-inline-flex align-items-center"><i class="fa-solid fa-paper-plane me-1"></i><?= e($l['recipient']) ?></span>
+					<?php endif; ?>
+					<span class="d-inline-flex align-items-center"><i class="fa-solid fa-user-pen me-1"></i>Oleh: <?= e($l['created_by_name'] ?: 'TU') ?></span>
+				</div>
+
+				<div class="d-flex align-items-center gap-2 pt-2 border-top">
+					<a href="<?= site_url('surat/pdf/'.$l['id'].'/lihat') ?>" target="_blank" class="btn btn-sm btn-outline-primary" title="Pratinjau PDF">
+						<i class="fa-solid fa-eye me-1"></i> Pratinjau
+					</a>
+					<button type="button" class="btn btn-sm btn-success flex-fill fw-semibold" data-bs-toggle="modal" data-bs-target="#approveModal_<?= $l['id'] ?>" title="Setujui & Tanda Tangani Surat">
+						<i class="fa-solid fa-signature me-1"></i> Tanda Tangani
+					</button>
+					<button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectModal_<?= $l['id'] ?>" title="Tolak / Revisi">
+						<i class="fa-solid fa-ban"></i>
+					</button>
+				</div>
+			</div>
+		<?php endforeach; endif; ?>
+		</div>
 	</div>
 </div>
 
@@ -144,7 +192,7 @@
 		<h2 class="h6 card-title mb-0 text-navy"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Riwayat Persetujuan Terakhir</h2>
 	</div>
 	<div class="card-body p-0">
-		<div class="table-responsive">
+		<div class="table-responsive d-none d-md-block">
 			<table class="table table-hover align-middle mb-0 small">
 				<thead class="table-light">
 					<tr>
@@ -175,6 +223,31 @@
 				<?php endforeach; endif; ?>
 				</tbody>
 			</table>
+		</div>
+
+		<!-- Tampilan Kartu Riwayat Khusus Mobile (< 768px) -->
+		<div class="list-mobile d-md-none">
+		<?php if (empty($history)): ?>
+			<div class="text-center py-3 text-muted small">Belum ada riwayat persetujuan.</div>
+		<?php else: foreach ($history as $h): ?>
+			<div class="list-mobile-item p-3">
+				<div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+					<a href="<?= site_url('surat/detail/'.$h['id']) ?>" class="fw-bold letter-number text-navy text-truncate"><?= e($h['letter_number']) ?></a>
+					<div class="text-end flex-shrink-0">
+						<?php if ($h['approval_status'] === 'disetujui'): ?>
+							<span class="badge text-bg-success"><i class="fa-solid fa-check me-1"></i>Disetujui</span>
+						<?php else: ?>
+							<span class="badge text-bg-danger"><i class="fa-solid fa-xmark me-1"></i>Ditolak</span>
+						<?php endif; ?>
+					</div>
+				</div>
+				<div class="small fw-semibold text-dark mb-1"><?= e($h['subject']) ?></div>
+				<div class="small text-muted mb-1"><i class="fa-regular fa-clock me-1"></i>Diproses: <?= $h['approved_at'] ? e(tgl_indo($h['approved_at'])) : '-' ?></div>
+				<?php if ($h['rejection_reason']): ?>
+					<div class="small text-danger bg-danger-subtle p-2 rounded mt-1">Alasan: <?= e($h['rejection_reason']) ?></div>
+				<?php endif; ?>
+			</div>
+		<?php endforeach; endif; ?>
 		</div>
 	</div>
 </div>

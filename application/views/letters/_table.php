@@ -59,31 +59,33 @@
 		<div class="list-mobile-item p-3">
 			<div class="d-flex justify-content-between align-items-start gap-2 mb-2">
 				<div class="min-w-0">
-					<div class="letter-number fw-bold text-navy text-truncate"><?= e($r['letter_number']) ?></div>
-					<div class="small text-muted mt-1">
-						<span class="badge text-bg-light border me-1"><?= e($r['type_code']) ?></span>
-						<span><?= e($r['type_name']) ?></span>
+					<div class="d-flex align-items-center gap-1.5 flex-wrap">
+						<span class="badge text-bg-light border fw-semibold" title="<?= e($r['type_name']) ?>"><?= e($r['type_code']) ?></span>
+						<span class="letter-number fw-bold text-navy text-truncate"><?= e($r['letter_number']) ?></span>
 					</div>
 				</div>
-				<div class="text-end flex-shrink-0">
+				<div class="text-end flex-shrink-0 d-flex flex-column align-items-end gap-1">
 					<?= status_badge($r['status']) ?>
 					<?php if (isset($r['signature_type']) && $r['signature_type'] === 'basah'): ?>
-						<span class="badge bg-warning-subtle text-warning border border-warning-subtle d-block mt-1" style="font-size:0.68rem;"><i class="fa-solid fa-pen-nib"></i> Basah</span>
+						<span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:0.68rem;" title="Tanda Tangan Basah"><i class="fa-solid fa-pen-nib"></i> Basah</span>
 					<?php elseif (isset($r['approval_status']) && $r['approval_status'] === 'disetujui'): ?>
-						<span class="badge bg-primary-subtle text-primary border border-primary-subtle d-block mt-1" style="font-size:0.68rem;"><i class="fa-solid fa-signature"></i> e-Sign</span>
+						<span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size:0.68rem;" title="Disetujui Kepsek (e-Sign Digital)"><i class="fa-solid fa-signature"></i> e-Sign</span>
+					<?php endif; ?>
+					<?php if (isset($r['approval_status']) && $r['approval_status'] === 'disetujui' && isset($r['stamp_type']) && $r['stamp_type'] === 'digital' && ! empty($r['stamped_at'])): ?>
+						<span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size:0.68rem;" title="Stempel Digital TU"><i class="fa-solid fa-stamp"></i> Stempel</span>
 					<?php endif; ?>
 				</div>
 			</div>
 
 			<div class="fw-semibold text-dark mb-2"><?= e($r['subject']) ?></div>
 
-			<div class="d-flex flex-wrap gap-2 text-muted small mb-3">
-				<div><i class="fa-regular fa-calendar me-1"></i><?= e(tgl_indo($r['letter_date'])) ?></div>
+			<div class="d-flex flex-wrap align-items-center column-gap-3 row-gap-1 text-muted small mb-3">
+				<span class="d-inline-flex align-items-center"><i class="fa-regular fa-calendar me-1"></i><?= e(tgl_indo($r['letter_date'])) ?></span>
 				<?php if ($r['recipient'] !== NULL && $r['recipient'] !== ''): ?>
-					<div>&middot; <i class="fa-solid fa-paper-plane me-1"></i><?= e($r['recipient']) ?></div>
+					<span class="d-inline-flex align-items-center"><i class="fa-solid fa-paper-plane me-1"></i><?= e($r['recipient']) ?></span>
 				<?php endif; ?>
 				<?php if ((int) $r['pdf_count'] > 0): ?>
-					<div>&middot; <span class="text-danger fw-semibold"><i class="fa-solid fa-file-pdf me-1"></i>PDF Tersedia</span></div>
+					<span class="d-inline-flex align-items-center text-danger fw-semibold"><i class="fa-solid fa-file-pdf me-1"></i>PDF Tersedia</span>
 				<?php endif; ?>
 			</div>
 
@@ -100,7 +102,7 @@
 					<i class="fa-solid fa-download me-1"></i> PDF
 				</a>
 				<?php if ( ! is_pegawai()): ?>
-					<?= form_open('surat/hapus/'.(int) $r['id'], array('class' => 'd-inline', 'data-confirm' => 'Hapus surat nomor '.$r['letter_number'].'? Data dan file PDF arsipnya akan dihapus permanen.')) ?>
+					<?= form_open('surat/hapus/'.(int) $r['id'], array('class' => 'd-inline m-0', 'data-confirm' => 'Hapus surat nomor '.$r['letter_number'].'? Data dan file PDF arsipnya akan dihapus permanen.')) ?>
 						<input type="hidden" name="back" value="<?= e($back) ?>">
 						<button type="submit" class="btn btn-sm btn-light border text-danger" title="Hapus"><i class="fa-solid fa-trash"></i></button>
 					<?= form_close() ?>
