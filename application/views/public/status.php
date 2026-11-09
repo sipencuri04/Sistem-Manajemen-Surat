@@ -10,10 +10,11 @@ $mask = function ($name) {
 	return implode(' ', $out);
 };
 $badges = array(
-	'pending'  => array('warning', 'fa-hourglass-half', 'Menunggu Pemeriksaan', 'Permohonan sudah diterima dan menunggu diperiksa petugas TU.'),
-	'approved' => array('success', 'fa-circle-check', 'Siap Dicetak / Diambil', 'Surat sudah diterbitkan. Anda dapat mencetak/mengunduh dokumen langsung di bawah ini atau mengambilnya di ruang TU.'),
-	'taken'    => array('secondary', 'fa-box-archive', 'Sudah Diambil', 'Surat sudah diserahkan / diambil.'),
-	'rejected' => array('danger', 'fa-circle-xmark', 'Ditolak', 'Permohonan tidak dapat diproses. Lihat keterangan dari TU di bawah.'),
+	'pending'   => array('warning', 'fa-hourglass-half', 'Menunggu Pemeriksaan', 'Permohonan sudah diterima dan menunggu diverifikasi oleh petugas Tata Usaha.'),
+	'processed' => array('info', 'fa-arrows-rotate', 'Sedang Diproses', 'Surat sedang dibuat oleh Tata Usaha, proses penandatanganan Kepala Sekolah, dan pembubuhan stempel resmi.'),
+	'approved'  => array('success', 'fa-circle-check', 'Siap Dicetak / Diambil', 'Surat resmi telah disahkan oleh Kepala Sekolah dan distempel Tata Usaha. Dokumen siap diambil di ruang TU atau diunduh.'),
+	'taken'     => array('secondary', 'fa-box-archive', 'Sudah Diambil', 'Fisik surat resmi sudah diserahkan / diambil pemohon di ruang Tata Usaha.'),
+	'rejected'  => array('danger', 'fa-circle-xmark', 'Ditolak', 'Permohonan tidak dapat diproses. Lihat keterangan dari petugas TU di bawah.'),
 );
 ?>
 <div class="row justify-content-center">
@@ -178,6 +179,29 @@ $badges = array(
 									</a>
 								</div>
 							<?php endif; ?>
+						</div>
+					<?php elseif ($request['status'] === 'processed'): ?>
+						<div class="mt-4 pt-3 border-top text-center">
+							<div class="alert alert-info border-0 rounded-4 text-start p-3 mb-0 small">
+								<div class="d-flex gap-2">
+									<i class="fa-solid fa-circle-info fs-5 text-info mt-1 flex-shrink-0"></i>
+									<div>
+										<div class="fw-bold text-dark">Tahap Pemrosesan Dokumen Surat</div>
+										<div class="text-muted mt-1">
+											<?php if (empty($request['approval_status']) || $request['approval_status'] === 'menunggu_persetujuan'): ?>
+												Surat permohonan telah dibuat drafnya dan saat ini sedang menunggu persetujuan / tanda tangan Kepala Sekolah.
+											<?php elseif ($request['approval_status'] === 'disetujui' && (empty($request['stamp_type']) || $request['stamp_type'] === 'belum_stempel')): ?>
+												Surat telah ditandatangani Kepala Sekolah dan sedang dalam proses pembubuhan cap stempel resmi oleh Tata Usaha.
+											<?php else: ?>
+												Surat sedang dalam proses penyelesaian administrasi dan legalisasi sekolah.
+											<?php endif; ?>
+										</div>
+										<div class="mt-2 text-primary fw-semibold">
+											<i class="fa-solid fa-arrows-rotate me-1"></i> Halaman unduh/cetak akan otomatis aktif setelah surat selesai disahkan &amp; distempel. Silakan cek berkala.
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					<?php endif; ?>
 				</div>

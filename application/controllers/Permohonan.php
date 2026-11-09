@@ -168,7 +168,7 @@ class Permohonan extends MY_Controller
 		$request = $this->Letter_request_model->find_by_code($code);
 		if ( ! $request OR ! in_array($request['status'], array('approved', 'taken'), TRUE) OR empty($request['letter_id']))
 		{
-			show_error('Dokumen surat belum tersedia untuk diunduh/dicetak atau permohonan belum selesai diproses.', 404, 'Dokumen Belum Tersedia');
+			show_error('Dokumen surat belum tersedia untuk diunduh/dicetak karena permohonan masih dalam proses administrasi atau legalisasi.', 403, 'Dokumen Belum Tersedia');
 		}
 
 		$this->load->model('Letter_model');
@@ -176,6 +176,11 @@ class Permohonan extends MY_Controller
 		if ( ! $letter)
 		{
 			show_error('Data surat tidak ditemukan.', 404, 'Surat Tidak Ditemukan');
+		}
+
+		if (isset($letter['approval_status']) && $letter['approval_status'] !== 'disetujui')
+		{
+			show_error('Surat masih menunggu persetujuan dan tanda tangan Kepala Sekolah.', 403, 'Surat Belum Disahkan');
 		}
 
 		$type = $this->Letter_type_model->find_with_template((int) $letter['letter_type_id']);

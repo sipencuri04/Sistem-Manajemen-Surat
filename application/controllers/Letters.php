@@ -195,14 +195,22 @@ class Letters extends Admin_Controller
 		}
 		if ($req)
 		{
+			$is_fully_ready = ($row['approval_status'] === 'disetujui' && ! empty($row['stamp_type']) && $row['stamp_type'] !== 'belum_stempel');
+			$req_status = $is_fully_ready ? 'approved' : 'processed';
+			$admin_note = $is_fully_ready
+				? 'Surat sudah selesai disahkan & distempel. Silakan ambil fisik surat di ruang TU pada jam kerja.'
+				: ($row['approval_status'] === 'disetujui'
+					? 'Surat telah ditandatangani Kepala Sekolah (No. '.$letter['letter_number'].'), sedang menunggu pembubuhan stempel resmi TU.'
+					: 'Surat telah dibuat oleh TU (No. '.$letter['letter_number'].'), sedang menunggu tanda tangan Kepala Sekolah.');
+
 			$this->Letter_request_model->update($req['id'], array(
-				'status'       => 'approved',
+				'status'       => $req_status,
 				'letter_id'    => $id,
-				'admin_note'   => 'Surat sudah terbit. Silakan ambil di ruang TU pada jam kerja dengan menyebutkan kode permohonan.',
+				'admin_note'   => $admin_note,
 				'processed_by' => (int) $this->current_user['id'],
 				'processed_at' => date('Y-m-d H:i:s'),
 			));
-			$msg .= ' Permohonan '.$req['tracking_code'].' kini berstatus Siap Diambil.';
+			$msg .= ' Permohonan '.$req['tracking_code'].' kini berstatus '.Letter_request_model::$statuses[$req_status].'.';
 		}
 
 		if ($row['approval_status'] === 'menunggu_persetujuan')
@@ -764,6 +772,29 @@ class Letters extends Admin_Controller
 		{
 			$updated_letter = $this->Letter_model->find($letter['id']);
 			$this->archive_pdf($updated_letter);
+		}
+
+		// Sinkronisasi status permohonan siswa jika surat ini berasal dari permohonan siswa
+		$this->load->model('Letter_request_model');
+		$linked_req = $this->db->get_where('letter_requests', array('letter_id' => $letter['id']))->row_array();
+		if ($linked_req)
+		{
+			if ($new_stamp !== 'belum_stempel')
+			{
+				$this->Letter_request_model->update($linked_req['id'], array(
+					'status'     => 'approved',
+					'admin_note' => 'Surat sudah selesai disahkan Kepala Sekolah & distempel resmi TU. Silakan ambil fisik surat di ruang TU pada jam kerja atau unduh salinan resminya.',
+				));
+				$msg .= ' Status permohonan siswa ('.$linked_req['tracking_code'].') kini Siap Diambil.';
+			}
+			else
+			{
+				$this->Letter_request_model->update($linked_req['id'], array(
+					'status'     => 'processed',
+					'admin_note' => 'Surat telah ditandatangani Kepala Sekolah, menunggu pembubuhan stempel Tata Usaha.',
+				));
+				$msg .= ' Status permohonan siswa ('.$linked_req['tracking_code'].') dikembalikan ke Sedang Diproses.';
+			}
 		}
 
 		audit_log('LETTER_STAMP', 'letters', $letter['id'], 'TU memperbarui stempel (' . $new_stamp . ') pada surat ' . $letter['letter_number']);

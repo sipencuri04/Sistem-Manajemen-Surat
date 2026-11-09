@@ -503,7 +503,6 @@ details[open]{box-shadow:var(--shadow)}
       <tr><td><span class="tag publik">Siswa &amp; tamu</span></td><td>Tidak</td><td>Mengajukan surat keterangan, mengambil tiket antrean, mengirim surat dinas, memeriksa keaslian surat.</td><td><a href="#verifikasi">Bab 7</a> <a href="#siswa">Bab 11</a> <a href="#instansi">Bab 12</a> <a href="#antrean">Bab 13</a></td></tr>
     </tbody>
   </table></div>
-  <p class="prose" style="margin-top:.75em; font-size:.92em;">💡 Rincian username dan password siap pakai untuk setiap peran dapat dilihat langsung pada tabel akun di <a href="#masuk-daftar-akun">Bab 2 (Daftar Akun Database)</a>.</p>
 
   <h3 id="mulai-baca">Cara membaca buku ini</h3>
   <dl class="legend prose">
@@ -538,6 +537,108 @@ details[open]{box-shadow:var(--shadow)}
   </ol>
   <aside class="note warn"><svg aria-hidden="true"><use href="#i-warn"/></svg><div><strong class="t">Akun terkunci 10 menit</strong>Setelah 5 kali salah memasukkan password, akun dikunci sementara selama 10 menit. Tunggu sampai kunci terbuka, lalu coba lagi dengan password yang benar.</div></aside>
   <aside class="note"><svg aria-hidden="true"><use href="#i-info"/></svg><div><strong class="t">Password bawaan</strong>Jika Anda masih memakai password bawaan, Dashboard dan halaman akun menampilkan peringatan <em>Anda masih memakai password bawaan</em>. Ganti segera lewat <span class="path"><b>Pengaturan Akun</b></span> (lihat <a href="#akun">Bab 4</a>).</div></aside>
+
+  <h3 id="masuk-daftar-akun">Daftar Akun Pengguna di Database (Siap Pakai)</h3>
+  <p class="prose">Untuk mempermudah penggunaan, pelatihan, serta pengujian sistem, berikut adalah daftar akun pengguna yang telah terkonfigurasi di dalam database beserta peran dan kata sandi awalnya:</p>
+
+  <div class="tablewrap"><table>
+    <caption>1. Akun Standar / Demo Bawaan Database</caption>
+    <thead>
+      <tr>
+        <th>Peran (Role)</th>
+        <th>Nama Pengguna</th>
+        <th>Username</th>
+        <th>Password Awal</th>
+        <th>Hak Akses &amp; Wewenang Utama</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tag kepsek">Kepala Sekolah</span></td>
+        <td>Drs. H. Ahmad Dahlan, M.Pd</td>
+        <td><code>kepsek</code></td>
+        <td><code>kepsek123</code></td>
+        <td>Persetujuan draf surat keluar (e-Sign/Acc/Tolak), disposisi surat masuk ke guru.</td>
+      </tr>
+      <tr>
+        <td><span class="tag tu">Tata Usaha</span></td>
+        <td>Siti Rahmawati, S.AP</td>
+        <td><code>tu</code></td>
+        <td><code>tu123</code></td>
+        <td>Pembuatan draf surat keluar, pembubuhan cap stempel resmi TU, pemrosesan permohonan siswa, pencatatan surat masuk, dan loket antrean.</td>
+      </tr>
+      <tr>
+        <td><span class="tag pegawai">Guru / Pegawai 1</span></td>
+        <td>Bambang Wijaya, S.Pd</td>
+        <td><code>pegawai1</code></td>
+        <td><code>pegawai123</code></td>
+        <td>Menerima lembar disposisi instruksi pimpinan, lapor progres tindak lanjut tugas, unggah bukti, dan melihat arsip surat dinas.</td>
+      </tr>
+      <tr>
+        <td><span class="tag pegawai">Guru / Pegawai 2</span></td>
+        <td>Dewi Lestari, S.Kom</td>
+        <td><code>pegawai2</code></td>
+        <td><code>pegawai123</code></td>
+        <td>Menerima lembar disposisi instruksi pimpinan, lapor progres tindak lanjut tugas, unggah bukti, dan melihat arsip surat dinas.</td>
+      </tr>
+      <tr>
+        <td><span class="tag super">Superuser / TI</span></td>
+        <td>Superuser Sistem / IT</td>
+        <td><code>superuser</code></td>
+        <td><code>superuser123</code></td>
+        <td>Kelola akun pengguna, backup database, audit log aktivitas sistem, dan konfigurasi profil/kop sekolah.</td>
+      </tr>
+      <tr>
+        <td><span class="tag super">Administrator</span></td>
+        <td>Administrator Sistem</td>
+        <td><code>admin</code></td>
+        <td><code>admin</code></td>
+        <td>Akun administrator utama sistem (wewenang penuh setara Superuser).</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <div class="tablewrap" style="margin-top: 1.5em;"><table>
+    <caption>2. Akun Khusus Pengujian Terpadu (Testing Suite)</caption>
+    <thead>
+      <tr>
+        <th>Peran (Role)</th>
+        <th>Nama Lengkap Akun Penguji</th>
+        <th>Username</th>
+        <th>Password Pengujian</th>
+        <th>Keterangan Simulasi Kontak</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tag kepsek">Kepala Sekolah</span></td>
+        <td>Drs. H. Mulyadi Pratama, M.Pd</td>
+        <td><code>test_kepsek</code></td>
+        <td><code>testing123</code></td>
+        <td rowspan="4" style="vertical-align: middle;">Seluruh akun pengujian ini disiapkan khusus dengan nomor WhatsApp dan Email terpadu untuk pengujian simulasi notifikasi otomatis.</td>
+      </tr>
+      <tr>
+        <td><span class="tag tu">Tata Usaha</span></td>
+        <td>Noxa Anindya, S.AP</td>
+        <td><code>test_tu</code></td>
+        <td><code>testing123</code></td>
+      </tr>
+      <tr>
+        <td><span class="tag pegawai">Guru / Pegawai</span></td>
+        <td>Premia Bagus Saputra, S.Kom</td>
+        <td><code>test_pegawai</code></td>
+        <td><code>testing123</code></td>
+      </tr>
+      <tr>
+        <td><span class="tag super">Superuser</span></td>
+        <td>Administrator Penguji Sistem</td>
+        <td><code>test_admin</code></td>
+        <td><code>testing123</code></td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <aside class="note tip"><svg aria-hidden="true"><use href="#i-tip"/></svg><div><strong class="t">Layanan Publik (Tanpa Login)</strong>Untuk <strong>Siswa / Wali Murid</strong> (pengajuan permohonan surat keterangan mandiri &amp; mesin antrean fisik Kiosk) dan <strong>Instansi Luar</strong> (pengiriman berkas surat dinas resmi ke TU), dapat diakses langsung melalui laman publik tanpa perlu membuat akun login.</div></aside>
 
   <h3 id="masuk-daftar-akun">Daftar Akun Pengguna di Database (Siap Pakai)</h3>
   <p class="prose">Untuk mempermudah penggunaan, pelatihan, serta pengujian sistem, berikut adalah daftar akun pengguna yang telah terkonfigurasi di dalam database beserta peran dan kata sandi awalnya:</p>

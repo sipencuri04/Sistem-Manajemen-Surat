@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 $labels = Letter_request_model::$statuses;
-$colors = array('pending' => 'warning', 'approved' => 'success', 'taken' => 'secondary', 'rejected' => 'danger');
+$colors = array('pending' => 'warning', 'processed' => 'info', 'approved' => 'success', 'taken' => 'secondary', 'rejected' => 'danger');
 $id = (int) $req['id'];
 ?>
 <nav aria-label="breadcrumb">
@@ -28,6 +28,34 @@ $id = (int) $req['id'];
 		<?= form_close() ?>
 	<?php endif; ?>
 </div>
+
+<?php if ($req['status'] === 'processed'): ?>
+	<div class="alert alert-info border d-flex align-items-center gap-3 mb-3">
+		<div class="fs-3 text-info"><i class="fa-solid fa-hourglass-start"></i></div>
+		<div>
+			<div class="fw-bold">Surat Keluar Sedang Diproses</div>
+			<div class="small">
+				<?php if (empty($req['approval_status']) || $req['approval_status'] === 'menunggu_persetujuan'): ?>
+					Surat telah dibuat (<strong><?= e($req['letter_number'] ?: 'Draft') ?></strong>) dan saat ini <strong>menunggu tanda tangan Kepala Sekolah</strong> di menu Persetujuan Surat.
+				<?php elseif ($req['approval_status'] === 'disetujui' && (empty($req['stamp_type']) || $req['stamp_type'] === 'belum_stempel')): ?>
+					Surat telah disetujui Kepala Sekolah. Petugas TU silakan <a href="<?= site_url('surat/detail/'.(int) $req['letter_id']) ?>" class="fw-bold text-decoration-underline text-info-emphasis">membubuhkan stempel resmi</a> pada surat agar status otomatis menjadi <strong>Siap Diambil</strong>.
+				<?php else: ?>
+					Surat sedang dalam proses penyelesaian administrasi dan legalisasi.
+				<?php endif; ?>
+			</div>
+		</div>
+	</div>
+<?php elseif ($req['status'] === 'approved'): ?>
+	<div class="alert alert-success border d-flex align-items-center gap-3 mb-3">
+		<div class="fs-3 text-success"><i class="fa-solid fa-circle-check"></i></div>
+		<div>
+			<div class="fw-bold">Surat Resmi Selesai (Siap Diambil / Diunduh)</div>
+			<div class="small">
+				Surat telah ditandatangani Kepala Sekolah dan telah distempel oleh TU. Klik tombol <strong>Tandai Sudah Diambil</strong> di atas setelah fisik surat diserahkan ke pemohon.
+			</div>
+		</div>
+	</div>
+<?php endif; ?>
 
 <div class="row g-3">
 	<div class="col-lg-7">
@@ -68,6 +96,8 @@ $id = (int) $req['id'];
 								$msg_wa_to_siswa = "Halo *" . $req['requester_name'] . "*,\nPermohonan surat *" . $req['type_name'] . "* Anda di " . $school['school_name'] . " telah *SELESAI DIPROSES* dengan Nomor Surat: *" . $req['letter_number'] . "*.\nSilakan unduh dokumen atau ambil fisik surat di ruang Tata Usaha dengan menyebutkan Kode: *" . $req['tracking_code'] . "*.\nTerima kasih.";
 							} elseif ($req['status'] === 'rejected') {
 								$msg_wa_to_siswa = "Halo *" . $req['requester_name'] . "*,\nPermohonan surat *" . $req['type_name'] . "* Anda di " . $school['school_name'] . " (Kode: *" . $req['tracking_code'] . "*) belum dapat diproses karena:\n\"" . $req['admin_note'] . "\"\nSilakan hubungi ruang Tata Usaha untuk informasi lebih lanjut.";
+							} elseif ($req['status'] === 'processed') {
+								$msg_wa_to_siswa = "Halo *" . $req['requester_name'] . "*,\nPermohonan surat *" . $req['type_name'] . "* Anda (Kode: *" . $req['tracking_code'] . "*) saat ini sedang dalam proses penandatanganan Kepala Sekolah & stempel resmi di " . $school['school_name'] . ". Kami akan menginformasikan jika surat sudah siap diambil.";
 							} else {
 								$msg_wa_to_siswa = "Halo *" . $req['requester_name'] . "*,\nPermohonan surat *" . $req['type_name'] . "* Anda dengan Kode: *" . $req['tracking_code'] . "* sedang diperiksa oleh petugas Tata Usaha " . $school['school_name'] . ".";
 							}

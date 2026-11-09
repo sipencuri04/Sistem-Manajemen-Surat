@@ -66,6 +66,28 @@ class Approvals extends Admin_Controller
 		// Buat PDF arsip
 		$this->archive_approved_pdf($updated_letter);
 
+		// Sinkronisasi status permohonan siswa jika surat ini berasal dari permohonan siswa
+		$this->load->model('Letter_request_model');
+		$linked_req = $this->db->get_where('letter_requests', array('letter_id' => $letter['id']))->row_array();
+		if ($linked_req)
+		{
+			$sig_note_label = $sig_type === 'digital' ? 'Tanda Tangan Digital' : 'Tanda Tangan Basah';
+			if ( ! empty($updated_letter['stamp_type']) && $updated_letter['stamp_type'] !== 'belum_stempel')
+			{
+				$this->Letter_request_model->update($linked_req['id'], array(
+					'status'     => 'approved',
+					'admin_note' => 'Surat telah disahkan Kepala Sekolah ('.$sig_note_label.') dan telah distempel TU. Silakan ambil fisik surat di ruang TU atau unduh dokumen.',
+				));
+			}
+			else
+			{
+				$this->Letter_request_model->update($linked_req['id'], array(
+					'status'     => 'processed',
+					'admin_note' => 'Surat telah disahkan Kepala Sekolah ('.$sig_note_label.'). Menunggu pembubuhan stempel resmi oleh Tata Usaha.',
+				));
+			}
+		}
+
 		// Notifikasi ke pembuat surat (TU)
 		if ($letter['created_by'])
 		{
@@ -120,6 +142,17 @@ class Approvals extends Admin_Controller
 				site_url('surat/detail/'.$letter['id']),
 				'warning'
 			);
+		}
+
+		// Sinkronisasi status permohonan siswa jika surat ini berasal dari permohonan siswa
+		$this->load->model('Letter_request_model');
+		$linked_req = $this->db->get_where('letter_requests', array('letter_id' => $letter['id']))->row_array();
+		if ($linked_req)
+		{
+			$this->Letter_request_model->update($linked_req['id'], array(
+				'status'     => 'processed',
+				'admin_note' => 'Surat sedang direvisi oleh Tata Usaha berdasarkan catatan Kepala Sekolah: '.$reason,
+			));
 		}
 
 		audit_log('LETTER_REJECT', 'letters', $letter['id'], 'Kepala Sekolah menolak surat '.$letter['letter_number'].'. Alasan: '.$reason);

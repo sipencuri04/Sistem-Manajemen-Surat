@@ -152,10 +152,24 @@ class Requests extends Admin_Controller
 		{
 			set_flash('warning', 'Hanya permohonan berstatus Siap Diambil yang dapat ditandai sudah diambil.');
 			redirect('permohonan-masuk/'.(int) $req['id']);
+			return;
 		}
+
+		if ( ! empty($req['letter_id']))
+		{
+			$this->load->model('Letter_model');
+			$letter = $this->Letter_model->find((int) $req['letter_id']);
+			if ( ! $letter || (isset($letter['approval_status']) && $letter['approval_status'] !== 'disetujui') || empty($letter['stamp_type']) || $letter['stamp_type'] === 'belum_stempel')
+			{
+				set_flash('danger', 'Surat belum lengkap! Pastikan surat telah ditandatangani Kepala Sekolah dan telah distempel oleh TU sebelum diserahkan ke pemohon.');
+				redirect('permohonan-masuk/'.(int) $req['id']);
+				return;
+			}
+		}
+
 		$this->Letter_request_model->update($req['id'], array('status' => 'taken'));
 		set_flash('success', 'Permohonan '.$req['tracking_code'].' ditandai sudah diambil.');
-		redirect('permohonan-masuk?status=approved');
+		redirect('permohonan-masuk?status=taken');
 	}
 
 	/** Kirim email pemberitahuan/berkas ke Gmail siswa oleh petugas TU. */

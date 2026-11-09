@@ -205,7 +205,7 @@ CREATE TABLE `letter_requests` (
   `requester_email`  VARCHAR(150) NULL DEFAULT NULL COMMENT 'Alamat Gmail/Email Siswa' COMMENT 'Nomor WhatsApp/HP yang dapat dihubungi',
   `content_data`     JSON         NULL COMMENT 'Isian formulir jenis surat',
   `requester_note`   VARCHAR(500) NULL DEFAULT NULL,
-  `status`           VARCHAR(10)  NOT NULL DEFAULT 'pending' COMMENT 'pending | approved | taken | rejected',
+  `status`           VARCHAR(20)  NOT NULL DEFAULT 'pending' COMMENT 'pending | processed | approved | taken | rejected',
   `admin_note`       VARCHAR(500) NULL DEFAULT NULL COMMENT 'Alasan tolak / info pengambilan',
   `letter_id`        INT UNSIGNED NULL DEFAULT NULL,
   `ip_address`       VARCHAR(45)  NOT NULL DEFAULT '',

@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 $labels = Letter_request_model::$statuses;
-$colors = array('pending' => 'warning', 'approved' => 'success', 'taken' => 'secondary', 'rejected' => 'danger');
-$tabs = array('pending' => 'Menunggu', 'approved' => 'Siap Diambil', 'taken' => 'Sudah Diambil', 'rejected' => 'Ditolak', 'semua' => 'Semua');
+$colors = array('pending' => 'warning', 'processed' => 'info', 'approved' => 'success', 'taken' => 'secondary', 'rejected' => 'danger');
+$tabs = array('pending' => 'Menunggu', 'processed' => 'Diproses', 'approved' => 'Siap Diambil', 'taken' => 'Sudah Diambil', 'rejected' => 'Ditolak', 'semua' => 'Semua');
 ?>
 <div class="alert alert-light border d-flex flex-wrap align-items-center gap-2 share-box">
 	<i class="fa-solid fa-link text-primary"></i>
@@ -31,7 +31,7 @@ $tabs = array('pending' => 'Menunggu', 'approved' => 'Siap Diambil', 'taken' => 
 
 	<?php if (empty($requests)): ?>
 		<div class="empty-state"><i class="fa-regular fa-envelope-open d-block"></i>
-			<p class="mb-0"><?= $status === 'pending' ? 'Tidak ada permohonan yang menunggu. Semua sudah diproses.' : 'Tidak ada permohonan.' ?></p></div>
+			<p class="mb-0"><?= $status === 'pending' ? 'Tidak ada permohonan yang menunggu. Semua sudah diproses.' : ($status === 'processed' ? 'Tidak ada permohonan yang sedang diproses.' : 'Tidak ada permohonan.') ?></p></div>
 	<?php else: ?>
 		<div class="table-responsive d-none d-md-block">
 			<table class="table table-hover align-middle mb-0">

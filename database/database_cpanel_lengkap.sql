@@ -225,7 +225,7 @@ CREATE TABLE `letter_requests` (
   `requester_email`  VARCHAR(150) NULL DEFAULT NULL COMMENT 'Alamat Gmail/Email Siswa',
   `content_data`     JSON         NULL,
   `requester_note`   VARCHAR(500) NULL DEFAULT NULL,
-  `status`           VARCHAR(10)  NOT NULL DEFAULT 'pending',
+  `status`           VARCHAR(20)  NOT NULL DEFAULT 'pending' COMMENT 'pending | processed | approved | taken | rejected',
   `admin_note`       VARCHAR(500) NULL DEFAULT NULL,
   `letter_id`        INT UNSIGNED NULL DEFAULT NULL,
   `ip_address`       VARCHAR(45)  NOT NULL DEFAULT '',

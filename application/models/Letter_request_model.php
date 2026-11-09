@@ -9,10 +9,11 @@ class Letter_request_model extends CI_Model
 	protected $table = 'letter_requests';
 
 	public static $statuses = array(
-		'pending'  => 'Menunggu',
-		'approved' => 'Siap Diambil',
-		'taken'    => 'Sudah Diambil',
-		'rejected' => 'Ditolak',
+		'pending'   => 'Menunggu',
+		'processed' => 'Sedang Diproses',
+		'approved'  => 'Siap Diambil',
+		'taken'     => 'Sudah Diambil',
+		'rejected'  => 'Ditolak',
 	);
 
 	/** Kode lacak acak 10 karakter tanpa huruf yang mirip (0/O, 1/I/L). */
@@ -50,7 +51,7 @@ class Letter_request_model extends CI_Model
 	public function find($id)
 	{
 		$row = $this->db->select('r.*, t.name AS type_name, t.code AS type_code, t.template_key,
-				l.letter_number, u.full_name AS processed_by_name')
+				l.letter_number, l.approval_status, l.stamp_type, l.signature_type, u.full_name AS processed_by_name')
 			->from($this->table.' r')
 			->join('letter_types t', 't.id = r.letter_type_id', 'inner')
 			->join('letters l', 'l.id = r.letter_id', 'left')
@@ -73,7 +74,7 @@ class Letter_request_model extends CI_Model
 			return NULL;
 		}
 		return $this->db->select('r.id, r.tracking_code, r.requester_name, r.requester_email, r.status, r.admin_note, r.created_at,
-				r.processed_at, r.letter_id, t.name AS type_name, l.letter_number, l.signature_type')
+				r.processed_at, r.letter_id, t.name AS type_name, l.letter_number, l.signature_type, l.approval_status, l.stamp_type')
 			->from($this->table.' r')
 			->join('letter_types t', 't.id = r.letter_type_id', 'inner')
 			->join('letters l', 'l.id = r.letter_id', 'left')
@@ -107,7 +108,7 @@ class Letter_request_model extends CI_Model
 			->join('letters l', 'l.id = r.letter_id', 'left');
 		$this->apply_filters($f);
 		// Permohonan yang menunggu tampil paling atas, terlama lebih dulu (antrean).
-		$this->db->order_by("FIELD(r.status, 'pending', 'approved', 'taken', 'rejected')", '', FALSE)
+		$this->db->order_by("FIELD(r.status, 'pending', 'processed', 'approved', 'taken', 'rejected')", '', FALSE)
 			->order_by('r.created_at', 'ASC');
 		return $this->db->limit((int) $limit, (int) $offset)->get()->result_array();
 	}
