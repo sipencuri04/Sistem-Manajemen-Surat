@@ -457,6 +457,21 @@ class Letters extends Admin_Controller
 		$letter = $this->load_letter($id);
 
 		$this->db->trans_start();
+
+		// Jika surat ini berasal dari permohonan siswa, kembalikan status permohonan ke 'pending' agar bisa diproses ulang
+		$this->load->model('Letter_request_model');
+		$linked_req = $this->db->get_where('letter_requests', array('letter_id' => $letter['id']))->row_array();
+		if ($linked_req && in_array($linked_req['status'], array('processed', 'approved'), TRUE))
+		{
+			$this->Letter_request_model->update($linked_req['id'], array(
+				'status'       => 'pending',
+				'letter_id'    => NULL,
+				'admin_note'   => 'Draf surat sebelumnya dibatalkan/dihapus oleh TU. Permohonan kembali ke antrean untuk diproses ulang.',
+				'processed_at' => NULL,
+				'processed_by' => NULL,
+			));
+		}
+
 		$this->Letter_file_model->delete_by_letter($letter['id']);
 		$this->Letter_model->delete($letter['id']);
 		$this->db->trans_complete();
