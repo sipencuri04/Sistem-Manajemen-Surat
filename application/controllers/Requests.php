@@ -246,8 +246,80 @@ class Requests extends Admin_Controller
 			);
 		}
 
+		$school_name = !empty($school['school_name']) ? $school['school_name'] : 'SMK Muhammadiyah Bandongan';
+		$send_wa = (bool) $this->input->post('send_wa');
+		$send_email = (bool) $this->input->post('send_email');
+
+		// 1. Tautan WhatsApp otomatis ke siswa jika dicentang
+		$wa_url = '';
+		if ($send_wa && !empty($req['requester_phone']))
+		{
+			$msg_wa = "Halo *" . $req['requester_name'] . "*," . "\n\n"
+				. "Kabar baik! Permohonan surat *" . $type['name'] . "* Anda di *" . $school_name . "* (Kode: *" . $req['tracking_code'] . "*) telah *DIVERIFIKASI OLEH TATA USAHA* dengan Nomor Surat: *" . $letter_number . "*." . "\n\n"
+				. "Saat ini surat telah diajukan ke meja Kepala Sekolah untuk proses penandatanganan dan stempel resmi." . "\n\n"
+				. "Anda dapat melacak status surat secara berkala di: " . site_url('permohonan/cek?kode=' . $req['tracking_code']) . "\n\n"
+				. "Terima kasih." . "\n"
+				. "- *Tata Usaha " . $school_name . "*";
+			$wa_url = build_wa_link($req['requester_phone'], $msg_wa);
+			$this->session->set_flashdata('open_wa_url', $wa_url);
+		}
+
+		// 2. Kirim email notifikasi ke siswa jika dicentang
+		$email_sent_info = '';
+		if ($send_email && !empty($req['requester_email']) && !empty($school['smtp_user']) && !empty($school['smtp_pass']) && !empty($school['smtp_enabled']))
+		{
+			$this->load->library('email');
+			$smtp_crypto = !empty($school['smtp_crypto']) ? $school['smtp_crypto'] : 'tls';
+			if ($smtp_crypto === 'none') $smtp_crypto = '';
+			$config = array(
+				'protocol'    => 'smtp',
+				'smtp_host'   => !empty($school['smtp_host']) ? $school['smtp_host'] : 'smtp.gmail.com',
+				'smtp_user'   => $school['smtp_user'],
+				'smtp_pass'   => $school['smtp_pass'],
+				'smtp_port'   => !empty($school['smtp_port']) ? (int) $school['smtp_port'] : 587,
+				'smtp_crypto' => $smtp_crypto,
+				'mailtype'    => 'html',
+				'charset'     => 'utf-8',
+				'newline'     => "\r\n",
+				'crlf'        => "\r\n",
+			);
+			$this->email->initialize($config);
+			$from_name = !empty($school['smtp_from_name']) ? $school['smtp_from_name'] : $school_name;
+			$this->email->from($school['smtp_user'], $from_name);
+			$this->email->to($req['requester_email']);
+			$this->email->subject('[' . $from_name . '] Surat Anda Sedang Diproses - ' . $req['tracking_code']);
+
+			$cek_url = site_url('permohonan/cek?kode=' . $req['tracking_code']);
+			$email_data = array(
+				'title'          => 'Permohonan Surat Sedang Diproses - ' . $req['tracking_code'],
+				'school_name'    => $school_name,
+				'recipient_name' => $req['requester_name'],
+				'message'        => 'Permohonan surat <strong>' . htmlspecialchars($type['name']) . '</strong> Anda telah diverifikasi oleh petugas Tata Usaha dan saat ini telah diajukan ke meja Kepala Sekolah untuk proses penandatanganan dan stempel resmi.',
+				'details'        => array(
+					'Kode Lacak'   => '<code style="font-family:monospace; font-size:14px; background:#e2e8f0; padding:2px 8px; border-radius:4px; font-weight:700; color:#0f172a;">' . htmlspecialchars($req['tracking_code']) . '</code>',
+					'Jenis Surat'  => htmlspecialchars($type['name']),
+					'Nomor Surat'  => '<strong>' . htmlspecialchars($letter_number) . '</strong>',
+					'Status'       => '<span style="color:#2563eb; font-weight:700;">Sedang Diproses (Menunggu TTD Kepsek)</span>',
+				),
+				'action_url'     => $cek_url,
+				'action_text'    => 'Lacak Status Surat',
+			);
+			$body = $this->load->view('emails/general_notification', $email_data, TRUE);
+			$this->email->message($body);
+			if (@$this->email->send())
+			{
+				$email_sent_info = ' serta notifikasi otomatis telah dikirim ke Gmail siswa (' . $req['requester_email'] . ')';
+			}
+		}
+
+		$wa_btn = '';
+		if (!empty($wa_url))
+		{
+			$wa_btn = ' <a href="' . $wa_url . '" target="_blank" rel="noopener" class="btn btn-xs btn-success rounded-pill px-2 py-1 ms-2 fw-semibold text-white"><i class="fa-brands fa-whatsapp me-1"></i> Buka WhatsApp Siswa</a>';
+		}
+
 		audit_log('LETTER_CREATE_FROM_REQUEST', 'letters', $letter_id, 'Membuat surat '.$letter_number.' langsung dari permohonan '.$req['tracking_code'].' dan diteruskan ke Kepala Sekolah');
-		set_flash('success', '<strong>Berhasil!</strong> Surat No. <strong>' . $letter_number . '</strong> berhasil diterbitkan dan langsung diteruskan ke meja Kepala Sekolah untuk ditandatangani.');
+		set_flash('success', '<strong>Berhasil!</strong> Surat No. <strong>' . $letter_number . '</strong> berhasil diterbitkan dan langsung diteruskan ke meja Kepala Sekolah untuk ditandatangani' . $email_sent_info . '.' . $wa_btn, TRUE);
 		redirect('permohonan-masuk/'.(int) $req['id']);
 	}
 

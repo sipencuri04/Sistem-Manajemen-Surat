@@ -268,22 +268,25 @@ $id = (int) $req['id'];
 						<input type="date" name="letter_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
 					</div>
 
+					<input type="hidden" name="signature_type" value="digital">
+
 					<div class="mb-2">
-						<label class="form-label fw-bold small text-navy">Mode Tanda Tangan Kepala Sekolah:</label>
+						<label class="form-label fw-bold small text-navy">Pemberitahuan Otomatis ke Siswa:</label>
 						<div class="p-3 bg-light rounded-3 border">
 							<div class="form-check">
-								<input class="form-check-input" type="radio" name="signature_type" id="sig_digital_modal" value="digital" checked>
-								<label class="form-check-label small fw-semibold text-primary" for="sig_digital_modal">
-									<i class="fa-solid fa-qrcode me-1"></i> Tanda Tangan Digital (QR Code &amp; Verifikasi Online)
+								<input class="form-check-input" type="checkbox" name="send_wa" id="send_wa_modal_kepsek" value="1" <?= !empty($req['requester_phone']) ? 'checked' : 'disabled' ?>>
+								<label class="form-check-label small fw-semibold text-success" for="send_wa_modal_kepsek">
+									<i class="fa-brands fa-whatsapp me-1"></i> Buka WhatsApp &amp; kirim info ke nomor siswa (<?= e($req['requester_phone'] ?: '-') ?>)
 								</label>
-								<div class="form-text small ps-4">Siswa dapat langsung mengunduh surat resmi PDF setelah disahkan.</div>
+								<div class="form-text small ps-4">Memberitahukan siswa bahwa permohonan telah diverifikasi TU dan sedang diajukan ke Kepala Sekolah.</div>
 							</div>
+							
 							<div class="form-check mt-2">
-								<input class="form-check-input" type="radio" name="signature_type" id="sig_basah_modal" value="basah">
-								<label class="form-check-label small fw-semibold text-secondary" for="sig_basah_modal">
-									<i class="fa-solid fa-pen-nib me-1"></i> Tanda Tangan Basah (Cetak &amp; TTD Manual)
+								<input class="form-check-input" type="checkbox" name="send_email" id="send_email_modal_kepsek" value="1" <?= !empty($req['requester_email']) ? 'checked' : 'disabled' ?>>
+								<label class="form-check-label small text-primary fw-semibold" for="send_email_modal_kepsek">
+									<i class="fa-solid fa-envelope me-1"></i> Kirim notifikasi email ke Gmail siswa (<?= e($req['requester_email'] ?: '-') ?>)
 								</label>
-								<div class="form-text small ps-4">Siswa wajib datang ke ruang TU untuk mengambil berkas fisik bertanda tangan asli.</div>
+								<div class="form-text small ps-4">Notifikasi otomatis terkirim ke email siswa berisi link status pelacakan online.</div>
 							</div>
 						</div>
 					</div>
