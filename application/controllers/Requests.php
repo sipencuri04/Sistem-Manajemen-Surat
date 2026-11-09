@@ -268,47 +268,56 @@ class Requests extends Admin_Controller
 		$email_sent_info = '';
 		if ($send_email && !empty($req['requester_email']) && !empty($school['smtp_user']) && !empty($school['smtp_pass']) && !empty($school['smtp_enabled']))
 		{
-			$this->load->library('email');
-			$smtp_crypto = !empty($school['smtp_crypto']) ? $school['smtp_crypto'] : 'tls';
-			if ($smtp_crypto === 'none') $smtp_crypto = '';
-			$config = array(
-				'protocol'    => 'smtp',
-				'smtp_host'   => !empty($school['smtp_host']) ? $school['smtp_host'] : 'smtp.gmail.com',
-				'smtp_user'   => $school['smtp_user'],
-				'smtp_pass'   => $school['smtp_pass'],
-				'smtp_port'   => !empty($school['smtp_port']) ? (int) $school['smtp_port'] : 587,
-				'smtp_crypto' => $smtp_crypto,
-				'mailtype'    => 'html',
-				'charset'     => 'utf-8',
-				'newline'     => "\r\n",
-				'crlf'        => "\r\n",
-			);
-			$this->email->initialize($config);
-			$from_name = !empty($school['smtp_from_name']) ? $school['smtp_from_name'] : $school_name;
-			$this->email->from($school['smtp_user'], $from_name);
-			$this->email->to($req['requester_email']);
-			$this->email->subject('[' . $from_name . '] Surat Anda Sedang Diproses - ' . $req['tracking_code']);
-
-			$cek_url = site_url('permohonan/cek?kode=' . $req['tracking_code']);
-			$email_data = array(
-				'title'          => 'Permohonan Surat Sedang Diproses - ' . $req['tracking_code'],
-				'school_name'    => $school_name,
-				'recipient_name' => $req['requester_name'],
-				'message'        => 'Permohonan surat <strong>' . htmlspecialchars($type['name']) . '</strong> Anda telah diverifikasi oleh petugas Tata Usaha dan saat ini telah diajukan ke meja Kepala Sekolah untuk proses penandatanganan dan stempel resmi.',
-				'details'        => array(
-					'Kode Lacak'   => '<code style="font-family:monospace; font-size:14px; background:#e2e8f0; padding:2px 8px; border-radius:4px; font-weight:700; color:#0f172a;">' . htmlspecialchars($req['tracking_code']) . '</code>',
-					'Jenis Surat'  => htmlspecialchars($type['name']),
-					'Nomor Surat'  => '<strong>' . htmlspecialchars($letter_number) . '</strong>',
-					'Status'       => '<span style="color:#2563eb; font-weight:700;">Sedang Diproses (Menunggu TTD Kepsek)</span>',
-				),
-				'action_url'     => $cek_url,
-				'action_text'    => 'Lacak Status Surat',
-			);
-			$body = $this->load->view('emails/general_notification', $email_data, TRUE);
-			$this->email->message($body);
-			if (@$this->email->send())
+			try
 			{
-				$email_sent_info = ' serta notifikasi otomatis telah dikirim ke Gmail siswa (' . $req['requester_email'] . ')';
+				$this->load->library('email');
+				$this->load->library('email_theme');
+				$smtp_crypto = !empty($school['smtp_crypto']) ? $school['smtp_crypto'] : 'tls';
+				if ($smtp_crypto === 'none') $smtp_crypto = '';
+				$config = array(
+					'protocol'    => 'smtp',
+					'smtp_host'   => !empty($school['smtp_host']) ? $school['smtp_host'] : 'smtp.gmail.com',
+					'smtp_user'   => $school['smtp_user'],
+					'smtp_pass'   => $school['smtp_pass'],
+					'smtp_port'   => !empty($school['smtp_port']) ? (int) $school['smtp_port'] : 587,
+					'smtp_crypto' => $smtp_crypto,
+					'mailtype'    => 'html',
+					'charset'     => 'utf-8',
+					'newline'     => "\r\n",
+					'crlf'        => "\r\n",
+				);
+				$this->email->initialize($config);
+				$from_name = !empty($school['smtp_from_name']) ? $school['smtp_from_name'] : $school_name;
+				$this->email->from($school['smtp_user'], $from_name);
+				$this->email->to($req['requester_email']);
+				$this->email->subject('[' . $from_name . '] Surat Anda Sedang Diproses - ' . $req['tracking_code']);
+
+				$cek_url = site_url('permohonan/cek?kode=' . $req['tracking_code']);
+				$body = $this->email_theme->render(array(
+					'title'          => 'Permohonan Surat Sedang Diproses - ' . $req['tracking_code'],
+					'school_name'    => $school_name,
+					'recipient_name' => $req['requester_name'],
+					'badge_type'     => 'info',
+					'badge_text'     => 'SEDANG DIPROSES',
+					'message'        => 'Permohonan surat <strong>' . htmlspecialchars($type['name']) . '</strong> Anda telah diverifikasi oleh petugas Tata Usaha dan saat ini telah diajukan ke meja Kepala Sekolah untuk proses penandatanganan dan stempel resmi.',
+					'details'        => array(
+						'Kode Lacak'   => '<code style="font-family:monospace; font-size:14px; background:#e2e8f0; padding:2px 8px; border-radius:4px; font-weight:700; color:#0f172a;">' . htmlspecialchars($req['tracking_code']) . '</code>',
+						'Jenis Surat'  => htmlspecialchars($type['name']),
+						'Nomor Surat'  => '<strong>' . htmlspecialchars($letter_number) . '</strong>',
+						'Status'       => '<span style="color:#2563eb; font-weight:700;">Sedang Diproses (Menunggu TTD Kepsek)</span>',
+					),
+					'button_url'     => $cek_url,
+					'button_text'    => 'Lacak Status Surat',
+				));
+				$this->email->message($body);
+				if (@$this->email->send())
+				{
+					$email_sent_info = ' serta notifikasi otomatis telah dikirim ke Gmail siswa (' . $req['requester_email'] . ')';
+				}
+			}
+			catch (Throwable $e)
+			{
+				log_message('error', 'Gagal mengirim email pemberitahuan ke siswa: ' . $e->getMessage());
 			}
 		}
 
