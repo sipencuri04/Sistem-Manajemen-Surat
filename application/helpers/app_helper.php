@@ -545,7 +545,7 @@ if ( ! function_exists('is_kepala_sekolah'))
 	{
 		$user = current_user();
 		if ( ! $user) return FALSE;
-		return in_array($user['role'], array('kepala_sekolah', 'admin'), TRUE);
+		return $user['role'] === 'kepala_sekolah';
 	}
 }
 

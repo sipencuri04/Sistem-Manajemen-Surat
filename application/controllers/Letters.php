@@ -155,8 +155,8 @@ class Letters extends Admin_Controller
 
 		$row['letter_type_id'] = (int) $type['id'];
 		$save_as               = $this->input->post('save_as');
-		$can_sign = in_array(strtolower($this->current_user['role']), array('kepala_sekolah', 'superuser'), TRUE);
-		// TU dan Pegawai tidak bisa mengesahkan tanda tangan sendiri, wajib diajukan ke Kepala Sekolah
+		$can_sign = (strtolower($this->current_user['role']) === 'kepala_sekolah');
+		// Selain Kepala Sekolah, surat tidak bisa disahkan langsung dan wajib diajukan ke Kepala Sekolah
 		if ($save_as === 'final' && ! $can_sign) {
 			$save_as = 'approval';
 		}
@@ -383,8 +383,8 @@ class Letters extends Admin_Controller
 			unset($row['letter_number'], $row['number_mode'], $row['sequence_no'], $row['number_year']);
 		}
 		$save_as = $this->input->post('save_as');
-		$can_sign = in_array(strtolower($this->current_user['role']), array('kepala_sekolah', 'superuser'), TRUE);
-		// TU dan Pegawai tidak bisa mengesahkan tanda tangan sendiri, wajib diajukan ke Kepala Sekolah
+		$can_sign = (strtolower($this->current_user['role']) === 'kepala_sekolah');
+		// Selain Kepala Sekolah, surat tidak bisa disahkan langsung dan wajib diajukan ke Kepala Sekolah
 		if ($save_as === 'final' && ! $can_sign) {
 			$save_as = 'approval';
 		}

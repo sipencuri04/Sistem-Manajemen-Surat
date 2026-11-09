@@ -9,7 +9,7 @@ class Approvals extends Admin_Controller
 		$this->require_schema();
 		$this->load->model(array('Letter_model', 'Letter_type_model', 'Letter_file_model'));
 		$this->load->library(array('Template_registry', 'Letter_renderer'));
-		$this->require_role(array('kepala_sekolah', 'admin'));
+		$this->require_role(array('kepala_sekolah'));
 	}
 
 	public function index()

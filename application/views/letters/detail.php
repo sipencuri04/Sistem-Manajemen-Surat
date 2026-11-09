@@ -2,8 +2,8 @@
 $id = (int) $letter['id'];
 $curr_user = current_user();
 $u_role = $curr_user ? strtolower($curr_user['role']) : (isset($current_user['role']) ? strtolower($current_user['role']) : '');
-$can_tu = in_array($u_role, array('tu', 'superuser', 'admin'), TRUE) || is_tu() || is_superuser() || is_admin();
-$can_kepsek = in_array($u_role, array('kepala_sekolah', 'superuser', 'admin'), TRUE) || is_kepala_sekolah();
+$can_tu = in_array($u_role, array('tu', 'superuser', 'admin'), TRUE);
+$can_kepsek = ($u_role === 'kepala_sekolah');
 ?>
 <nav aria-label="breadcrumb">
 	<ol class="breadcrumb small mb-2">
