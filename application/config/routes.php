@@ -52,6 +52,8 @@ $route['kirim-surat/status/(:any)']      = 'kirim_surat/status/$1';
 // Pengelolaan permohonan oleh TU (wajib login)
 $route['permohonan-masuk']                     = 'requests/index';
 $route['permohonan-masuk/kirim-email/(:num)']  = 'requests/send_email/$1';
+$route['permohonan-masuk/kirim-kepsek/(:num)'] = 'requests/kirim_kepsek/$1';
+$route['permohonan-masuk/pratinjau/(:num)']    = 'requests/preview/$1';
 $route['permohonan-masuk/(:num)']              = 'requests/detail/$1';
 $route['permohonan-masuk/tolak/(:num)']  = 'requests/reject/$1';
 $route['permohonan-masuk/diambil/(:num)'] = 'requests/taken/$1';

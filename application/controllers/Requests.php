@@ -68,13 +68,187 @@ class Requests extends Admin_Controller
 			$data['kelas'] = $req['requester_class'];
 		}
 
+		$this->load->library('Letter_numbering');
+		$this->load->model('Settings_model');
+		$school = $this->Settings_model->get(TRUE);
+		$next_number = $type ? $this->letter_numbering->preview($school, $type, date('Y-m-d')) : '-';
+
 		$this->render('requests/detail', array(
-			'page_title' => 'Detail Permohonan',
-			'req'        => $req,
-			'type'       => $type,
-			'tpl'        => $tpl,
-			'values'     => $tpl ? $this->template_registry->formatted_values($tpl, $data) : array(),
+			'page_title'  => 'Detail Permohonan',
+			'req'         => $req,
+			'type'        => $type,
+			'tpl'         => $tpl,
+			'school'      => $school,
+			'next_number' => $next_number,
+			'values'      => $tpl ? $this->template_registry->formatted_values($tpl, $data) : array(),
 		));
+	}
+
+	/** Pratinjau surat untuk permohonan siswa (tampil di modal). */
+	public function preview($id = 0)
+	{
+		$this->require_role(array('tu', 'superuser', 'admin', 'kepala_sekolah'));
+		$req = $this->load_request($id);
+		$type = $this->Letter_type_model->find($req['letter_type_id']);
+		if ( ! $type)
+		{
+			show_404();
+		}
+
+		$this->load->library(array('Letter_numbering', 'Letter_renderer'));
+		$this->load->model('Settings_model');
+		$school = $this->Settings_model->get(TRUE);
+		$number = $this->letter_numbering->preview($school, $type, date('Y-m-d'));
+
+		$kepsek = $this->db->get_where('users', array('role' => 'kepala_sekolah', 'is_active' => 1))->row_array();
+
+		$data = $req['data'];
+		if (empty($data['nama_siswa']) && ! empty($req['requester_name'])) $data['nama_siswa'] = $req['requester_name'];
+		if (empty($data['kelas']) && ! empty($req['requester_class'])) $data['kelas'] = $req['requester_class'];
+		if (empty($data['kompetensi_keahlian']) && ! empty($data['jurusan'])) $data['kompetensi_keahlian'] = $data['jurusan'];
+		if (empty($data['alamat_instansi']) && ! empty($data['alamat'])) $data['alamat_instansi'] = $data['alamat'];
+
+		$mock_letter = array(
+			'letter_number'   => $req['letter_number'] ?: $number,
+			'letter_date'     => date('Y-m-d'),
+			'subject'         => $type['name'] . ' a.n. ' . $req['requester_name'],
+			'recipient'       => !empty($type['recipient_default']) ? $type['recipient_default'] : 'Siswa yang bersangkutan',
+			'signer_name'     => $kepsek ? $kepsek['full_name'] : (!empty($school['headmaster_name']) ? $school['headmaster_name'] : 'Kepala Sekolah'),
+			'signer_nip'      => $kepsek ? $kepsek['nip'] : (!empty($school['headmaster_nip']) ? $school['headmaster_nip'] : '-'),
+			'signer_title'    => 'Kepala Sekolah',
+			'signature_type'  => 'digital',
+			'stamp_type'      => 'digital',
+			'approval_status' => 'menunggu_persetujuan',
+			'status'          => 'draft',
+			'content_data'    => json_encode($data),
+			'data'            => $data,
+		);
+
+		$html = $this->letter_renderer->html($mock_letter, $type, $school, 'html', array('watermark' => 'PRATINJAU DOKUMEN'));
+		$this->output->set_output($html);
+	}
+
+	/** Buat surat secara otomatis dari data permohonan siswa & langsung ajukan ke Kepala Sekolah. */
+	public function kirim_kepsek($id = 0)
+	{
+		$this->require_role(array('tu', 'superuser', 'admin'));
+		$this->require_post();
+		$req = $this->load_request($id);
+
+		if ($req['status'] !== 'pending')
+		{
+			set_flash('warning', 'Permohonan ini sudah diproses sebelumnya.');
+			redirect('permohonan-masuk/'.(int) $req['id']);
+			return;
+		}
+
+		$type = $this->Letter_type_model->find($req['letter_type_id']);
+		if ( ! $type)
+		{
+			set_flash('danger', 'Jenis surat tidak valid.');
+			redirect('permohonan-masuk/'.(int) $req['id']);
+			return;
+		}
+
+		$this->load->library('Letter_numbering');
+		$this->load->model(array('Letter_model', 'Settings_model'));
+		$school = $this->Settings_model->get(TRUE);
+
+		$letter_number = trim((string) $this->input->post('letter_number', TRUE));
+		$letter_date   = trim((string) $this->input->post('letter_date', TRUE));
+		if ( ! valid_date_string($letter_date))
+		{
+			$letter_date = date('Y-m-d');
+		}
+
+		$signature_type = (string) $this->input->post('signature_type', TRUE);
+		if ( ! in_array($signature_type, array('digital', 'basah'), TRUE))
+		{
+			$signature_type = 'digital';
+		}
+
+		$kepsek = $this->db->get_where('users', array('role' => 'kepala_sekolah', 'is_active' => 1))->row_array();
+
+		$data = $req['data'];
+		if (empty($data['nama_siswa']) && ! empty($req['requester_name'])) $data['nama_siswa'] = $req['requester_name'];
+		if (empty($data['kelas']) && ! empty($req['requester_class'])) $data['kelas'] = $req['requester_class'];
+		if (empty($data['kompetensi_keahlian']) && ! empty($data['jurusan'])) $data['kompetensi_keahlian'] = $data['jurusan'];
+		if (empty($data['alamat_instansi']) && ! empty($data['alamat'])) $data['alamat_instansi'] = $data['alamat'];
+
+		// Alokasi nomor jika kosong / otomatis
+		$sequence_no = 0;
+		$number_year = (int) date('Y', strtotime($letter_date));
+		if ($letter_number === '')
+		{
+			$alloc = $this->letter_numbering->allocate($school, $type, $letter_date);
+			$letter_number = $alloc['number'];
+			$sequence_no   = $alloc['sequence'];
+			$number_year   = $alloc['year'];
+		}
+		else
+		{
+			// Cek apakah nomor manual bentrok
+			if ($this->Letter_model->number_exists($letter_number, 0))
+			{
+				set_flash('danger', 'Nomor surat "'.$letter_number.'" sudah terpakai. Silakan gunakan nomor lain.');
+				redirect('permohonan-masuk/'.(int) $req['id']);
+				return;
+			}
+		}
+
+		$row = array(
+			'letter_type_id'   => (int) $type['id'],
+			'letter_number'    => $letter_number,
+			'letter_date'      => $letter_date,
+			'subject'          => $type['name'] . ' a.n. ' . $req['requester_name'],
+			'recipient'        => !empty($type['recipient_default']) ? $type['recipient_default'] : 'Siswa yang bersangkutan',
+			'content_data'     => json_encode($data),
+			'signer_name'      => $kepsek ? $kepsek['full_name'] : (!empty($school['headmaster_name']) ? $school['headmaster_name'] : 'Kepala Sekolah'),
+			'signer_nip'       => $kepsek ? $kepsek['nip'] : (!empty($school['headmaster_nip']) ? $school['headmaster_nip'] : '-'),
+			'signer_title'     => 'Kepala Sekolah',
+			'status'           => 'draft',
+			'approval_status'  => 'menunggu_persetujuan',
+			'signature_type'   => $signature_type,
+			'stamp_type'       => 'belum_stempel',
+			'sequence_no'      => $sequence_no,
+			'number_year'      => $number_year,
+			'notes'            => 'Dari permohonan siswa kode ' . $req['tracking_code'],
+			'created_by'       => (int) $this->current_user['id'],
+		);
+
+		$letter_id = $this->Letter_model->insert($row);
+		if ( ! $letter_id)
+		{
+			set_flash('danger', 'Gagal membuat surat. Terjadi kesalahan pada database.');
+			redirect('permohonan-masuk/'.(int) $req['id']);
+			return;
+		}
+
+		// Update permohonan siswa menjadi 'processed'
+		$this->Letter_request_model->update($req['id'], array(
+			'status'       => 'processed',
+			'letter_id'    => $letter_id,
+			'admin_note'   => 'Surat telah dibuat oleh TU (No. ' . $letter_number . '), sedang menunggu tanda tangan Kepala Sekolah.',
+			'processed_by' => (int) $this->current_user['id'],
+			'processed_at' => date('Y-m-d H:i:s'),
+		));
+
+		// Kirim notifikasi internal ke Kepala Sekolah
+		$kepseks = $this->db->get_where('users', array('role' => 'kepala_sekolah', 'is_active' => 1))->result_array();
+		foreach ($kepseks as $ks)
+		{
+			send_notification(
+				(int) $ks['id'],
+				'Permohonan Surat Siswa Baru',
+				'Surat No. ' . $letter_number . ' (' . $type['name'] . ' a.n. ' . $req['requester_name'] . ') diajukan oleh TU dan siap ditandatangani.',
+				site_url('persetujuan-surat'),
+				'persetujuan'
+			);
+		}
+
+		audit_log('LETTER_CREATE_FROM_REQUEST', 'letters', $letter_id, 'Membuat surat '.$letter_number.' langsung dari permohonan '.$req['tracking_code'].' dan diteruskan ke Kepala Sekolah');
+		set_flash('success', '<strong>Berhasil!</strong> Surat No. <strong>' . $letter_number . '</strong> berhasil diterbitkan dan langsung diteruskan ke meja Kepala Sekolah untuk ditandatangani.');
+		redirect('permohonan-masuk/'.(int) $req['id']);
 	}
 
 	/** Tolak permohonan dengan alasan (wajib) dan siapkan notifikasi WhatsApp / Gmail. */
