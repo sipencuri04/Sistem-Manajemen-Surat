@@ -984,7 +984,8 @@ body { background: var(--bg); color: var(--text); font-size: .94rem; }
 	.public-body .card-body { overflow-wrap: anywhere; }
 
 	/* Input kode lacak & tombol tetap sebaris */
-	.public-body .input-group > .form-control { min-width: 0; }
+	.public-body .input-group > .form-control,
+	.public-body .tracking-search-form .form-control { min-width: 0; }
 	.tracking-code { font-size: 1.3rem; letter-spacing: .1em; padding: .4rem .7rem; }
 }
 
@@ -1370,4 +1371,25 @@ a.list-mobile-item:hover, a.list-mobile-item:active { background: #f7f9fc; color
     max-width: 60px;
   }
 }
+
+/* =====================================================================
+   Hero Tracking Search Bar (Mencegah tombol Lacak terhimpit & teks melipat)
+   ===================================================================== */
+.tracking-search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.tracking-search-form .form-control {
+  min-width: 0 !important;
+  flex: 1 1 auto;
+}
+.tracking-search-form .btn {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+.tracking-search-form .btn span {
+  white-space: nowrap !important;
+}
+
 

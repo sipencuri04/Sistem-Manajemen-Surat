@@ -81,7 +81,7 @@ class Letter_request_model extends CI_Model
 		}
 
 		return $this->db->select('r.id, r.tracking_code, r.requester_name, r.requester_email, r.status, r.admin_note, r.created_at,
-				r.processed_at, r.letter_id, t.name AS type_name, l.letter_number, l.signature_type, l.approval_status, l.stamp_type')
+				r.processed_at, r.letter_id, t.name AS type_name, l.letter_number, l.signature_type, l.approval_status, l.stamp_type, l.stamped_at')
 			->from($this->table.' r')
 			->join('letter_types t', 't.id = r.letter_type_id', 'inner')
 			->join('letters l', 'l.id = r.letter_id', 'left')

@@ -116,11 +116,10 @@ $statuses = array(
 					</div>
 				</div>
 				
-				<form method="get" action="<?= site_url('kirim-surat/status') ?>" class="d-flex gap-2 bg-white p-2 rounded-4 shadow-sm">
-					<input type="text" name="kode" class="form-control border-0 rounded-3 text-uppercase fw-bold letter-number px-3" maxlength="30" value="<?= e($code) ?>" placeholder="Contoh: SM-005/2026 atau SM-XXXXXX" aria-label="Nomor Agenda atau Resi" required style="letter-spacing: 0.5px;">
-					<button class="btn btn-primary rounded-3 px-3 px-sm-4 fw-semibold d-flex align-items-center gap-2" type="submit">
-						<i class="fa-solid fa-magnifying-glass"></i>
-						<span>Lacak</span>
+				<form method="get" action="<?= site_url('kirim-surat/status') ?>" class="tracking-search-form d-flex gap-2 bg-white p-2 rounded-4 shadow-sm align-items-center">
+					<input type="text" name="kode" class="form-control border-0 rounded-3 text-uppercase fw-bold letter-number px-3 flex-grow-1" maxlength="30" value="<?= e($code) ?>" placeholder="Contoh: SM-005/2026 atau SM-XXXXXX" aria-label="Nomor Agenda atau Resi" required style="letter-spacing: 0.5px; min-width: 0;">
+					<button class="btn btn-primary rounded-3 px-3 py-2 fw-semibold d-flex align-items-center justify-content-center flex-shrink-0" style="min-width: 48px; height: 44px;" type="submit" aria-label="Lacak" title="Lacak">
+						<i class="fa-solid fa-magnifying-glass fs-5"></i>
 					</button>
 				</form>
 			</div>

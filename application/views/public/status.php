@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-// Konfigurasi status & tema visual
+// Konfigurasi status & tema visual dasar
 $badges = array(
 	'pending' => array(
 		'bg'        => 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
@@ -11,7 +11,6 @@ $badges = array(
 		'icon'      => 'fa-hourglass-half',
 		'title'     => 'Menunggu Pemeriksaan',
 		'desc'      => 'Permohonan sudah diterima dan menunggu diverifikasi oleh petugas Tata Usaha.',
-		'step_active' => 2, // Verifikasi TU aktif
 	),
 	'processed' => array(
 		'bg'        => 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
@@ -22,7 +21,6 @@ $badges = array(
 		'icon'      => 'fa-arrows-rotate fa-spin',
 		'title'     => 'Sedang Diproses & Disahkan',
 		'desc'      => 'Surat sedang dibuat oleh Tata Usaha, proses penandatanganan Kepala Sekolah, dan pembubuhan stempel resmi.',
-		'step_active' => 4, // Penandatanganan Kepala Sekolah aktif
 	),
 	'approved' => array(
 		'bg'        => 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)',
@@ -33,7 +31,6 @@ $badges = array(
 		'icon'      => 'fa-circle-check',
 		'title'     => 'Surat Selesai Disahkan',
 		'desc'      => 'Surat resmi telah disahkan oleh Kepala Sekolah dan distempel Tata Usaha. Dokumen siap diambil di ruang TU atau diunduh.',
-		'step_active' => 5, // Siap unduh / selesai
 	),
 	'taken' => array(
 		'bg'        => 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
@@ -44,7 +41,6 @@ $badges = array(
 		'icon'      => 'fa-box-archive',
 		'title'     => 'Surat Sudah Diserahkan',
 		'desc'      => 'Fisik surat resmi telah diserahkan dan diambil oleh pemohon di ruang Tata Usaha.',
-		'step_active' => 5, // Selesai tuntas
 	),
 	'rejected' => array(
 		'bg'        => 'linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)',
@@ -55,7 +51,6 @@ $badges = array(
 		'icon'      => 'fa-circle-xmark',
 		'title'     => 'Permohonan Belum Dapat Diproses',
 		'desc'      => 'Permohonan tidak dapat diproses. Silakan baca catatan keterangan dari petugas Tata Usaha di bawah.',
-		'step_active' => -1, // Ditolak
 	),
 );
 ?>
@@ -103,7 +98,7 @@ $badges = array(
 			</div>
 		<?php endif; ?>
 
-		<!-- Search / Hero Card (Matches Image Design) -->
+		<!-- Search / Hero Card (Matches Image Design with Icon-Only Button) -->
 		<div class="card border-0 shadow-sm rounded-4 mb-3 overflow-hidden text-white" style="background: linear-gradient(135deg, #1d6fe0 0%, #0d47a1 100%);">
 			<div class="card-body p-3 p-sm-4">
 				<div class="d-flex align-items-center gap-3 mb-3">
@@ -116,11 +111,10 @@ $badges = array(
 					</div>
 				</div>
 				
-				<form method="get" action="<?= site_url('permohonan/cek') ?>" class="d-flex gap-2 bg-white p-2 rounded-4 shadow-sm">
-					<input type="text" name="kode" class="form-control border-0 rounded-3 text-uppercase fw-bold letter-number px-3" maxlength="30" value="<?= e($code) ?>" placeholder="REQ-PREF82 atau SM-005/2026" aria-label="Kode permohonan" required style="letter-spacing: 0.5px;">
-					<button class="btn btn-primary rounded-3 px-3 px-sm-4 fw-semibold d-flex align-items-center gap-2" type="submit">
-						<i class="fa-solid fa-magnifying-glass"></i>
-						<span>Lacak</span>
+				<form method="get" action="<?= site_url('permohonan/cek') ?>" class="tracking-search-form d-flex gap-2 bg-white p-2 rounded-4 shadow-sm align-items-center">
+					<input type="text" name="kode" class="form-control border-0 rounded-3 text-uppercase fw-bold letter-number px-3 flex-grow-1" maxlength="30" value="<?= e($code) ?>" placeholder="REQ-PREF82 atau SM-005/2026" aria-label="Kode permohonan" required style="letter-spacing: 0.5px; min-width: 0;">
+					<button class="btn btn-primary rounded-3 px-3 py-2 fw-semibold d-flex align-items-center justify-content-center flex-shrink-0" style="min-width: 48px; height: 44px;" type="submit" aria-label="Lacak" title="Lacak">
+						<i class="fa-solid fa-magnifying-glass fs-5"></i>
 					</button>
 				</form>
 			</div>
@@ -135,13 +129,49 @@ $badges = array(
 			</div>
 		<?php elseif ($request): 
 			$b = isset($badges[$request['status']]) ? $badges[$request['status']] : $badges['pending'];
-			$st_act = $b['step_active'];
 			$is_rejected = ($request['status'] === 'rejected');
+			$is_approved_or_taken = in_array($request['status'], array('approved', 'taken'), TRUE);
+			$is_kepsek_approved = ($request['approval_status'] === 'disetujui' || $is_approved_or_taken);
+			$is_tu_stamped = ($is_approved_or_taken || ($is_kepsek_approved && !empty($request['stamp_type']) && $request['stamp_type'] !== 'belum_stempel' && !empty($request['stamped_at'])));
+
+			// Menentukan step aktif:
+			// 1: Pengajuan Surat
+			// 2: Verifikasi TU
+			// 3: Tanda Tangan Kepsek
+			// 4: Stempel Resmi TU
+			// 5: Selesai (Unduh)
+			if ($is_rejected) {
+				$step_num = -1;
+			} elseif ($is_approved_or_taken) {
+				$step_num = 5;
+			} elseif ($request['status'] === 'processed') {
+				if ($is_kepsek_approved && ! $is_tu_stamped) {
+					$step_num = 4; // Menunggu Stempel TU
+					$b['badge_bg']  = '#0d9488';
+					$b['border']    = '#99f6e4';
+					$b['bg']        = 'linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%)';
+					$b['label']     = 'PROSES STEMPEL TU';
+					$b['icon']      = 'fa-stamp';
+					$b['title']     = 'Menunggu Stempel Resmi TU';
+					$b['desc']      = 'Surat telah ditandatangani Kepala Sekolah dan saat ini sedang dalam proses pembubuhan stempel resmi Tata Usaha.';
+				} else {
+					$step_num = 3; // Menunggu TTD Kepsek
+					$b['badge_bg']  = '#2563eb';
+					$b['border']    = '#bfdbfe';
+					$b['bg']        = 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)';
+					$b['label']     = 'PROSES TTD KEPSEK';
+					$b['icon']      = 'fa-pen-fancy';
+					$b['title']     = 'Menunggu Tanda Tangan Kepsek';
+					$b['desc']      = 'Surat telah diverifikasi TU dan sedang dalam antrean pemeriksaan serta penandatanganan oleh Kepala Sekolah.';
+				}
+			} else {
+				$step_num = 2; // Menunggu Verifikasi TU
+			}
 		?>
-			<!-- Horizontal Stepper Tracker Card (Matches Image Design) -->
+			<!-- Horizontal Stepper Tracker Card (SOP Resmi 5 Tahap) -->
 			<div class="tracking-stepper-card">
 				<div class="tracking-stepper">
-					<!-- Step 1: Pengajuan -->
+					<!-- Step 1: Pengajuan Surat -->
 					<div class="tracking-step completed">
 						<div class="tracking-step-circle">
 							<i class="fa-solid fa-check"></i>
@@ -150,13 +180,13 @@ $badges = array(
 					</div>
 
 					<!-- Step 2: Verifikasi TU -->
-					<div class="tracking-step <?= $is_rejected ? 'rejected' : ($st_act > 2 ? 'completed' : ($st_act == 2 ? 'active' : '')) ?>">
+					<div class="tracking-step <?= $is_rejected ? 'rejected' : ($step_num > 2 ? 'completed' : ($step_num == 2 ? 'active' : '')) ?>">
 						<div class="tracking-step-circle">
 							<?php if ($is_rejected): ?>
 								<i class="fa-solid fa-xmark"></i>
-							<?php elseif ($st_act > 2): ?>
+							<?php elseif ($step_num > 2): ?>
 								<i class="fa-solid fa-check"></i>
-							<?php elseif ($st_act == 2): ?>
+							<?php elseif ($step_num == 2): ?>
 								<i class="fa-solid fa-hourglass-half"></i>
 							<?php else: ?>
 								<i class="fa-regular fa-clock"></i>
@@ -165,38 +195,38 @@ $badges = array(
 						<div class="tracking-step-label">Verifikasi TU</div>
 					</div>
 
-					<!-- Step 3: Pemeriksaan Sekolah / Draft -->
-					<div class="tracking-step <?= ($st_act > 3 && !$is_rejected) ? 'completed' : ($st_act == 3 ? 'active' : '') ?>">
+					<!-- Step 3: Tanda Tangan Kepala Sekolah -->
+					<div class="tracking-step <?= ($step_num > 3 && !$is_rejected) ? 'completed' : ($step_num == 3 ? 'active' : '') ?>">
 						<div class="tracking-step-circle">
-							<?php if ($st_act > 3 && !$is_rejected): ?>
+							<?php if ($step_num > 3 && !$is_rejected): ?>
 								<i class="fa-solid fa-check"></i>
-							<?php elseif ($st_act == 3): ?>
-								<i class="fa-regular fa-file-lines"></i>
-							<?php else: ?>
-								<i class="fa-regular fa-file"></i>
-							<?php endif; ?>
-						</div>
-						<div class="tracking-step-label">Pemeriksaan Sekolah</div>
-					</div>
-
-					<!-- Step 4: Penandatanganan Kepala Sekolah -->
-					<div class="tracking-step <?= ($st_act > 4 && !$is_rejected) ? 'completed' : ($st_act == 4 ? 'active' : '') ?>">
-						<div class="tracking-step-circle">
-							<?php if ($st_act > 4 && !$is_rejected): ?>
-								<i class="fa-solid fa-check"></i>
-							<?php elseif ($st_act == 4): ?>
+							<?php elseif ($step_num == 3): ?>
 								<i class="fa-solid fa-pen-fancy"></i>
 							<?php else: ?>
 								<i class="fa-solid fa-pen"></i>
 							<?php endif; ?>
 						</div>
-						<div class="tracking-step-label">Penandatangan Kepala Sekolah</div>
+						<div class="tracking-step-label">Tanda Tangan Kepsek</div>
+					</div>
+
+					<!-- Step 4: Stempel Resmi TU -->
+					<div class="tracking-step <?= ($step_num > 4 && !$is_rejected) ? 'completed' : ($step_num == 4 ? 'active' : '') ?>">
+						<div class="tracking-step-circle">
+							<?php if ($step_num > 4 && !$is_rejected): ?>
+								<i class="fa-solid fa-check"></i>
+							<?php elseif ($step_num == 4): ?>
+								<i class="fa-solid fa-stamp"></i>
+							<?php else: ?>
+								<i class="fa-solid fa-stamp"></i>
+							<?php endif; ?>
+						</div>
+						<div class="tracking-step-label">Stempel Resmi TU</div>
 					</div>
 
 					<!-- Step 5: Selesai (Unduh / Ambil) -->
-					<div class="tracking-step <?= ($st_act >= 5 && !$is_rejected) ? 'completed' : '' ?>">
+					<div class="tracking-step <?= ($step_num >= 5 && !$is_rejected) ? 'completed' : '' ?>">
 						<div class="tracking-step-circle">
-							<?php if ($st_act >= 5 && !$is_rejected): ?>
+							<?php if ($step_num >= 5 && !$is_rejected): ?>
 								<i class="fa-solid fa-check"></i>
 							<?php else: ?>
 								<i class="fa-solid fa-download"></i>
