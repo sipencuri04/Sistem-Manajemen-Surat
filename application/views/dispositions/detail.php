@@ -73,7 +73,7 @@ $is_overdue = $disp['deadline_date'] && strtotime($disp['deadline_date']) < time
 								<th>Status</th>
 								<th>Progres</th>
 								<th>Catatan &amp; Bukti</th>
-								<th style="width:130px" class="text-end">Aksi</th>
+								<th style="width:160px" class="text-end text-nowrap">Aksi</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -91,7 +91,7 @@ $is_overdue = $disp['deadline_date'] && strtotime($disp['deadline_date']) < time
 											$emp_wa_msg = "Assalamu'alaikum Bpk/Ibu *" . $r['full_name'] . "*,\nAnda menerima Lembar Disposisi dari Kepala Sekolah:\n- No. Disposisi: *" . $disp['disposition_number'] . "*\n- Sifat: *" . strtoupper($disp['priority']) . "*\n- Instruksi: \"" . $disp['instruction'] . "\"\n- Tenggat: " . ($disp['deadline_date'] ? tgl_indo($disp['deadline_date']) : 'Segera') . "\nBuka sistem untuk melihat berkas: " . site_url('disposisi/detail/'.$disp['id']) . "\nTerima kasih.";
 											$emp_wa_link = build_wa_link($r['phone'], $emp_wa_msg);
 										?>
-											<a href="<?= $emp_wa_link ?>" target="_blank" rel="noopener" class="btn btn-xs btn-outline-success" title="Kirim Instruksi Disposisi via WhatsApp ke <?= e($r['full_name']) ?>">
+											<a href="<?= $emp_wa_link ?>" target="_blank" rel="noopener" class="badge bg-success-subtle text-success border border-success-subtle text-decoration-none px-2 py-1 fw-semibold" title="Kirim Instruksi Disposisi via WhatsApp ke <?= e($r['full_name']) ?>">
 												<i class="fa-brands fa-whatsapp me-1"></i> WA
 											</a>
 										<?php endif; ?>
@@ -126,14 +126,16 @@ $is_overdue = $disp['deadline_date'] && strtotime($disp['deadline_date']) < time
 										</a>
 									<?php endif; ?>
 								</td>
-								<td class="text-end">
+								<td class="text-end text-nowrap">
 									<?php if ($can_edit && ! $r['delegated_to']): ?>
-										<button type="button" class="btn btn-xs btn-primary me-1" data-bs-toggle="modal" data-bs-target="#progressModal_<?= $r['id'] ?>" title="Update Progres">
-											<i class="fa-solid fa-pen-to-square"></i> Update
-										</button>
-										<button type="button" class="btn btn-xs btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#delegateModal_<?= $r['id'] ?>" title="Delegasikan Ulang">
-											<i class="fa-solid fa-share"></i>
-										</button>
+										<div class="d-inline-flex align-items-center gap-1 justify-content-end">
+											<button type="button" class="btn btn-sm btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#progressModal_<?= $r['id'] ?>" title="Update Progres">
+												<i class="fa-solid fa-pen-to-square me-1"></i> Update
+											</button>
+											<button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#delegateModal_<?= $r['id'] ?>" title="Delegasikan Ulang Tugas">
+												<i class="fa-solid fa-share"></i>
+											</button>
+										</div>
 									<?php endif; ?>
 								</td>
 							</tr>
