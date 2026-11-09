@@ -42,3 +42,4 @@ WHERE r.letter_id IS NOT NULL
   AND l.approval_status = 'disetujui'
   AND l.stamp_type IN ('digital', 'basah')
   AND r.status = 'processed';
+

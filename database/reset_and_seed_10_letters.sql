@@ -10,12 +10,14 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- 1. HAPUS SEMUA DATA SURAT LAMA TERLEBIH DAHULU (MENGGUNAKAN DELETE AGAR AMAN DARI ERROR FOREIGN KEY #1701)
 DELETE FROM `letter_files`;
+DELETE FROM `letter_counters`;
 DELETE FROM `disposition_activities`;
 DELETE FROM `disposition_recipients`;
 DELETE FROM `dispositions`;
 DELETE FROM `letter_requests`;
 DELETE FROM `incoming_letters`;
 DELETE FROM `letters`;
+DELETE FROM `queue_tickets`;
 DELETE FROM `notifications` WHERE `type` IN ('surat_masuk', 'persetujuan', 'disposisi', 'permohonan');
 
 -- Reset Auto Increment ID kembali ke 1
@@ -26,6 +28,7 @@ ALTER TABLE `dispositions` AUTO_INCREMENT = 1;
 ALTER TABLE `letter_requests` AUTO_INCREMENT = 1;
 ALTER TABLE `incoming_letters` AUTO_INCREMENT = 1;
 ALTER TABLE `letters` AUTO_INCREMENT = 1;
+ALTER TABLE `queue_tickets` AUTO_INCREMENT = 1;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
