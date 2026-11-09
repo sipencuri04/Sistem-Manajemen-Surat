@@ -1,6 +1,6 @@
 -- =============================================================================
 -- DATA AKUN TESTING PERSURATAN SMK
--- Email yang sama: noxapremia02@gmail.com
+-- Email yang sama: noxapremia2@gmail.com
 -- No. WA yang sama: +62 877-4177-7837
 -- Password default semua akun testing: testing123
 -- Bcrypt Hash: $2y$10$ctRwUdfOit.mI.dze23cBuBljAmU/NvZbK.tG1sfsfVaJqMSJU6Aa
@@ -17,7 +17,7 @@ INSERT INTO `users` (
   '19720315 199802 1 003',
   'Kepala Sekolah',
   '+62 877-4177-7837',
-  'noxapremia02@gmail.com',
+  'noxapremia2@gmail.com',
   'kepala_sekolah',
   1,
   NOW()
@@ -42,7 +42,7 @@ INSERT INTO `users` (
   '19890520 201403 2 006',
   'Staf Administrasi & Persuratan TU',
   '+62 877-4177-7837',
-  'noxapremia02@gmail.com',
+  'noxapremia2@gmail.com',
   'tu',
   1,
   NOW()
@@ -67,7 +67,7 @@ INSERT INTO `users` (
   '19920810 201902 1 007',
   'Guru Produktif / Ka. Bengkel TKJ',
   '+62 877-4177-7837',
-  'noxapremia02@gmail.com',
+  'noxapremia2@gmail.com',
   'pegawai',
   1,
   NOW()
@@ -92,7 +92,7 @@ INSERT INTO `users` (
   '19850101 201001 1 001',
   'Superuser Administrator',
   '+62 877-4177-7837',
-  'noxapremia02@gmail.com',
+  'noxapremia2@gmail.com',
   'superuser',
   1,
   NOW()
@@ -109,6 +109,6 @@ INSERT INTO `users` (
 -- Opsional: Jika ingin meng-update semua akun bawaan (admin, kepsek, tu, pegawai1) dengan email & WA yang sama:
 UPDATE `users` SET 
   `phone` = '+62 877-4177-7837', 
-  `email` = 'noxapremia02@gmail.com'
+  `email` = 'noxapremia2@gmail.com'
 WHERE `username` IN ('admin', 'superuser', 'kepsek', 'tu', 'pegawai1', 'pegawai2');
 

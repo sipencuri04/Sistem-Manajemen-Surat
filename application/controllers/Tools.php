@@ -121,7 +121,7 @@ class Tools extends CI_Controller
 			'requester_name'  => 'Noxa Aulia Pratama',
 			'requester_class' => 'XII TKJ 1',
 			'requester_phone' => '+62 877-4177-7837',
-			'requester_email' => 'noxapremia02@gmail.com',
+			'requester_email' => 'noxapremia2@gmail.com',
 			'content_data'    => json_encode(array(
 				'nama'            => 'Noxa Aulia Pratama',
 				'nis'             => '10895',
@@ -144,7 +144,7 @@ class Tools extends CI_Controller
 		echo "      - Kode Lacak: $code\n";
 		echo "      - Pemohon: Noxa Aulia Pratama (XII TKJ 1)\n";
 		echo "      - No. HP/WA: +62 877-4177-7837\n";
-		echo "      - Email: noxapremia02@gmail.com\n";
+		echo "      - Email: noxapremia2@gmail.com\n";
 		echo "      - Status: pending (Menunggu Diproses TU di menu Permohonan Siswa)\n\n";
 
 		// 2. Data Dummy Surat Masuk dari Instansi
@@ -163,7 +163,7 @@ class Tools extends CI_Controller
 			'is_external'   => 1,
 			'tracking_code' => $tracking,
 			'sender_phone'  => '+62 877-4177-7837',
-			'sender_email'  => 'noxapremia02@gmail.com',
+			'sender_email'  => 'noxapremia2@gmail.com',
 			'created_by'    => 4, // ID staf TU Siti Rahmawati
 		);
 		$inc_id = $this->Incoming_letter_model->insert($inc_data);
@@ -182,7 +182,7 @@ class Tools extends CI_Controller
 	public function seed_test_users()
 	{
 		$phone = '+62 877-4177-7837';
-		$email = 'noxapremia02@gmail.com';
+		$email = 'noxapremia2@gmail.com';
 		$password = 'testing123';
 		$pass_hash = password_hash($password, PASSWORD_BCRYPT);
 

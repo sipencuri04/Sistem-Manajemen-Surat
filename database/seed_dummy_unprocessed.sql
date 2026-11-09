@@ -3,7 +3,7 @@
 -- SMK MUHAMMADIYAH BANDONGAN
 -- Kontak Pengujian:
 --   No. WhatsApp : +62 877-4177-7837
---   Email / Gmail: noxapremia02@gmail.com
+--   Email / Gmail: noxapremia2@gmail.com
 -- =============================================================================
 
 -- 1. SURAT DARI SISTEM (Permohonan Surat Mandiri Siswa - Status: pending / Menunggu)
@@ -27,7 +27,7 @@ INSERT INTO `letter_requests` (
   'Noxa Aulia Pratama',
   'XII TKJ 1',
   '+62 877-4177-7837',
-  'noxapremia02@gmail.com',
+  'noxapremia2@gmail.com',
   '{\"nama\":\"Noxa Aulia Pratama\",\"nis\":\"10895\",\"nisn\":\"0068492088\",\"tempat_lahir\":\"Magelang\",\"tanggal_lahir\":\"2008-04-18\",\"kelas\":\"XII TKJ 1\",\"jurusan\":\"Teknik Komputer dan Jaringan\",\"nama_orang_tua\":\"Bambang Premia S.\",\"keperluan\":\"Persyaratan Pengajuan Beasiswa Pendidikan Prestasi & Bantuan Kuliah Tahun 2026\",\"tahun_pelajaran\":\"2025/2026\"}',
   'Mohon bantuannya Bapak/Ibu TU untuk diproses surat keterangan aktif ini, berkas beasiswa harus segera saya serahkan. Terima kasih.',
   'pending',
@@ -72,7 +72,7 @@ INSERT INTO `incoming_letters` (
   1,
   'SM-NOXA01',
   '+62 877-4177-7837',
-  'noxapremia02@gmail.com',
+  'noxapremia2@gmail.com',
   4,
   NOW()
 );
