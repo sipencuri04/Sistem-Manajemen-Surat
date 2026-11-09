@@ -78,29 +78,6 @@ $menu[] = array('url' => 'akun', 'icon' => 'fa-user-gear', 'label' => 'Pengatura
 	<!-- Non-Blocking Asynchronous FontAwesome Icons -->
 	<link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>" media="print" onload="this.media='all'">
 	<noscript><link rel="stylesheet" href="<?= asset_url('assets/vendor/fontawesome/css/all.min.css') ?>"></noscript>
-
-	<!-- Modern Instant Navigation (Speculation Rules API - Chromium 109+ untuk LCP <= 0.10s) -->
-	<script type="speculationrules">
-	{
-		"prerender": [
-			{
-				"where": {
-					"and": [
-						{ "href_matches": "/*" },
-						{ "not": { "href_matches": "*/logout*" } },
-						{ "not": { "href_matches": "*/*hapus*" } },
-						{ "not": { "href_matches": "*/*delete*" } },
-						{ "not": { "href_matches": "*/*batal*" } },
-						{ "not": { "href_matches": "*/*cetak*" } },
-						{ "not": { "href_matches": "*/*download*" } },
-						{ "not": { "selector_matches": "[data-no-instant]" } }
-					]
-				},
-				"eagerness": "moderate"
-			}
-		]
-	}
-	</script>
 </head>
 <body>
 <div class="app">

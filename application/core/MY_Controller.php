@@ -78,20 +78,20 @@ class MY_Controller extends CI_Controller
 				}
 
 				// Badge surat masuk belum didisposisi (Kepsek & TU)
-				if ($this->db->table_exists('incoming_letters') && in_array($role, array('kepala_sekolah', 'tu', 'superuser', 'admin'), TRUE))
+				if (in_array($role, array('kepala_sekolah', 'tu', 'superuser', 'admin'), TRUE))
 				{
 					$badge_data['pending_incoming_count'] = $this->db->where_in('status', array('baru', 'diteruskan'))->count_all_results('incoming_letters');
 				}
 
 				// Badge disposisi aktif milik pegawai
-				if ($this->db->table_exists('disposition_recipients') && $role === 'pegawai')
+				if ($role === 'pegawai')
 				{
 					$this->load->model('Disposition_model');
 					$badge_data['my_pending_dispositions'] = $this->Disposition_model->count_pending_for_user($user_id);
 				}
 
 				// Badge surat menunggu persetujuan (Kepala Sekolah)
-				if ($this->db->table_exists('letters') && $this->db->field_exists('approval_status', 'letters') && in_array($role, array('kepala_sekolah', 'superuser', 'admin'), TRUE))
+				if (in_array($role, array('kepala_sekolah', 'superuser', 'admin'), TRUE))
 				{
 					$badge_data['pending_approvals_count'] = $this->db->where('approval_status', 'menunggu_persetujuan')->count_all_results('letters');
 				}

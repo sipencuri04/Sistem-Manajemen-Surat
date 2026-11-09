@@ -540,5 +540,9 @@ class Schema_upgrade
 				$db->query("ALTER TABLE `school_settings` ADD COLUMN `queue_video_url` VARCHAR(255) NULL DEFAULT NULL COMMENT 'URL Video Profil YouTube pada Display TV'");
 			}
 		}
+
+		$db->db_debug = $debug;
+		@file_put_contents($this->flag_file(), date('Y-m-d H:i:s'));
+		return TRUE;
 	}
 }
