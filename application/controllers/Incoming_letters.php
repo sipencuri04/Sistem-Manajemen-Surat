@@ -16,9 +16,15 @@ class Incoming_letters extends Admin_Controller
 
 	public function index()
 	{
+		$status = (string) $this->input->get('status', TRUE);
+		if ($status === '' && $this->input->get('status') === NULL)
+		{
+			$status = 'semua';
+		}
+
 		$filters = array(
 			'q'      => substr(trim((string) $this->input->get('q', TRUE)), 0, 100),
-			'status' => (string) $this->input->get('status', TRUE),
+			'status' => ($status === 'semua' || $status === '') ? '' : $status,
 			'from'   => (string) $this->input->get('from', TRUE),
 			'to'     => (string) $this->input->get('to', TRUE),
 		);
@@ -34,6 +40,7 @@ class Incoming_letters extends Admin_Controller
 			'diteruskan'  => $this->Incoming_letter_model->count_status('diteruskan'),
 			'didisposisi' => $this->Incoming_letter_model->count_status('didisposisi'),
 			'selesai'     => $this->Incoming_letter_model->count_status('selesai'),
+			'diarsipkan'  => $this->Incoming_letter_model->count_status('diarsipkan'),
 		);
 
 		$this->render('incoming/index', array(
@@ -41,6 +48,7 @@ class Incoming_letters extends Admin_Controller
 			'letters'    => $this->Incoming_letter_model->search($filters, self::PER_PAGE, $offset),
 			'total'      => $total,
 			'filters'    => $filters,
+			'status'     => $status,
 			'counts'     => $counts,
 			'offset'     => $offset,
 			'pagination' => $this->pagination->create_links(),

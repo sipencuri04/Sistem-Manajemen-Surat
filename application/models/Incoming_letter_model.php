@@ -44,7 +44,7 @@ class Incoming_letter_model extends CI_Model
 
 	protected function apply_filters(array $f)
 	{
-		if ( ! empty($f['status']))
+		if ( ! empty($f['status']) && $f['status'] !== 'semua')
 		{
 			$this->db->where('i.status', $f['status']);
 		}
