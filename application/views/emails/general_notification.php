@@ -18,3 +18,4 @@ $options = array(
 );
 
 echo $CI->email_theme->render($options);
+

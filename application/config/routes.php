@@ -71,6 +71,7 @@ $route['jenis-surat/hapus/(:num)']       = 'letter_types/delete/$1';
 // Pengaturan
 $route['pengaturan']                     = 'settings/index';
 $route['pengaturan/tes-email']           = 'settings/test_email';
+$route['pengaturan/reset-data']          = 'settings/reset_data';
 $route['pengaturan/hapus-gambar/(:any)'] = 'settings/remove_image/$1';
 $route['akun']                           = 'account/index';
 

@@ -245,6 +245,94 @@ $text = function ($k, $label, $opts = array()) use ($val, $inv, $fb) {
 </div>
 <?= form_close() ?>
 
+<?php if (in_array(current_user()['role'], array('admin', 'superuser', 'tu'))): ?>
+<!-- Bagian Pemeliharaan & Reset Data -->
+<div class="card border-0 shadow-sm rounded-4 mt-4 mb-4" id="database_section" style="border-left: 4px solid #ef4444 !important; background: #fff5f5;">
+	<div class="card-body p-4">
+		<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+			<div>
+				<h5 class="fw-bold text-danger mb-1"><i class="fa-solid fa-database me-2"></i>Pemeliharaan &amp; Reset Data Transaksi</h5>
+				<p class="text-secondary small mb-0">Fitur untuk membersihkan riwayat surat lama, permohonan siswa, disposisi, dan antrean sebelum memulai pengujian baru.<br><strong>Akun Pengguna, Master Jenis Surat, dan Profil Sekolah tetap 100% aman tersimpan.</strong></p>
+			</div>
+			<div class="d-flex flex-wrap gap-2 flex-shrink-0">
+				<button type="button" class="btn btn-outline-danger fw-semibold px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalResetCleanOnly">
+					<i class="fa-solid fa-trash-can me-1"></i> Kosongkan Total
+				</button>
+				<button type="button" class="btn btn-danger fw-bold px-3 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalResetAndSeed">
+					<i class="fa-solid fa-rotate me-1"></i> Reset &amp; Isi 10 Data Uji Coba
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Reset & Isi 10 Data Baru -->
+<div class="modal fade" id="modalResetAndSeed" tabindex="-1" aria-labelledby="modalResetAndSeedLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content border-0 shadow">
+			<div class="modal-header bg-danger text-white">
+				<h5 class="modal-title fs-6 fw-bold" id="modalResetAndSeedLabel">
+					<i class="fa-solid fa-rotate me-2"></i>Reset &amp; Isi 10 Data Baru
+				</h5>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+			</div>
+			<?= form_open('pengaturan/reset-data') ?>
+				<input type="hidden" name="action_type" value="clean_and_seed">
+				<div class="modal-body p-4">
+					<div class="text-center mb-3">
+						<div class="d-inline-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle" style="width: 64px; height: 64px;">
+							<i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+						</div>
+					</div>
+					<h6 class="fw-bold text-center text-navy mb-2">Bersihkan &amp; Siapkan 10 Data Pengujian Baru?</h6>
+					<p class="small text-muted text-center mb-3">Seluruh riwayat surat masuk, surat keluar, disposisi, tiket antrean, dan permohonan siswa saat ini akan dihapus bersih.</p>
+
+					<div class="bg-light border rounded-3 p-3 small text-secondary">
+						<p class="fw-semibold text-dark mb-1"><i class="fa-solid fa-circle-check text-success me-1"></i> Data yang otomatis disiapkan:</p>
+						<ul class="mb-0 ps-3">
+							<li><strong>5 Surat Masuk Instansi</strong> (Dinas Dikbud, Telkom, BBPMP, Polsek, UNIMMA) status <code>baru</code> siap diproses TU &amp; didisposisikan Kepsek.</li>
+							<li><strong>5 Permohonan Surat Siswa</strong> (SKA, SKL, SKPKL) status <code>pending</code> (Premia Bagus Saputra, Noxa Aulia, dll) dengan kontak WhatsApp &amp; Gmail Anda untuk uji coba notifikasi.</li>
+						</ul>
+					</div>
+				</div>
+				<div class="modal-footer border-top bg-light">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+					<button type="submit" class="btn btn-danger fw-bold"><i class="fa-solid fa-rotate me-1"></i> Ya, Reset &amp; Isi Data Baru</button>
+				</div>
+			<?= form_close() ?>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Kosongkan Total -->
+<div class="modal fade" id="modalResetCleanOnly" tabindex="-1" aria-labelledby="modalResetCleanOnlyLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content border-0 shadow">
+			<div class="modal-header bg-secondary text-white">
+				<h5 class="modal-title fs-6 fw-bold" id="modalResetCleanOnlyLabel">
+					<i class="fa-solid fa-trash-can me-2"></i>Kosongkan Total Data Transaksi
+				</h5>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+			</div>
+			<?= form_open('pengaturan/reset-data') ?>
+				<input type="hidden" name="action_type" value="clean_only">
+				<div class="modal-body p-4 text-center">
+					<div class="d-inline-flex align-items-center justify-content-center bg-secondary-subtle text-secondary rounded-circle mb-3" style="width: 64px; height: 64px;">
+						<i class="fa-solid fa-eraser fa-2x"></i>
+					</div>
+					<h6 class="fw-bold text-navy mb-2">Kosongkan Seluruh Data Transaksi?</h6>
+					<p class="small text-muted mb-0">Semua data surat, permohonan, disposisi, dan antrean akan dihapus tanpa membuat data baru. Database transaksi akan bersih 0 berkas (seperti saat pertama kali instal).</p>
+				</div>
+				<div class="modal-footer border-top bg-light">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+					<button type="submit" class="btn btn-outline-danger fw-semibold"><i class="fa-solid fa-trash-can me-1"></i> Ya, Kosongkan Total</button>
+				</div>
+			<?= form_close() ?>
+		</div>
+	</div>
+</div>
+<?php endif; ?>
+
 <?php foreach ($images as $field => $meta): if (empty($s[$field])) continue; ?>
 	<?= form_open('pengaturan/hapus-gambar/'.$field, array('id' => 'rm_'.$field, 'data-confirm' => 'Hapus '.$meta[0].'?')) ?><?= form_close() ?>
 <?php endforeach; ?>

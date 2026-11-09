@@ -351,4 +351,73 @@ class Settings extends Admin_Controller
 
 		redirect('pengaturan#email_section');
 	}
+
+	/**
+	 * Reset transaksi data & seed data baru (Khusus Admin / Superuser / TU)
+	 */
+	public function reset_data()
+	{
+		$this->require_post();
+		$this->require_role(array('tu', 'admin'));
+
+		$action = $this->input->post('action_type', TRUE); // 'clean_and_seed' atau 'clean_only'
+
+		try
+		{
+			$this->db->query("SET FOREIGN_KEY_CHECKS = 0");
+			$this->db->query("DELETE FROM `letter_files`");
+			$this->db->query("DELETE FROM `letter_counters`");
+			$this->db->query("DELETE FROM `disposition_activities`");
+			$this->db->query("DELETE FROM `disposition_recipients`");
+			$this->db->query("DELETE FROM `dispositions`");
+			$this->db->query("DELETE FROM `letter_requests`");
+			$this->db->query("DELETE FROM `incoming_letters`");
+			$this->db->query("DELETE FROM `letters`");
+			$this->db->query("DELETE FROM `queue_tickets`");
+			$this->db->query("DELETE FROM `notifications` WHERE `type` IN ('surat_masuk', 'persetujuan', 'disposisi', 'permohonan')");
+			$this->db->query("DELETE FROM `audit_logs`");
+
+			$this->db->query("ALTER TABLE `letter_files` AUTO_INCREMENT = 1");
+			$this->db->query("ALTER TABLE `disposition_activities` AUTO_INCREMENT = 1");
+			$this->db->query("ALTER TABLE `disposition_recipients` AUTO_INCREMENT = 1");
+			$this->db->query("ALTER TABLE `dispositions` AUTO_INCREMENT = 1");
+			$this->db->query("ALTER TABLE `letter_requests` AUTO_INCREMENT = 1");
+			$this->db->query("ALTER TABLE `incoming_letters` AUTO_INCREMENT = 1");
+			$this->db->query("ALTER TABLE `letters` AUTO_INCREMENT = 1");
+			$this->db->query("ALTER TABLE `queue_tickets` AUTO_INCREMENT = 1");
+			$this->db->query("ALTER TABLE `audit_logs` AUTO_INCREMENT = 1");
+			$this->db->query("SET FOREIGN_KEY_CHECKS = 1");
+
+			if ($action === 'clean_and_seed')
+			{
+				$sql_file = FCPATH . 'database/reset_and_seed_10_letters.sql';
+				if (is_file($sql_file))
+				{
+					$sql = file_get_contents($sql_file);
+					$queries = explode(';', $sql);
+					foreach ($queries as $q)
+					{
+						$q = trim($q);
+						if ($q !== '' && stripos($q, 'INSERT INTO') !== FALSE)
+						{
+							$this->db->query($q);
+						}
+					}
+				}
+				audit_log('DATABASE_RESET', 'system', 0, 'Reset data transaksi dan isi ulang 10 data pengujian dummy');
+				set_flash('success', '<strong>Berhasil!</strong> Seluruh data transaksi lama telah dibersihkan dan sistem telah diisi dengan <strong>10 data pengujian baru</strong> (5 surat masuk instansi & 5 permohonan siswa). Siap untuk diuji coba!', TRUE);
+			}
+			else
+			{
+				audit_log('DATABASE_RESET', 'system', 0, 'Kosongkan total seluruh data transaksi');
+				set_flash('success', '<strong>Berhasil!</strong> Seluruh data surat masuk, surat keluar, permohonan siswa, disposisi, dan antrean telah <strong>dikosongkan total</strong>. Data Master (Pengguna, Sekolah, Jenis Surat) tetap aman.', TRUE);
+			}
+		}
+		catch (Throwable $e)
+		{
+			set_flash('danger', 'Terjadi kesalahan saat mereset data: ' . $e->getMessage(), TRUE);
+		}
+
+		redirect('pengaturan#database_section');
+	}
 }

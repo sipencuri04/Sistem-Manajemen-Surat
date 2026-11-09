@@ -19,6 +19,7 @@ DELETE FROM `incoming_letters`;
 DELETE FROM `letters`;
 DELETE FROM `queue_tickets`;
 DELETE FROM `notifications` WHERE `type` IN ('surat_masuk', 'persetujuan', 'disposisi', 'permohonan');
+DELETE FROM `audit_logs`;
 
 -- Reset Auto Increment ID kembali ke 1
 ALTER TABLE `letter_files` AUTO_INCREMENT = 1;
@@ -29,6 +30,7 @@ ALTER TABLE `letter_requests` AUTO_INCREMENT = 1;
 ALTER TABLE `incoming_letters` AUTO_INCREMENT = 1;
 ALTER TABLE `letters` AUTO_INCREMENT = 1;
 ALTER TABLE `queue_tickets` AUTO_INCREMENT = 1;
+ALTER TABLE `audit_logs` AUTO_INCREMENT = 1;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
