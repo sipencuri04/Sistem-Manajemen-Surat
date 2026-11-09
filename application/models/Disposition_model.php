@@ -47,6 +47,22 @@ class Disposition_model extends CI_Model
 		return $row;
 	}
 
+	public function for_incoming_letter($incoming_letter_id)
+	{
+		$rows = $this->db->select('d.*, u.full_name AS creator_name, u.position AS creator_position')
+			->from($this->table.' d')
+			->join('users u', 'u.id = d.created_by', 'left')
+			->where('d.incoming_letter_id', (int) $incoming_letter_id)
+			->order_by('d.id', 'ASC')
+			->get()->result_array();
+
+		foreach ($rows as &$r)
+		{
+			$r['recipients'] = $this->recipients($r['id']);
+		}
+		return $rows;
+	}
+
 	public function recipients($disposition_id)
 	{
 		return $this->db->select('r.*, u.full_name, u.nip, u.position, u.email, u.phone,

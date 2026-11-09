@@ -64,11 +64,11 @@ $badges = array(
 		<!-- Search / Query Form Card -->
 		<div class="card border-0 shadow-sm rounded-4 mb-4">
 			<div class="card-body p-3 p-sm-4">
-				<h2 class="h6 fw-bold text-navy mb-2"><i class="fa-solid fa-ticket-simple text-primary me-1"></i> Cek Status Permohonan Lain</h2>
+				<h2 class="h6 fw-bold text-navy mb-2"><i class="fa-solid fa-magnifying-glass text-primary me-1"></i> Pelacakan Surat &amp; Permohonan</h2>
 				<form method="get" action="<?= site_url('permohonan/cek') ?>" class="d-flex gap-2">
-					<input type="text" name="kode" class="form-control rounded-3 text-uppercase fw-bold letter-number" maxlength="15" value="<?= e($code) ?>" placeholder="Masukkan kode permohonan (misal: <?= !empty($request['tracking_code']) ? e($request['tracking_code']) : 'REQ-PREM02' ?>)" aria-label="Kode permohonan" required>
-					<button class="btn btn-primary rounded-3 px-3 px-sm-4" type="submit">
-						<i class="fa-solid fa-magnifying-glass me-1"></i> Cari
+					<input type="text" name="kode" class="form-control rounded-3 text-uppercase fw-bold letter-number" maxlength="30" value="<?= e($code) ?>" placeholder="Contoh: <?= !empty($request['tracking_code']) ? e($request['tracking_code']) : 'REQ-PREM02' ?> atau SM-005/2026" aria-label="Kode permohonan atau agenda surat" required>
+					<button class="btn btn-primary rounded-3 px-3 px-sm-4 fw-semibold" type="submit">
+						<i class="fa-solid fa-magnifying-glass me-1"></i> Lacak
 					</button>
 				</form>
 			</div>

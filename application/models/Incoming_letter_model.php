@@ -112,13 +112,40 @@ class Incoming_letter_model extends CI_Model
 
 	public function find_by_tracking($code)
 	{
-		$clean = strtoupper(trim((string) $code));
-		if ($clean === '') return NULL;
-		return $this->db->select('i.*, u.full_name AS created_by_name')
+		$raw = trim((string) $code);
+		if ($raw === '') return NULL;
+		$clean = strtoupper($raw);
+
+		// 1. Coba exact match di tracking_code
+		$row = $this->db->select('i.*, u.full_name AS created_by_name')
 			->from($this->table.' i')
 			->join('users u', 'u.id = i.created_by', 'left')
 			->where('i.tracking_code', $clean)
 			->get()->row_array();
+		if ($row) return $row;
+
+		// 2. Coba exact match di agenda_number (misal SM-005/2026)
+		$row = $this->db->select('i.*, u.full_name AS created_by_name')
+			->from($this->table.' i')
+			->join('users u', 'u.id = i.created_by', 'left')
+			->where('i.agenda_number', $clean)
+			->get()->row_array();
+		if ($row) return $row;
+
+		// 3. Coba toleransi format agenda_number (misal 'SM-005' tanpa tahun, atau 'SM0052026' tanpa tanda baca)
+		$alphanumeric = preg_replace('/[^A-Za-z0-9]/', '', $clean);
+		$row = $this->db->select('i.*, u.full_name AS created_by_name')
+			->from($this->table.' i')
+			->join('users u', 'u.id = i.created_by', 'left')
+			->group_start()
+				->like('i.agenda_number', $clean)
+				->or_where("REPLACE(REPLACE(REPLACE(UPPER(i.agenda_number), '-', ''), '/', ''), '.', '') = ", $alphanumeric)
+				->or_where('i.letter_number', $clean)
+			->group_end()
+			->order_by('i.id', 'DESC')
+			->get()->row_array();
+
+		return $row ?: NULL;
 	}
 
 	public function generate_tracking_code()

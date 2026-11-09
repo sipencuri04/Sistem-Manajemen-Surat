@@ -148,24 +148,43 @@ class Kirim_surat extends MY_Controller
 	/** Cek status tanda terima surat oleh instansi pengirim. */
 	public function status($code = '')
 	{
-		$code = strtoupper(trim((string) ($code ?: $this->input->get('kode', TRUE))));
+		$raw_code = trim((string) ($code ?: $this->input->get('kode', TRUE)));
+		$code = strtoupper(urldecode($raw_code));
 		$letter = NULL;
+		$dispositions = array();
 		$searched = FALSE;
+
+		// Jika input ternyata kode permohonan siswa (REQ-...), alihkan ke lacak permohonan siswa
+		if (strpos($code, 'REQ-') === 0 || strpos($code, 'REQ') === 0)
+		{
+			$this->load->model('Letter_request_model');
+			if ($this->Letter_request_model->find_by_code($code))
+			{
+				redirect('permohonan/cek?kode='.urlencode($code));
+				return;
+			}
+		}
 
 		if ($code !== '')
 		{
 			$searched = TRUE;
 			$letter = $this->Incoming_letter_model->find_by_tracking($code);
+			if ($letter)
+			{
+				$this->load->model('Disposition_model');
+				$dispositions = $this->Disposition_model->for_incoming_letter((int) $letter['id']);
+			}
 		}
 
-		$is_new = ($code !== '' && $code === (string) $this->session->flashdata('new_ext_tracking'));
+		$is_new = ($code !== '' && $letter && (string)$letter['tracking_code'] === (string) $this->session->flashdata('new_ext_tracking'));
 
 		$this->public_view('public/external_status', array(
-			'page_title' => 'Tanda Terima Pengiriman Surat Kedinasan',
-			'code'       => $code,
-			'letter'     => $letter,
-			'searched'   => $searched,
-			'is_new'     => $is_new,
+			'page_title'   => 'Tanda Terima & Pelacakan Surat Masuk Kedinasan',
+			'code'         => $code,
+			'letter'       => $letter,
+			'dispositions' => $dispositions,
+			'searched'     => $searched,
+			'is_new'       => $is_new,
 		));
 	}
 

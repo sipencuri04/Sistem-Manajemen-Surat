@@ -148,10 +148,23 @@ class Permohonan extends MY_Controller
 	public function cek()
 	{
 		$code = trim((string) $this->input->get('kode', TRUE));
+
+		// Deteksi cerdas: jika kode merujuk pada Surat Masuk / Agenda Kedinasan (misal SM-005/2026 atau SM-XXXXXX)
+		if ($code !== '')
+		{
+			$this->load->model('Incoming_letter_model');
+			$incoming = $this->Incoming_letter_model->find_by_tracking($code);
+			if ($incoming)
+			{
+				redirect('kirim-surat/status/'.urlencode($incoming['tracking_code'] ?: $incoming['agenda_number']));
+				return;
+			}
+		}
+
 		$request = $code !== '' ? $this->Letter_request_model->find_by_code($code) : NULL;
 		$this->public_view('public/status', array(
 			'page_title' => 'Cek Status Permohonan',
-			'code'       => strtoupper(substr(preg_replace('/[^A-Za-z0-9\-]/', '', $code), 0, 15)),
+			'code'       => strtoupper(substr(preg_replace('/[^A-Za-z0-9\-\/]/', '', $code), 0, 30)),
 			'request'    => $request,
 			'searched'   => $code !== '',
 			'is_new'     => $this->session->flashdata('new_request') === ($request ? $request['tracking_code'] : '#'),
