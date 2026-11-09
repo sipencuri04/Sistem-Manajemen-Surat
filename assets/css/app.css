@@ -1261,3 +1261,113 @@ a.list-mobile-item:hover, a.list-mobile-item:active { background: #f7f9fc; color
     width: auto;
   }
 }
+
+/* =====================================================================
+   Pelacakan Surat Stepper Tracker (Mobile-First Timeline)
+   ===================================================================== */
+.tracking-stepper-card {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  padding: 1.25rem 1rem 1rem;
+  margin-bottom: 1.25rem;
+}
+.tracking-stepper {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+.tracking-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 0;
+  text-align: center;
+}
+.tracking-step::before {
+  position: absolute;
+  content: "";
+  border-bottom: 3px solid #e2e8f0;
+  width: 100%;
+  top: 18px;
+  left: -50%;
+  z-index: 1;
+}
+.tracking-step:first-child::before {
+  content: none;
+}
+.tracking-step.completed::before,
+.tracking-step.active::before {
+  border-bottom-color: #10b981;
+}
+.tracking-step-circle {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  transition: all 0.25s ease;
+}
+.tracking-step.completed .tracking-step-circle {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+.tracking-step.active .tracking-step-circle {
+  background: #eff6ff;
+  border-color: #2563eb;
+  color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.16);
+}
+.tracking-step.rejected .tracking-step-circle {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
+}
+.tracking-step-label {
+  font-size: 0.72rem;
+  line-height: 1.25;
+  color: #64748b;
+  font-weight: 500;
+  max-width: 76px;
+  word-wrap: break-word;
+}
+.tracking-step.active .tracking-step-label {
+  color: #2563eb;
+  font-weight: 700;
+}
+.tracking-step.completed .tracking-step-label {
+  color: #0f172a;
+  font-weight: 600;
+}
+@media (max-width: 480px) {
+  .tracking-stepper-card {
+    padding: 1rem 0.5rem 0.75rem;
+  }
+  .tracking-step-circle {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+  .tracking-step::before {
+    top: 15px;
+  }
+  .tracking-step-label {
+    font-size: 0.65rem;
+    max-width: 60px;
+  }
+}
+
