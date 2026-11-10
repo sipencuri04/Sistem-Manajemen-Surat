@@ -48,6 +48,11 @@ class Notifications extends Admin_Controller
 		redirect('notifikasi');
 	}
 
+	public function mark_as_read($id = 0)
+	{
+		return $this->read($id);
+	}
+
 	public function mark_all_read()
 	{
 		$this->require_post();

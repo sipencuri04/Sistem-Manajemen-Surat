@@ -116,7 +116,7 @@ $route['pengguna/status/(:num)']         = 'users/toggle_status/$1';
 
 // Notifikasi Internal
 $route['notifikasi']                      = 'notifications/index';
-$route['notifikasi/baca/(:num)']          = 'notifications/mark_as_read/$1';
+$route['notifikasi/baca/(:num)']          = 'notifications/read/$1';
 $route['notifikasi/baca-semua']           = 'notifications/mark_all_read';
 
 // Log & Backup Sistem (Superuser)
